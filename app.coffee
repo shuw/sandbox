@@ -9,7 +9,8 @@ app = module.exports = express.createServer()
 app.configure(() ->
 	app.set 'view engine', 'jade'
 	app.set 'views', "#{__dirname}/views"
-	
+
+	app.use require('connect-assets')()
 	app.use connect.bodyParser()
 	app.use connect.static(__dirname + '/public')
 	app.use express.cookieParser()
@@ -34,8 +35,8 @@ app.get '/', (req, res) ->
 	res.render 'index',
 		locals:
 			title: 'Hello World!'
-			
+
 # SERVER
-	
+
 app.listen(1234)
 console.log "Express server listening on port #{app.address().port}"
