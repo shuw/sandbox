@@ -9,6 +9,7 @@ npm install express
 npm install coffee-script
 npm install jade
 npm install connect-assets
+npm install moment
 
 coffee app.coffee
 

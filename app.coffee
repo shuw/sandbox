@@ -1,6 +1,7 @@
 connect = require 'connect'
 express = require 'express'
 jade = require 'jade'
+moment = require 'moment'
 
 app = module.exports = express.createServer()
 
