@@ -5,69 +5,77 @@ w = 1300
 h = 700
 fill = d3.scale.category20()
 
+# TODO: Visualize breakups as well
 Graph =
   init: ->
+    @nodeMap = {}
+    @nodes   = []
+    @links   = []
+
     @vis = d3.select("#chart").append("svg")
       .attr("width", w)
       .attr("height", h)
 
+    # TODO: Order events by date
     d3.json "data/celebrities_started_dating.json", (news_events) =>
-      @processData(news_events)
+      @news_events = news_events
       @start()
 
   processData: (news_events)->
-    @news_events = news_events
-
-    nodeMap = {}
-    @linksToAdd = _(news_events).chain().map((news_event) =>
+    _(news_events).chain().map((news_event) =>
       persons = _(news_event.params).filter (param) ->
         param.name == 'person' || param.name == 'celebrity'
 
       if persons.length >= 2
         # TODO: Handle > 2 params
-        param_nodes = _(news_event.params).map (param) ->
-          node = (nodeMap[param.topic_id || "param_#{param.id}"] ||= param)
+        param_nodes = _(news_event.params).map (param) =>
+          key = param.topic_id || "param_#{param.id}"
+          node = @nodeMap[key]
+          unless node
+            node = @nodeMap[key] = param
+            @nodes.push param
+          node
 
-        return source: param_nodes[0], target: param_nodes[1]
+        @links.push source: param_nodes[0], target: param_nodes[1]
+
     ).compact().value()
 
-    @links = @linksToAdd
-
-    @nodes = _(nodeMap).values()
-
   start: ->
-     # Precalc
-    firstTimestamp      = moment @news_events[0].date
-    lastTimestamp       = moment _(@news_events).last().date
-    fullDuration        = lastTimestamp - firstTimestamp
-    maxDurationPerFrame = fullDuration * MAX_PCT_PER_FRAME
+    #  # Precalc
+    # firstTimestamp      = moment @news_events[0].date
+    # lastTimestamp       = moment _(@news_events).last().date
+    # fullDuration        = lastTimestamp - firstTimestamp
+    # maxDurationPerFrame = fullDuration * MAX_PCT_PER_FRAME
 
-    # What we're actually displaying
-    current   = firstTimestamp
-    nextIndex = 0
-    nodes = []
-    links = []
+    # # What we're actually displaying
+    # current   = firstTimestamp
 
     @layout = d3.layout.force()
       .gravity(.05)
       .distance(100)
       .charge(-100)
+      .size([w, h])
 
     @refreshData()
-    # setInterval (=>
-    #   @refreshData()
-    # ), UPDATE_INTERVAL
+    setInterval (=>
+      # _(@linksToAdd.splice(0,5)).each (link) =>
+      #   @links.push(link)
+
+
+
+      @processData(@news_events.splice(0, 3))
+      @refreshData()
+    ), 500
 
   refreshData: ->
     @layout
       .nodes(@nodes)
       .links(@links)
-      .size([w, h])
       .start()
 
-    @link = @vis.selectAll("line.link")
-      .data(@links)
-      .enter().append("line")
+    @link = @vis.selectAll("line.link").data(@links)
+
+    @link.enter().append("line")
       .attr("class", "link")
       .style("stroke-width", (d) -> 2)
       .attr("x1", (d) -> d.source.x)
@@ -75,19 +83,23 @@ Graph =
       .attr("x2", (d) -> d.target.x)
       .attr("y2", (d) -> d.target.y)
 
-    @node = @vis.selectAll("g.node")
-      .data(@nodes)
-      .enter().append("svg:g")
+    @link.exit().remove()
+
+    @node = @vis.selectAll("g.node").data(@nodes)
+
+    @node.enter()
+      .append("svg:g")
       .attr("class", "node")
       .call(@layout.drag)
-
-    @node.append("svg:image")
+      .append("svg:image")
       .attr("class", "circle")
       .attr("xlink:href", (d) -> d.topic_image || '/images/fb_no_face.gif' )
       .attr("x", "-20px")
       .attr("y", "-30px")
       .attr("width", "40px")
       .attr("height", "60px")
+
+    @node.exit().remove()
 
     @node.append("title")
       .text((d) -> d.topic_name || d.name)
