@@ -58,11 +58,6 @@ Graph =
 
     @refreshData()
     setInterval (=>
-      # _(@linksToAdd.splice(0,5)).each (link) =>
-      #   @links.push(link)
-
-
-
       @processData(@news_events.splice(0, 3))
       @refreshData()
     ), 500
@@ -74,7 +69,6 @@ Graph =
       .start()
 
     @link = @vis.selectAll("line.link").data(@links)
-
     @link.enter().append("line")
       .attr("class", "link")
       .style("stroke-width", (d) -> 2)
@@ -82,11 +76,9 @@ Graph =
       .attr("y1", (d) -> d.source.y)
       .attr("x2", (d) -> d.target.x)
       .attr("y2", (d) -> d.target.y)
-
     @link.exit().remove()
 
     @node = @vis.selectAll("g.node").data(@nodes)
-
     @node.enter()
       .append("svg:g")
       .attr("class", "node")
@@ -98,7 +90,6 @@ Graph =
       .attr("y", "-30px")
       .attr("width", "40px")
       .attr("height", "60px")
-
     @node.exit().remove()
 
     @node.append("title")
