@@ -10,7 +10,10 @@ $ ->
   d3.json "data/celebrities_started_dating.json", (news_events) ->
     nodeMap = {}
     links = _(news_events).chain().map((news_event) ->
-      if news_event.params.length >= 2
+      persons = _(news_event.params).filter (param) ->
+        param.name == 'person' || param.name == 'celebrity'
+
+      if persons.length >= 2
         # TODO: Handle > 2 params
         param_nodes = _(news_event.params).map (param) ->
           node = (nodeMap[param.topic_id || "param_#{param.id}"] ||= param)
@@ -33,7 +36,7 @@ $ ->
       .data(links)
       .enter().append("line")
       .attr("class", "link")
-      .style("stroke-width", (d) -> Math.sqrt(d.value))
+      .style("stroke-width", (d) -> 2)
       .attr("x1", (d) -> d.source.x)
       .attr("y1", (d) -> d.source.y)
       .attr("x2", (d) -> d.target.x)
