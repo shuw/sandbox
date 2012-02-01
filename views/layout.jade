@@ -3,7 +3,9 @@ html(lang="en")
   head
     meta(charset="utf-8")
     title= title
-    != js('dependencies')
+    != js('vendor/d3')
+    != js('vendor/jquery-1.7.1')
+    != js('vendor/underscore')
     != js('viz')
   body
     != body

@@ -5,4 +5,3 @@
 #= require d3/d3.geom.js
 #= require d3/d3.layout.js
 #= require d3/d3.time.js
-#= require jquery-1.7.1.js

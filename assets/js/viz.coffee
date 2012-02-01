@@ -7,6 +7,10 @@ vis = d3.select("#chart").append("svg")
    .attr("height", h)
 
 d3.json "data/celebrities_started_dating.json", (json) ->
+  debugger
+  
+
+
   force = d3.layout.force()
     .charge(-120)
     .linkDistance(30)
