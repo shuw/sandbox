@@ -17,14 +17,16 @@ Graph =
       .attr("height", h)
 
     # TODO: Order events by date
-    d3.json "data/celebrities_started_dating.json", (news_events) =>
+    d3.json "data/org_acquired_another_org.json", (news_events) =>
       @news_events = news_events
       @start()
 
   processData: (news_events)->
     _(news_events).chain().map((news_event) =>
       persons = _(news_event.params).filter (param) ->
-        param.name == 'person' || param.name == 'celebrity'
+        return true if param.name == 'person' || param.name == 'celebrity'
+        return true if param.name == 'org1'|| param.name == 'org2'
+        return false
 
       if persons.length >= 2
         # TODO: Handle > 2 params
@@ -33,6 +35,7 @@ Graph =
           node = @nodeMap[key]
           unless node
             node = @nodeMap[key] = param
+
             @nodes.push param
           node
 
@@ -52,7 +55,7 @@ Graph =
 
     @layout = d3.layout.force()
       .gravity(.05)
-      .distance(100)
+      .distance(80)
       .charge(-100)
       .size([w, h])
 
