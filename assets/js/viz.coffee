@@ -6,6 +6,8 @@ h = 700
 fill = d3.scale.category20()
 
 # TODO: Visualize breakups as well
+# - make people with more connections bigger
+# - add keyboard highlighting
 window.Graph =
   init: (data_path) ->
     @nodeMap = {}
