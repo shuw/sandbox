@@ -6,8 +6,8 @@ h = 700
 fill = d3.scale.category20()
 
 # TODO: Visualize breakups as well
-Graph =
-  init: ->
+window.Graph =
+  init: (data_path) ->
     @nodeMap = {}
     @nodes   = []
     @links   = []
@@ -16,8 +16,10 @@ Graph =
       .attr("width", w)
       .attr("height", h)
 
+    data_path ||= 'celebrities_started_dating'
+
     # TODO: Order events by date
-    d3.json "data/org_acquired_another_org.json", (news_events) =>
+    d3.json "data/#{data_path}.json", (news_events) =>
       @news_events = news_events
       @start()
 
@@ -61,7 +63,7 @@ Graph =
 
     @refreshData()
     setInterval (=>
-      @processData(@news_events.splice(0, 3))
+      @processData(@news_events.splice(0, 5))
       @refreshData()
     ), 500
 
@@ -107,5 +109,3 @@ Graph =
       .attr("y2", (d) -> d.target.y)
 
     @node.attr "transform", (d) -> "translate(#{d.x},#{d.y})"
-
-$ => Graph.init()

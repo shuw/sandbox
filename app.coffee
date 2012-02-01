@@ -35,7 +35,8 @@ app.configure 'production', () ->
 app.get '/', (req, res) ->
 	res.render 'index',
 		locals:
-			title: '| - |'
+			data_path: 	req.query["data"]
+			title: 			'/|/|/'
 
 # SERVER
 
