@@ -2,14 +2,31 @@
 
 header
   style
+    body {
+      font-family: sans-serif;
+    }
+
     .cell {
       border: solid 1px white;
-      font: 10px sans-serif;
       line-height: 12px;
       overflow: hidden;
       position: absolute;
       text-indent: 2px;
+      font-sze: 10px;
+      cursor: pointer !important;
+    }
+
+    #pop-over {
+      position: fixed;
+      z-index: 1;
+      background-color: black;
+      opacity: 0.5;
+      color: white;
+      padding: 5px 20px;
+      right: 0px;
+      max-width: 500px
     }
 
 body
+  #pop-over
   #chart
