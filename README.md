@@ -11,7 +11,10 @@ npm install jade
 npm install connect-assets
 npm install moment
 
-coffee app.coffee
+
+## Start server
+
+supervisor app.js # if supervisor is installed
 
 or
 

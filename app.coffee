@@ -33,10 +33,20 @@ app.configure 'production', () ->
 # ROUTES
 
 app.get '/', (req, res) ->
+	res.render 'index',
+	locals:
+		title: 			'Experiments'
+
+app.get '/topic_graph', (req, res) ->
 	res.render 'topic_graph',
 		locals:
 			data_path: 	req.query["data"]
 			title: 			'/|/|/'
+
+app.get '/news_viz', (req, res) ->
+	res.render 'news_viz',
+		locals:
+			title: 			'News Visualization'
 
 # SERVER
 
