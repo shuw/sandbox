@@ -19,3 +19,7 @@ nodemon app.coffee
 
 # or else
 node app.js
+
+## Use
+
+http://localhost:1234
