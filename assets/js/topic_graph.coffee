@@ -18,8 +18,6 @@ window.TopicGraph =
       .attr("width", w)
       .attr("height", h)
 
-    data_path ||= 'celebrities_started_dating'
-
     # TODO: Order events by date
     d3.json "data/#{data_path}.json", (news_events) =>
       @news_events = news_events

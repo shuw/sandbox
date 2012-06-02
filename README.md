@@ -8,19 +8,14 @@ npm install connect
 npm install express
 npm install coffee-script
 npm install jade
+npm install less
 npm install connect-assets
 npm install moment
 
-
 ## Start server
 
-supervisor app.js # if supervisor is installed
+# if using nodemon
+nodemon app.coffee
 
-or
-
+# or else
 node app.js
-
-```
-
-## Template used
-http://github.com/alfrednerstu/node-express-coffeescript.git

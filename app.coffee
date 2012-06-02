@@ -40,7 +40,7 @@ app.get '/', (req, res) ->
 app.get '/topic_graph', (req, res) ->
 	res.render 'topic_graph',
 		locals:
-			data_path: 	req.query["data"]
+			data_path: 	req.query["data"] || 'celebrities_started_dating'
 			title: 			'/|/|/'
 
 app.get '/news_viz', (req, res) ->
