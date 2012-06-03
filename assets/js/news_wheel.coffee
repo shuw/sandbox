@@ -1,6 +1,6 @@
 columns = 5
 padding = 20
-max_images = 50
+max_images = 10
 width = Math.max(800, $(window).width() - 40)
 column_width = (width / columns) - (padding * 2)
 
@@ -22,9 +22,11 @@ $ ->
       .map((n) ->
         params = if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten()
         {
+          event: n
           date: moment(n.date)
           headline: n.headline
-          topic_images: params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().value()
+          topic_images: params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(4).value()
+          topic_names: params.map((p) -> p.topic?.name).compact().value()
           event_image: _.chain(n.images).map((i) -> get_image(i, 400)).compact().value()[0]
         })
       .filter((n) -> n.event_image && n.topic_images.length)
@@ -32,23 +34,44 @@ $ ->
 
     # Layout
     c_pos = []
-    _(column_width).times -> c_pos.push(0)
+    _(column_width).times -> c_pos.push(10) # Initialize y coordinates
     news.each((n, i) ->
+        # naively just layout events in stacked columns
         c_i = (i % columns)
+
         _(n).extend
-          x: c_i * (column_width + padding)
+          x: (c_i * (column_width + padding) + 10)
           y: c_pos[c_i]
 
         size = n.event_image.size
-        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding
+        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 70
       )
 
     root.selectAll('div')
       .data(news.first(max_images).value())
       .enter()
-        .append('img')
+        .append('div')
         .attr('class', 'cell')
-        .attr('src', (d) -> d.event_image.url)
-        .attr('width', column_width)
-        .style('left', (d) -> "#{d.x}px")
-        .style('top', (d) -> "#{d.y}px")
+        .call(construct_image_cells)
+
+
+construct_image_cells = ->
+  @style('left', (d) -> "#{d.x}px")
+    .style('top', (d) -> "#{d.y}px")
+
+  @append('img')
+    .attr('src', (d) -> d.event_image.url)
+    .attr('width', column_width)
+
+  @append('div').selectAll('img')
+    .data((d) -> d.topic_images)
+    .enter()
+      .append('img')
+      .attr('src', (d) -> d.url)
+      .attr('width', "50px")
+      .style('padding-right', "20px")
+
+  @append('div')
+    .attr('class', 'actors')
+    .text((d) -> ("Starring: " + d.topic_names.join(', ')))
+    .style('width', "#{column_width}px")
