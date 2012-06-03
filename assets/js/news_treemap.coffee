@@ -6,7 +6,7 @@ $ ->
   treemap = d3.layout.treemap()
       .size([width, height])
       .sticky(true)
-      .value((d) -> d.size)
+      .value((d) -> d.articles_count)
 
   chart = d3.select('#chart').append('div')
       .style('position', 'relative')
