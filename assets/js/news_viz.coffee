@@ -28,18 +28,18 @@ $ ->
           {
             type: 'relation'
             name: relation_type,
-            children: _.chain(news).map(
-                (n) ->
-                  (
-                    if n.summary
-                      topics = _.chain(n.summary.entities).map((e) -> e.topic)
-                    else
-                      topics = _.chain(n.params).flatten().map((p) -> p.topic)
-                  ).compact().filter((t) -> !t.staff_only ).map((t) -> {
-                      topic_name: t.name,
-                      event: n
-                    }
-                  ).value())
+            children: _.chain(news).map((n) ->
+              # map news events to all their topics
+              params = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
+              params
+                .filter((p) -> p.topic && !p.topic.staff_only )
+                .map((p) -> {
+                    topic_name: p.topic.name,
+                    topic_images: p.topic_images,
+                    event: n
+                  }
+                ).value()
+              )
               .flatten()
               .groupBy((d) -> d.topic_name)
               .map((matches, topic_name) ->
@@ -48,6 +48,7 @@ $ ->
                   relation_type: matches[0].event.relation_type
                   name: topic_name,
                   size: matches.length
+                  images: matches[0].topic_images,
                   events: _(matches).map((d) -> d.event)
                 })
               .value()
@@ -65,18 +66,27 @@ $ ->
         .call(cell)
 
     div.selectAll('div')
-      .on('mouseover', ((data, evt)->
+      .on('mouseover', ((data)->
         if data.type == 'topic'
-          d3.select('#pop-over')
+          images = data.images?.slice(0, 1) || []
+
+          selection = d3.select('#pop-over')
             .data([data])
             .text((d) -> d.name)
             .style('font-size', '30px')
-            .selectAll('div')
+
+          selection.selectAll('img')
+            .data(images)
+            .enter()
+              .append('img')
+              .attr('src', (d) -> d.sizes[0].url)
+
+          selection.selectAll('div')
             .data(data.events)
             .enter()
                 .append('div')
                 .text((d) -> d.headline)
-                .style('font-size', '15px')
+                .style('font-size', '18px')
         ), true)
 
   cell = ->
