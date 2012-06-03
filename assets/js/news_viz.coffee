@@ -6,7 +6,7 @@ $ ->
   treemap = d3.layout.treemap()
       .size([width, height])
       .sticky(true)
-      .value( (d) -> d.size)
+      .value((d) -> d.size)
 
   chart = d3.select('#chart').append('div')
       .style('position', 'relative')
@@ -54,7 +54,7 @@ $ ->
                 .classed('news_event', true)
         ), true)
 
-    d3.select("#article-count").on "click", -> update_size((d) -> 1)
+    d3.select("#article-count").on "click", -> update_size((d) -> d.articles_count)
     d3.select("#event-count").on "click", -> update_size((d) -> d.size)
 
   cell = ->
@@ -108,6 +108,7 @@ get_news_tree = (news) ->
                 relation_type: matches[0].event.relation_type
                 name: topic_name,
                 size: matches.length
+                articles_count: _.chain(matches).map((d) -> d.event.articles).flatten().size().value()
                 images: matches[0].topic_images,
                 events: _(matches).map((d) -> d.event)
               })
