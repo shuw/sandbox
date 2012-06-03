@@ -44,10 +44,10 @@ app.get '/topic_graph', (req, res) ->
 			data_path: 	req.query["data"] || 'celebrities_started_dating'
 			title: 			'/|/|/'
 
-app.get '/news_viz', (req, res) ->
-	res.render 'news_viz',
+app.get '/news_treemap', (req, res) ->
+	res.render 'news_treemap',
 		locals:
-			title: 			'News Visualization'
+			title: 			'news tree map'
 
 # SERVER
 
