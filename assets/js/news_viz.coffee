@@ -14,13 +14,19 @@ $ ->
       .style('height', height + 'px')
 
   d3.json '/data/news_data.json', (news) ->
+    news = _.chain(news).filter((n) -> !n.errors && !n.staff_only )
+    news.each((n) ->
+        n.date = new Date(n.date)
+        n.relation_type = n.relation_type.split('_').join(' ')
+      )
+    news = news.sortBy((n) -> n.date)
+
     json = {
-      children: _.chain(news)
-        .filter((n) -> !n.errors && !n.staff_only )
+      children: news
         .groupBy('relation_type')
         .map((news, relation_type) ->
           {
-            type: 'relation_type'
+            type: 'relation'
             name: relation_type,
             children: _.chain(news).map(
                 (n) ->
@@ -38,6 +44,8 @@ $ ->
               .groupBy((d) -> d.topic_name)
               .map((matches, topic_name) ->
                 {
+                  type: 'topic'
+                  relation_type: matches[0].event.relation_type
                   name: topic_name,
                   size: matches.length
                   events: _(matches).map((d) -> d.event)
@@ -53,31 +61,30 @@ $ ->
       .enter()
         .append('div')
         .attr('class', 'cell')
-        .style('background', (d) -> if d.children then color(d.name) else null)
+        .style('background', (d) -> if d.type == 'topic' then color(d.relation_type) else null)
         .call(cell)
-        .text( (d) -> if d.children then null else d.name )
 
     div.selectAll('div')
-      .on('mouseover', ->
-        node = d3.select(@)
-        d3.select('#pop-over')
-          .data([node.datum()])
-          .text((d) -> d.name)
-          .style('font-size', '30px')
-          .selectAll('div')
-          .data(node.datum().events)
-          .enter()
-              .append('div')
-              .text((d) -> d.headline)
-              .style('font-size', '15px')
-      )
-
+      .on('mouseover', ((data, evt)->
+        if data.type == 'topic'
+          d3.select('#pop-over')
+            .data([data])
+            .text((d) -> d.name)
+            .style('font-size', '30px')
+            .selectAll('div')
+            .data(data.events)
+            .enter()
+                .append('div')
+                .text((d) -> d.headline)
+                .style('font-size', '15px')
+        ), true)
 
   cell = ->
     @
+      .text( (d) -> d.name )
+      .classed('relation', (d) -> d.children)
+      .classed('topic', (d) -> d.events)
       .style('left', (d) -> d.x + 'px' )
       .style('top', (d) -> d.y + 'px' )
       .style('width', (d) -> Math.max(0, d.dx - 1) + 'px' )
       .style('height', (d) -> Math.max(0, d.dy - 1) + 'px' )
-      .style('color', 'gray')
-      .style('font-size', '10px')
