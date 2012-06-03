@@ -17,17 +17,25 @@ body {
 
   .headline {
     font-size: 20px;
-    color: #555;
+    padding-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    a {
+      text-decoration: none;
+      color: #365D9B;
+    }
   }
 
   img.event { }
 
   img.topic {
-    width: 50px;
-    padding-right: 20px;
+    height: 50px;
+    padding: 5px 10px 2px 0;
   }
 
   .actors {
     color: gray;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

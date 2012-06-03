@@ -1,7 +1,7 @@
 columns = 5
-padding = 20
+padding = 10
 max_images = 100
-width = Math.max(800, $(window).width() - 40)
+width = Math.max(800, $(window).width() - 20)
 column_width = (width / columns) - (padding * 2)
 
 $ ->
@@ -34,12 +34,12 @@ $ ->
           last_from_now = n.date.fromNow()
 
         _(n).extend
-          x: (c_i * (column_width + padding) + 10)
+          x: (c_i * (column_width + (padding * 2)) + 10)
           y: c_pos[c_i]
           show_from_now: show_from_now
 
         size = n.event_image.size
-        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 90
+        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 110
         c_pos[c_i] += 60 if show_from_now
       )
 
@@ -51,11 +51,15 @@ construct_image_cells = ->
 
   # main body
   @append('div').attr('class', 'from_now').text((d) -> if d.show_from_now then d.date.fromNow() else null)
-  @append('div').attr('class', 'headline').text((d) -> d.headline)
+  @append('div').attr('class', 'headline')
+    .append('a').text((d) -> d.headline).attr('target', 'blank').attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+
   @append('img').attr('class', 'event').attr('src', (d) -> d.event_image.url).attr('width', column_width)
 
   # topic images and text
-  @append('div').selectAll('img').data((d) -> d.topic_images).enter().append('img').attr('class', 'topic').attr('src', (d) -> d.url)
+  @append('div').selectAll('img').data((d) -> d.topic_images).enter()
+      .append('img').attr('class', 'topic').attr('src', (d) -> d.url)
+      .attr('width', (d) -> Math.floor((d.size[0] * 50) / d.size[1]) + 'px')
   @append('div').attr('class', 'actors').text((d) -> ("Starring: " + d.topic_names.join(', ')))
 
 # First tries to find an image equal or bigger than requested,
