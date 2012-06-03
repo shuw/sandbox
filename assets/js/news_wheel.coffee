@@ -24,10 +24,9 @@ $ ->
 
     # Layout
     last_from_now = null
-    c_pos = []
-    _(column_width).times -> c_pos.push(10) # Initialize y coordinates
+    c_pos = []; _(column_width).times -> c_pos.push(10) # Initialize column Y coordinates
     news.each((n, i) ->
-        # naively just layout events in stacked columns
+        # TODO: treat each column as a bucket and fir the next item into the shallowest one
         c_i = (i % columns)
 
         if n.date.fromNow() != last_from_now
