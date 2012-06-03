@@ -1,6 +1,6 @@
 columns = 5
 padding = 20
-max_images = 10
+max_images = 1000
 width = Math.max(800, $(window).width() - 40)
 column_width = (width / columns) - (padding * 2)
 
@@ -25,7 +25,7 @@ $ ->
           event: n
           date: moment(n.date)
           headline: n.headline
-          topic_images: params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(4).value()
+          topic_images: params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
           topic_names: params.map((p) -> p.topic?.name).compact().value()
           event_image: _.chain(n.images).map((i) -> get_image(i, 400)).compact().value()[0]
         })
@@ -44,7 +44,7 @@ $ ->
           y: c_pos[c_i]
 
         size = n.event_image.size
-        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 70
+        c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 90
       )
 
     root.selectAll('div')
@@ -59,7 +59,13 @@ construct_image_cells = ->
   @style('left', (d) -> "#{d.x}px")
     .style('top', (d) -> "#{d.y}px")
 
+  @append('div')
+    .attr('class', 'headline')
+    .text((d) -> d.headline)
+    .style('width', "#{column_width}px")
+
   @append('img')
+    .attr('class', 'event')
     .attr('src', (d) -> d.event_image.url)
     .attr('width', column_width)
 
@@ -67,9 +73,8 @@ construct_image_cells = ->
     .data((d) -> d.topic_images)
     .enter()
       .append('img')
+      .attr('class', 'topic')
       .attr('src', (d) -> d.url)
-      .attr('width', "50px")
-      .style('padding-right', "20px")
 
   @append('div')
     .attr('class', 'actors')
