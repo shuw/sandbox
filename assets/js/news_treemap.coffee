@@ -4,14 +4,14 @@ color = d3.scale.category20c()
 
 $ ->
   treemap = d3.layout.treemap()
-      .size([width, height])
-      .sticky(true)
-      .value((d) -> d.articles_count)
+    .size([width, height])
+    .sticky(true)
+    .value((d) -> d.articles_count)
 
-  chart = d3.select('#chart')
-      .style('position', 'relative')
-      .style('width', '#{width}px')
-      .style('height', '#{height}px')
+  root = d3.select('#root')
+    .style('position', 'relative')
+    .style('width', '#{width}px')
+    .style('height', '#{height}px')
 
   d3.json '/data/news_data.json', (news) ->
     news = filter_and_sort(news)
@@ -20,68 +20,57 @@ $ ->
     $('#date-range').text "Showing events from " + news[0].date.fromNow() + ' to ' + news[news.length - 1].date.fromNow()
 
     # Layout
-    chart.data([get_news_tree(news)])
+    root.data([construct_news_tree(news)])
       .selectAll('div')
-        .data(treemap.nodes)
+      .data(treemap.nodes)
       .enter()
         .append('div')
-        .style('background', (d) -> if d.type == 'topic' then color(d.relation_type) else null)
-        .call(cell)
+        .call(construct_cell)
 
-    # Popover
-    chart.selectAll('div')
-      .on('mouseover', ((data)->
-        if data.type == 'topic'
-          images = data.images?.slice(0, 1) || []
-
-          selection = d3.select('#pop-over')
-            .data([data])
-            .text((d) -> d.name)
-            .style('font-size', '30px')
-            .style('display', 'block')
-
-          selection.selectAll('img')
-            .data(images)
-            .enter()
-              .append('img')
-              .attr('src', (d) -> d.sizes[0].url)
-
-          selection.selectAll('div')
-            .data(data.events)
-            .enter()
-                .append('div')
-                .text((d) -> d.headline)
-                .classed('news_event', true)
-        ), true)
-
+    root.selectAll('div').on 'mouseover', (data) -> create_popover(data) if data.type == 'topic'
     d3.select("#article-count").on "click", -> update_size((d) -> d.articles_count)
     d3.select("#event-count").on "click", -> update_size((d) -> d.size)
 
-  cell = ->
-    @text((d) -> d.name )
-      .attr('title', (d) -> d.name )
-      .attr('class', (d) -> 'cell ' + d.type)
-      .style('left', (d) -> d.x + 'px' )
-      .style('top', (d) -> d.y + 'px' )
-      .style('width', (d) -> Math.max(0, d.dx - 1) + 'px' )
-      .style('height', (d) -> Math.max(0, d.dy - 1) + 'px' )
-
   update_size = (get_size) ->
-    chart.selectAll("div")
+    root.selectAll("div")
       .data(treemap.value(get_size))
       .transition().duration(1500)
-      .call(cell)
+      .call(construct_cell)
+
+construct_cell = ->
+  @text((d) -> d.name )
+    .style('background', (d) -> if d.type == 'topic' then color(d.relation_type) else null)
+    .attr('class', (d) -> 'cell ' + d.type)
+    .attr('title', (d) -> d.name)
+    .style('left', (d) -> d.x + 'px')
+    .style('top', (d) -> d.y + 'px')
+    .style('width', (d) -> Math.max(0, d.dx - 1) + 'px')
+    .style('height', (d) -> Math.max(0, d.dy - 1) + 'px')
+
+create_popover = (data) ->
+  images = data.images?.slice(0, 1) || []
+
+  popover = d3.select('#pop-over').data([data])
+    .text((d) -> d.name)
+    .style('display', 'block')
+
+  popover.selectAll('img').data(images)
+    .enter().append('img').attr('src', (d) -> d.sizes[0].url)
+
+  popover.selectAll('div').data(data.events)
+    .enter().append('div').text((d) -> d.headline).attr('class', 'news_event')
 
 filter_and_sort = (news) ->
-  news = _(news).filter((n) -> !n.errors && !n.staff_only )
-  _(news).each((n) ->
+  news = _.chain(news).filter((n) -> !n.errors && !n.staff_only )
+    .tap((news) -> _(news).each((n) ->
       n.date = moment(n.date)
       n.relation_type = n.relation_type.replace('_', ' ')
-    )
-  _(news).sortBy((n) -> n.date)
+    ))
+    .sortBy((n) -> n.date)
+    .value()
 
 # create tree: relations - topics - events
-get_news_tree = (news) ->
+construct_news_tree = (news) ->
   {
     children: _.chain(news)
       .groupBy('relation_type')
