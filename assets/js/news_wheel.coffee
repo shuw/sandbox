@@ -35,16 +35,23 @@ $ ->
     # Layout
     c_pos = []
     _(column_width).times -> c_pos.push(10) # Initialize y coordinates
+    last_from_now = null
     news.each((n, i) ->
         # naively just layout events in stacked columns
         c_i = (i % columns)
 
+        if n.date.fromNow() != last_from_now
+          show_from_now = true
+          last_from_now = n.date.fromNow()
+
         _(n).extend
           x: (c_i * (column_width + padding) + 10)
           y: c_pos[c_i]
+          show_from_now: show_from_now
 
         size = n.event_image.size
         c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 90
+        c_pos[c_i] += 60 if show_from_now
       )
 
     root.selectAll('div')
@@ -58,6 +65,10 @@ $ ->
 construct_image_cells = ->
   @style('left', (d) -> "#{d.x}px")
     .style('top', (d) -> "#{d.y}px")
+
+  @append('div')
+    .attr('class', 'from_now')
+    .text((d) -> if d.show_from_now then d.date.fromNow() else null)
 
   @append('div')
     .attr('class', 'headline')
