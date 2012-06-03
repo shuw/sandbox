@@ -76,7 +76,7 @@ filter_and_sort = (news) ->
   news = _(news).filter((n) -> !n.errors && !n.staff_only )
   _(news).each((n) ->
       n.date = moment(n.date)
-      n.relation_type = n.relation_type.split('_').join(' ')
+      n.relation_type = n.relation_type.replace('_', ' ')
     )
   _(news).sortBy((n) -> n.date)
 

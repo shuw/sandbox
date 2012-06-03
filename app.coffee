@@ -44,10 +44,11 @@ app.get '/topic_graph', (req, res) ->
 			data_path: 	req.query["data"] || 'celebrities_started_dating'
 			title: 			'/|/|/'
 
-app.get '/news_treemap', (req, res) ->
-	res.render 'news_treemap',
+app.get '/:experiment_name', (req, res) ->
+	experiment_name = req.params.experiment_name
+	res.render experiment_name,
 		locals:
-			title: 			'news tree map'
+			title: experiment_name.replace('_', ' ')
 
 # SERVER
 
