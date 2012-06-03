@@ -8,10 +8,10 @@ $ ->
       .sticky(true)
       .value((d) -> d.articles_count)
 
-  chart = d3.select('#chart').append('div')
+  chart = d3.select('#chart')
       .style('position', 'relative')
-      .style('width', width + 'px')
-      .style('height', height + 'px')
+      .style('width', '#{width}px')
+      .style('height', '#{height}px')
 
   d3.json '/data/news_data.json', (news) ->
     news = filter_and_sort(news)
