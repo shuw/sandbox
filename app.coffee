@@ -11,9 +11,10 @@ app.configure(() ->
 	app.set 'view engine', 'jade'
 	app.set 'views', "#{__dirname}/views"
 
+	pub_dir = __dirname + '/public'
 	app.use require('connect-assets')()
 	app.use connect.bodyParser()
-	app.use connect.static(__dirname + '/public')
+	app.use connect.static(pub_dir)
 	app.use express.cookieParser()
 	app.use express.session({secret : "shhhhhhhhhhhhhh!"})
 	app.use express.logger()

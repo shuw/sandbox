@@ -1,0 +1,50 @@
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+.cell {
+  border: solid 1px white;
+  overflow: hidden;
+  position: absolute;
+  text-indent: 2px;
+  font-size: 10px;
+
+  &.relation {
+    font-size: 15px;
+    pointer-events: none;
+    color: #525452;
+    z-index: 1;
+  }
+
+  &.topic {
+    font-size: 10px;
+    color: white;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    opacity: 0.7;
+    cursor: pointer;
+  }
+}
+
+
+#pop-over {
+  position: fixed;
+  z-index: 2;
+  background-color: black;
+  opacity: 0.8;
+  color: white;
+  padding: 5px 20px 10px 20px;
+  right: 0px;
+  max-width: 500px;
+
+  img {
+    float: left;
+    padding: 10px 10px 5px 0;
+    width: 150px
+  }
+}
+
+#date-range {
+  font-size: 20px
+}
