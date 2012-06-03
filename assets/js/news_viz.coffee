@@ -8,7 +8,7 @@ $ ->
       .sticky(true)
       .value( (d) -> d.size)
 
-  div = d3.select('#chart').append('div')
+  chart = d3.select('#chart').append('div')
       .style('position', 'relative')
       .style('width', width + 'px')
       .style('height', height + 'px')
@@ -20,16 +20,16 @@ $ ->
     $('#date-range').text "Showing events from " + news[0].date.fromNow() + ' to ' + news[news.length - 1].date.fromNow()
 
     # Layout
-    div.data([get_news_tree(news)]).selectAll('div')
+    chart.data([get_news_tree(news)])
+      .selectAll('div')
         .data(treemap.nodes)
       .enter()
         .append('div')
-        .attr('class', 'cell')
         .style('background', (d) -> if d.type == 'topic' then color(d.relation_type) else null)
         .call(cell)
 
     # Popover
-    div.selectAll('div')
+    chart.selectAll('div')
       .on('mouseover', ((data)->
         if data.type == 'topic'
           images = data.images?.slice(0, 1) || []
@@ -38,6 +38,7 @@ $ ->
             .data([data])
             .text((d) -> d.name)
             .style('font-size', '30px')
+            .style('display', 'block')
 
           selection.selectAll('img')
             .data(images)
@@ -50,20 +51,26 @@ $ ->
             .enter()
                 .append('div')
                 .text((d) -> d.headline)
-                .style('font-size', '18px')
+                .classed('news_event', true)
         ), true)
 
+    d3.select("#article-count").on "click", -> update_size((d) -> 1)
+    d3.select("#event-count").on "click", -> update_size((d) -> d.size)
+
   cell = ->
-    @
-      .text((d) -> d.name )
+    @text((d) -> d.name )
       .attr('title', (d) -> d.name )
-      .classed('relation', (d) -> d.children)
-      .classed('topic', (d) -> d.events)
+      .attr('class', (d) -> 'cell ' + d.type)
       .style('left', (d) -> d.x + 'px' )
       .style('top', (d) -> d.y + 'px' )
       .style('width', (d) -> Math.max(0, d.dx - 1) + 'px' )
       .style('height', (d) -> Math.max(0, d.dy - 1) + 'px' )
 
+  update_size = (get_size) ->
+    chart.selectAll("div")
+      .data(treemap.value(get_size))
+      .transition().duration(1500)
+      .call(cell)
 
 filter_and_sort = (news) ->
   news = _(news).filter((n) -> !n.errors && !n.staff_only )
