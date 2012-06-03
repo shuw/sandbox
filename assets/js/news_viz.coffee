@@ -14,15 +14,18 @@ $ ->
       .style('height', height + 'px')
 
   d3.json '/data/news_data.json', (news) ->
-    news = _.chain(news).filter((n) -> !n.errors && !n.staff_only )
-    news.each((n) ->
-        n.date = new Date(n.date)
+    news = _(news).filter((n) -> !n.errors && !n.staff_only )
+    _(news).each((n) ->
+        n.date = moment(n.date)
         n.relation_type = n.relation_type.split('_').join(' ')
       )
-    news = news.sortBy((n) -> n.date)
+    news = _(news).sortBy((n) -> n.date)
+    return if news.length < 2
 
-    json = {
-      children: news
+    $('#date-range').text "Showing events from " + news[0].date.fromNow() + ' to ' + news[news.length - 1].date.fromNow()
+
+    tree = {
+      children: _.chain(news)
         .groupBy('relation_type')
         .map((news, relation_type) ->
           {
@@ -57,7 +60,8 @@ $ ->
         .value()
       }
 
-    div.data([json]).selectAll('div')
+    # Layout
+    div.data([tree]).selectAll('div')
         .data(treemap.nodes)
       .enter()
         .append('div')
@@ -65,6 +69,7 @@ $ ->
         .style('background', (d) -> if d.type == 'topic' then color(d.relation_type) else null)
         .call(cell)
 
+    # Popover
     div.selectAll('div')
       .on('mouseover', ((data)->
         if data.type == 'topic'
@@ -91,7 +96,8 @@ $ ->
 
   cell = ->
     @
-      .text( (d) -> d.name )
+      .text((d) -> d.name )
+      .attr('title', (d) -> d.name )
       .classed('relation', (d) -> d.children)
       .classed('topic', (d) -> d.events)
       .style('left', (d) -> d.x + 'px' )
