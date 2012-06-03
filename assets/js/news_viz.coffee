@@ -14,54 +14,13 @@ $ ->
       .style('height', height + 'px')
 
   d3.json '/data/news_data.json', (news) ->
-    news = _(news).filter((n) -> !n.errors && !n.staff_only )
-    _(news).each((n) ->
-        n.date = moment(n.date)
-        n.relation_type = n.relation_type.split('_').join(' ')
-      )
-    news = _(news).sortBy((n) -> n.date)
+    news = filter_and_sort(news)
     return if news.length < 2
 
     $('#date-range').text "Showing events from " + news[0].date.fromNow() + ' to ' + news[news.length - 1].date.fromNow()
 
-    tree = {
-      children: _.chain(news)
-        .groupBy('relation_type')
-        .map((news, relation_type) ->
-          {
-            type: 'relation'
-            name: relation_type,
-            children: _.chain(news).map((n) ->
-              # map news events to all their topics
-              params = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
-              params
-                .filter((p) -> p.topic && !p.topic.staff_only )
-                .map((p) -> {
-                    topic_name: p.topic.name,
-                    topic_images: p.topic_images,
-                    event: n
-                  }
-                ).value()
-              )
-              .flatten()
-              .groupBy((d) -> d.topic_name)
-              .map((matches, topic_name) ->
-                {
-                  type: 'topic'
-                  relation_type: matches[0].event.relation_type
-                  name: topic_name,
-                  size: matches.length
-                  images: matches[0].topic_images,
-                  events: _(matches).map((d) -> d.event)
-                })
-              .value()
-          }
-        )
-        .value()
-      }
-
     # Layout
-    div.data([tree]).selectAll('div')
+    div.data([get_news_tree(news)]).selectAll('div')
         .data(treemap.nodes)
       .enter()
         .append('div')
@@ -104,3 +63,49 @@ $ ->
       .style('top', (d) -> d.y + 'px' )
       .style('width', (d) -> Math.max(0, d.dx - 1) + 'px' )
       .style('height', (d) -> Math.max(0, d.dy - 1) + 'px' )
+
+
+filter_and_sort = (news) ->
+  news = _(news).filter((n) -> !n.errors && !n.staff_only )
+  _(news).each((n) ->
+      n.date = moment(n.date)
+      n.relation_type = n.relation_type.split('_').join(' ')
+    )
+  _(news).sortBy((n) -> n.date)
+
+# create tree: relations - topics - events
+get_news_tree = (news) ->
+  {
+    children: _.chain(news)
+      .groupBy('relation_type')
+      .map((news, relation_type) ->
+        {
+          type: 'relation'
+          name: relation_type,
+          children: _.chain(news).map((n) ->
+            params = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
+            params
+              .filter((p) -> p.topic && !p.topic.staff_only )
+              .map((p) -> {
+                  topic_name: p.topic.name,
+                  topic_images: p.topic_images,
+                  event: n
+                }
+              ).value()
+            )
+            .flatten()
+            .groupBy((d) -> d.topic_name)
+            .map((matches, topic_name) ->
+              {
+                type: 'topic'
+                relation_type: matches[0].event.relation_type
+                name: topic_name,
+                size: matches.length
+                images: matches[0].topic_images,
+                events: _(matches).map((d) -> d.event)
+              })
+            .value()
+        }
+      )
+      .value()
+  }
