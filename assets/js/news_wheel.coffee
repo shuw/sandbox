@@ -1,3 +1,9 @@
+# TODO:
+# - layout topics verticalls and linked
+# - set height on images so there is no jumping around
+# - build API in Wavii frontend-website to get data in real time
+# - infinite scroll
+
 columns_count = 5
 padding = 10
 max_cells = 1000
