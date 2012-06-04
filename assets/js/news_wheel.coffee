@@ -7,8 +7,10 @@ column_width = (width / columns_count) - (padding * 2)
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
 FAKE_REALTIME = true
 
+root = null
+filter_relation_type = 'all'
+
 $ ->
-  filter_relation_type = 'all'
   root = d3.select('#root').style('width', "#{width}px")
 
   d3.json '/data/news_data.json', (news) ->
@@ -61,17 +63,17 @@ $ ->
 
     draw(news)
 
-  draw = (news) ->
-    news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.event.relation_type)
-    apply_layout(news)
+draw = (news) ->
+  news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.event.relation_type)
+  apply_layout(news)
 
-    # construct cells
-    cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
-    cells.enter().append('div').call(construct_image_cells).call(update_positions)
-    cells.exit().transition().duration(1500).style('opacity', 0)
+  # construct cells
+  cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
+  cells.enter().append('div').call(construct_image_cells).call(update_positions)
+  cells.exit().transition().duration(1500).style('opacity', 0)
 
-    # handle layout changes of existing elements
-    cells.transition().duration(1500).call(update_positions).style('opacity', 1)
+  # handle layout changes of existing elements
+  cells.transition().duration(1500).call(update_positions).style('opacity', 1)
 
 
 apply_layout = (news) ->
