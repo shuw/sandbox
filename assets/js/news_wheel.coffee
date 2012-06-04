@@ -84,10 +84,10 @@ update = (news) ->
   # construct cells
   cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
   cells.enter().append('div').call(construct_image_cells).call(update_positions)
-  cells.exit().transition().duration(1500).style('opacity', 0)
+  cells.exit().transition().duration(750).style('opacity', 0).remove()
 
   # handle layout changes of existing elements
-  cells.transition().duration(1500).call(update_positions).style('opacity', 1)
+  cells.transition().duration(1500).call(update_positions)
 
 
 apply_layout = (news) ->
