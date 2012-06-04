@@ -83,7 +83,7 @@ apply_layout = (news) ->
   c_pos = []; _(columns_count).times -> c_pos.push(10) # Initialize column Y coordinates
 
   news.each((n, i) ->
-      unless n.date.fromNow() == from_now_prev || size_current < columns_count
+      unless n.date.fromNow() == from_now_prev || size_current < (columns_count * 3)
         size_current = 0
         show_from_now = true
         from_now_prev = n.date.fromNow()
