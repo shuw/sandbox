@@ -64,7 +64,7 @@ filter_and_sort = (news) ->
   news = _.chain(news).filter((n) -> !n.errors && !n.staff_only )
     .tap((news) -> _(news).each((n) ->
       n.date = moment(n.date)
-      n.relation_type = n.relation_type.replace('_', ' ')
+      n.relation_type = n.relation_type.replace(/_/g, ' ')
     ))
     .sortBy((n) -> n.date)
     .value()

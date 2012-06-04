@@ -34,7 +34,7 @@ $ ->
       .data(relation_types)
       .enter()
         .append('button')
-        .text((d) -> "#{d.relation_type} (#{d.size})")
+        .text((d) -> "#{d.relation_type.replace(/_/g, ' ')} (#{d.size})")
         .on('click', (d) ->
           draw(news.filter((n) -> d.relation_type == 'all' || d.relation_type == n.event.relation_type))
         )
@@ -55,27 +55,32 @@ draw = (news) ->
 
 apply_layout = (news) ->
   last_from_now = null
+  since_last_date_cluster = Number.MAX_VALUE
   # treat each column as a bucket filled up to a y coordinate
   c_pos = []; _(columns_count).times -> c_pos.push(10) # Initialize column Y coordinates
 
   news.each((n, i) ->
-      if n.date.fromNow() == last_from_now
+      if n.date.fromNow() == last_from_now || since_last_date_cluster < 3
         # choose shalloest column
         column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
       else
         n.show_from_now = true
+        since_last_date_cluster = 0
         last_from_now = n.date.fromNow()
 
         # new date header, so align all columns and push
         new_pos = _(c_pos).max() + (if i then 50 else 0)
-        c_pos = _(c_pos).map (v, i) -> new_pos + (if i then 66 else 0)
+        c_pos = _(c_pos).map (v, i) -> new_pos + (if i then 56 else 0)
         column = { pos: c_pos[0], index: 0 }
 
-      n.x = (column.index * (column_width + (padding * 2)) + 10)
-      n.y = column.pos
+      since_last_date_cluster += 1
+      _(n).extend
+        x: (column.index * (column_width + (padding * 2)) + 10)
+        y: column.pos
 
       size = n.event_image.size
-      c_pos[column.index] += ((column_width / size[0]) * size[1]) + padding + 110
+      # push column by stretched image size + padding (to account for topic images)
+      c_pos[column.index] += ((column_width / size[0]) * size[1]) + 140
     )
   news
 
@@ -88,13 +93,17 @@ update_positions = (sel) ->
 
 construct_image_cells = ->
   @attr('class', 'cell')
+
   # main body
   @append('div').attr('class', 'from_now').text((d) -> d.date.fromNow())
   @append('div').attr('class', 'headline')
     .append('a').text((d) -> d.headline)
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+  @append('div').attr('class', 'date')
+    .text((d) -> d.date.format("h:mm a, dddd M/YY"))
 
+  # main image
   @append('a')
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
