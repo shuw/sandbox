@@ -69,9 +69,11 @@ apply_layout = (news) ->
         last_from_now = n.date.fromNow()
 
         # new date header, so align all columns and push
-        new_pos = _(c_pos).max() + (if i then 50 else 0)
-        c_pos = _(c_pos).map (v, i) -> new_pos + (if i then 56 else 0)
+        from_now_header_height = 56
+        new_pos = _(c_pos).max()+ (if i then 50 else 0) # add 50px between date clusters
+        c_pos = _(c_pos).map (v, i) -> new_pos + (if i then from_now_header_height else 0)
         column = { pos: c_pos[0], index: 0 }
+        c_pos[0] += from_now_header_height
 
       since_last_date_cluster += 1
       _(n).extend
