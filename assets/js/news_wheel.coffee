@@ -1,8 +1,8 @@
-columns = 5
+columns_count = 5
 padding = 10
 max_cells = 100
 width = Math.max(800, $(window).width() - 20)
-column_width = (width / columns) - (padding * 2)
+column_width = (width / columns_count) - (padding * 2)
 
 root = null
 $ ->
@@ -54,25 +54,28 @@ draw = (news) ->
 
 
 apply_layout = (news) ->
-  # Layout
   last_from_now = null
-  c_pos = []; _(column_width).times -> c_pos.push(10) # Initialize column Y coordinates
+  # treat each column as a bucket filled up to a y coordinate
+  c_pos = []; _(columns_count).times -> c_pos.push(10) # Initialize column Y coordinates
 
   news.each((n, i) ->
-      # TODO: treat each column as a bucket and fir the next item into the shallowest one
-      c_i = (i % columns)
-
-      if n.date.fromNow() != last_from_now
-        show_from_now = true
+      if n.date.fromNow() == last_from_now
+        # choose shalloest column
+        column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
+      else
+        n.show_from_now = true
         last_from_now = n.date.fromNow()
 
-      n.x = (c_i * (column_width + (padding * 2)) + 10)
-      n.y = c_pos[c_i]
-      n.show_from_now = show_from_now
+        # new date header, so align all columns and push
+        new_pos = _(c_pos).max() + (if i then 50 else 0)
+        c_pos = _(c_pos).map (v, i) -> new_pos + (if i then 66 else 0)
+        column = { pos: c_pos[0], index: 0 }
+
+      n.x = (column.index * (column_width + (padding * 2)) + 10)
+      n.y = column.pos
 
       size = n.event_image.size
-      c_pos[c_i] += ((column_width / size[0]) * size[1]) + padding + 110
-      c_pos[c_i] += 60 if show_from_now
+      c_pos[column.index] += ((column_width / size[0]) * size[1]) + padding + 110
     )
   news
 
