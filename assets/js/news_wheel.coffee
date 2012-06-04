@@ -1,12 +1,11 @@
 columns_count = 5
 padding = 10
-max_cells = 100
+max_cells = 1000
 width = Math.max(800, $(window).width() - 20)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
 FAKE_REALTIME = true
-
 
 $ ->
   filter_relation_type = 'all'
@@ -83,7 +82,7 @@ apply_layout = (news) ->
 
   news.each((n, i) ->
       if n.date.fromNow() == last_from_now || since_last_date_cluster < columns_count
-        # choose shalloest column
+        # choose shallowest column
         column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
       else
         show_from_now = true
