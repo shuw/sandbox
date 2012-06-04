@@ -1,6 +1,6 @@
 columns = 5
 padding = 10
-max_images = 1000
+max_cells = 100
 width = Math.max(800, $(window).width() - 20)
 column_width = (width / columns) - (padding * 2)
 
@@ -26,8 +26,8 @@ $ ->
     relation_types = news
       .groupBy((n) -> n.event.relation_type)
       .sortBy((events, relation_type) -> events.length)
-      .map((events) -> { relation_type: events[0].event.relation_type, size: Math.min(max_images, events.length)})
-      .union([{relation_type: "all", size: Math.min(max_images, news.size().value())}])
+      .map((events) -> { relation_type: events[0].event.relation_type, size: Math.min(max_cells, events.length)})
+      .union([{relation_type: "all", size: Math.min(max_cells, news.size().value())}])
       .reverse().first(7).value()
 
     d3.select('#filters').selectAll('button')
@@ -45,7 +45,7 @@ draw = (news) ->
   apply_layout(news)
 
   # construct cells
-  cells = root.selectAll('div.cell').data(news.first(max_images).value(), (d) -> d.event.news_event_id)
+  cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
   cells.enter().append('div').call(construct_image_cells).call(update_positions)
   cells.exit().transition().duration(1500).style('opacity', 0)
 
