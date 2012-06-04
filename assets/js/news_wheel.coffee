@@ -39,7 +39,7 @@ $ ->
         if event
           event.date = moment()
           news = _.chain([event]).union(news.value())
-          draw(news)
+          update(news)
         _.delay(trickle, (10 + (Math.random() * 15) - 7) * 1000)
 
       _.delay(trickle, 5000)
@@ -58,12 +58,12 @@ $ ->
         .text((d) -> "#{d.relation_type.replace(/_/g, ' ')} (#{d.size})")
         .on('click', (d) ->
           filter_relation_type = d.relation_type
-          draw(news)
+          update(news)
         )
 
-    draw(news)
+    update(news)
 
-draw = (news) ->
+update = (news) ->
   news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.event.relation_type)
   apply_layout(news)
 
@@ -77,36 +77,34 @@ draw = (news) ->
 
 
 apply_layout = (news) ->
-  last_from_now = null
-  since_last_date_cluster = Number.MAX_VALUE
+  from_now_prev = null
+  size_current = Number.MAX_VALUE
   # treat each column as a bucket filled up to a y coordinate
   c_pos = []; _(columns_count).times -> c_pos.push(10) # Initialize column Y coordinates
 
   news.each((n, i) ->
-      if n.date.fromNow() == last_from_now || since_last_date_cluster < columns_count
-        # choose shallowest column
-        column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
-      else
+      unless n.date.fromNow() == from_now_prev || size_current < columns_count
+        size_current = 0
         show_from_now = true
-        since_last_date_cluster = 0
-        last_from_now = n.date.fromNow()
+        from_now_prev = n.date.fromNow()
 
         # new date header, so align all columns and push
         from_now_header_height = 56
-        new_pos = _(c_pos).max()+ (if i then 50 else 0) # add 50px between date clusters
+        new_pos = _(c_pos).max() + (if i then 50 else 0) # add 50px between date clusters
         c_pos = _(c_pos).map (v, i) -> new_pos + (if i then from_now_header_height else 0)
-        column = { pos: c_pos[0], index: 0 }
-        c_pos[0] += from_now_header_height
+        column = pos: c_pos[0], index: 0
 
-      since_last_date_cluster += 1
+      size_current += 1
+      column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
+
       _(n).extend
-        x: (column.index * (column_width + (padding * 2)) + 10)
+        x: column.index * (column_width + (padding * 2)) + 10
         y: column.pos
         show_from_now: show_from_now
 
-      size = n.event_image.size
       # push column by stretched image size + padding (to account for topic images)
-      c_pos[column.index] += ((column_width / size[0]) * size[1]) + 140
+      c_pos[column.index] += (column_width * n.event_image.size[1]) / n.event_image.size[0] + 140
+      c_pos[column.index] += from_now_header_height if show_from_now
     )
   news
 
