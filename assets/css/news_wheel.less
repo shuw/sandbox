@@ -3,39 +3,49 @@ body {
   font-size: 12px;
 }
 
-.cell {
-  position: absolute;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-
-  .from_now {
-    font-size: 40px;
-    padding-bottom: 20px;
-    color: #888;
+#filters {
+  button {
+    margin-right: 10px;
   }
+}
 
-  .headline {
-    font-size: 20px;
-    padding-bottom: 10px;
-    overflow: hidden;
+#root {
+  position: relative;
+
+  .cell {
+    position: absolute;
+    white-space: nowrap;
     text-overflow: ellipsis;
-    a {
-      text-decoration: none;
-      color: #365D9B;
+    overflow: hidden;
+
+    .from_now {
+      font-size: 40px;
+      padding-bottom: 20px;
+      color: #888;
     }
-  }
 
-  img.event { }
+    .headline {
+      font-size: 20px;
+      padding-bottom: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      a {
+        text-decoration: none;
+        color: #365D9B;
+      }
+    }
 
-  img.topic {
-    height: 50px;
-    padding: 5px 10px 2px 0;
-  }
+    img.event { }
 
-  .actors {
-    color: gray;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    img.topic {
+      height: 50px;
+      padding: 5px 10px 2px 0;
+    }
+
+    .actors {
+      color: gray;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
