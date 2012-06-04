@@ -99,7 +99,9 @@ construct_image_cells = ->
   # main body
   @append('div').attr('class', 'from_now').text((d) -> d.date.fromNow())
   @append('div').attr('class', 'headline')
-    .append('a').text((d) -> d.headline)
+    .append('a')
+    .text((d) -> d.headline)
+    .attr('title', (d) -> d.headline)
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
   @append('div').attr('class', 'date')
