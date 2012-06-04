@@ -125,14 +125,14 @@ construct_image_cells = ->
     .text((d) -> d.headline)
     .attr('title', (d) -> d.headline)
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+    .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
   @append('div').attr('class', 'date')
     .text((d) -> d.date.format("h:mm a, dddd M/YY"))
 
   # main image
   @append('a')
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+    .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
     .append('img').attr('class', 'event')
       .attr('src', (d) -> d.event_image.url).attr('width', column_width)
 
