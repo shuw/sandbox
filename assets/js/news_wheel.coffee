@@ -4,8 +4,12 @@ max_cells = 100
 width = Math.max(800, $(window).width() - 20)
 column_width = (width / columns_count) - (padding * 2)
 
-root = null
+# Use for demonstration purposes.... move all news events to recent and trickle in new news events
+FAKE_REALTIME = true
+
+
 $ ->
+  filter_relation_type = 'all'
   root = d3.select('#root').style('width', "#{width}px")
 
   d3.json '/data/news_data.json', (news) ->
@@ -23,6 +27,22 @@ $ ->
         })
       .filter((n) -> n.event_image && n.topic_images.length).uniq((n) -> n.event_image.url)
 
+    if FAKE_REALTIME
+      trickle_in_news = news.first(10).reverse().value()
+      news = news.rest(10)
+      offset = moment() - news.first().value().date
+      news.each (n) -> n.date = moment(n.date + offset)
+
+      trickle = ->
+        event = trickle_in_news.pop()
+        if event
+          event.date = moment()
+          news = _.chain([event]).union(news.value())
+          draw(news)
+        _.delay(trickle, (10 + (Math.random() * 15) - 7) * 1000)
+
+      _.delay(trickle, 5000)
+
     relation_types = news
       .groupBy((n) -> n.event.relation_type)
       .sortBy((events, relation_type) -> events.length)
@@ -36,21 +56,23 @@ $ ->
         .append('button')
         .text((d) -> "#{d.relation_type.replace(/_/g, ' ')} (#{d.size})")
         .on('click', (d) ->
-          draw(news.filter((n) -> d.relation_type == 'all' || d.relation_type == n.event.relation_type))
+          filter_relation_type = d.relation_type
+          draw(news)
         )
 
     draw(news)
 
-draw = (news) ->
-  apply_layout(news)
+  draw = (news) ->
+    news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.event.relation_type)
+    apply_layout(news)
 
-  # construct cells
-  cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
-  cells.enter().append('div').call(construct_image_cells).call(update_positions)
-  cells.exit().transition().duration(1500).style('opacity', 0)
+    # construct cells
+    cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
+    cells.enter().append('div').call(construct_image_cells).call(update_positions)
+    cells.exit().transition().duration(1500).style('opacity', 0)
 
-  # handle layout changes of existing elements
-  cells.transition().duration(1500).call(update_positions).style('opacity', 1)
+    # handle layout changes of existing elements
+    cells.transition().duration(1500).call(update_positions).style('opacity', 1)
 
 
 apply_layout = (news) ->
@@ -64,7 +86,7 @@ apply_layout = (news) ->
         # choose shalloest column
         column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
       else
-        n.show_from_now = true
+        show_from_now = true
         since_last_date_cluster = 0
         last_from_now = n.date.fromNow()
 
@@ -79,6 +101,7 @@ apply_layout = (news) ->
       _(n).extend
         x: (column.index * (column_width + (padding * 2)) + 10)
         y: column.pos
+        show_from_now: show_from_now
 
       size = n.event_image.size
       # push column by stretched image size + padding (to account for topic images)
