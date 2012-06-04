@@ -82,7 +82,7 @@ apply_layout = (news) ->
   c_pos = []; _(columns_count).times -> c_pos.push(10) # Initialize column Y coordinates
 
   news.each((n, i) ->
-      if n.date.fromNow() == last_from_now || since_last_date_cluster < 3
+      if n.date.fromNow() == last_from_now || since_last_date_cluster < columns_count
         # choose shalloest column
         column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
       else
