@@ -3,6 +3,14 @@
 # - set height on images so there is no jumping around
 # - build API in Wavii frontend-website to get data in real time
 # - infinite scroll
+#
+# UI Suggestions from Allen:
+# > make sure headline is 2 lines (at least they can tell what news it is)
+# > add border so each cluster is within it's own region (seem less scattered)
+# > Need to be clear topic images are topics (or just move your Featuring: xxx line to above the topic images)
+# > What do you think of a small [Follow] button below each topic unfollowed? quick way to add, and also signifies they are topics
+# > or we can make a small pin when u hover over topic images and click on them = pin them (following them)
+
 
 columns_count = 5
 padding = 10
