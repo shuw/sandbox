@@ -21,10 +21,10 @@ FAKE_REALTIME = false
 root = null
 filter_relation_type = 'all'
 
-$ ->
+window.news_wheel_init = (data_path) ->
   root = d3.select('#root').style('width', "#{width}px")
 
-  d3.json '/data/news_data.json', (news) ->
+  d3.json data_path, (news) ->
     # Transform news data to what we want
     news = _.chain(news).sortBy((n) -> moment(n.date)).reverse()
       .map((n) ->
