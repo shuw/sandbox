@@ -164,7 +164,7 @@ construct_image_cells = ->
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.news_event_id}")
   content.append('div').attr('class', 'date')
-    .text((d) -> d.date.format("h:mm a, dddd M/YY"))
+    .text((d) -> d.date.format("h:mma, dddd M/DD"))
 
   # main event image
   content.append('a')
