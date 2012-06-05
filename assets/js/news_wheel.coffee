@@ -14,12 +14,12 @@
 
 columns_count = 5
 padding = 10
-max_cells = 1000
+max_cells = 100
 width = Math.max(800, $(window).width() - 20)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
-FAKE_REALTIME = true
+FAKE_REALTIME = false
 
 root = null
 filter_relation_type = 'all'
@@ -31,16 +31,32 @@ $ ->
     # Transform news data to what we want
     news = _.chain(news).sortBy((n) -> moment(n.date)).reverse()
       .map((n) ->
-        params = if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten()
+        topics = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
+          .filter((p) -> p.topic)
+          .map((p) ->
+            image = (p.topic_images && get_image(p.topic_images[0], 200)) || {
+              url: 'http://wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
+              size: [50, 50]
+            }
+            # Scale image to 50px
+            scale = Math.min(50.0 / image.size[0], 50.0 / image.size[1])
+            image.size = [scale * image.size[0], scale * image.size[1]]
+
+            {
+              topic_id: p.topic_id
+              topic: p.topic
+              image: image
+            })
+          .value()
+
         {
           event: n
           date: moment(n.date)
           headline: n.headline
-          topic_images: params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
-          topic_names: params.map((p) -> p.topic?.name).compact().value()
+          topics: topics,
           event_image: _.chain(n.images).map((i) -> get_image(i, 400)).compact().value()[0]
         })
-      .filter((n) -> n.event_image && n.topic_images.length).uniq((n) -> n.event_image.url)
+      .filter((n) -> n.event_image).uniq((n) -> n.event_image.url)
 
     if FAKE_REALTIME
       trickle_in_news = news.first(10).reverse().value()
@@ -117,8 +133,12 @@ apply_layout = (news) ->
         show_from_now: show_from_now
 
       # push column by stretched image size + padding (to account for topic images)
-      c_pos[column.index] += (column_width * n.event_image.size[1]) / n.event_image.size[0] + 140
-      c_pos[column.index] += from_now_header_height if show_from_now
+      height_of_cell = (column_width * n.event_image.size[1]) / n.event_image.size[0] + 90
+      height_of_cell += from_now_header_height if show_from_now
+
+      height_of_cell += n.topics.length * 55
+
+      c_pos[column.index] += height_of_cell
     )
   news
 
@@ -148,13 +168,31 @@ construct_image_cells = ->
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
     .append('img').attr('class', 'event')
-      .attr('src', (d) -> d.event_image.url).attr('width', column_width)
+      .attr('src', (d) -> d.event_image.url)
+      .attr('width', column_width)
 
-  # topic images and text
-  @append('div').selectAll('img').data((d) -> d.topic_images).enter()
-      .append('img').attr('class', 'topic').attr('src', (d) -> d.url)
-      .attr('width', (d) -> Math.floor((d.size[0] * 50) / d.size[1]) + 'px')
-  @append('div').attr('class', 'actors').text((d) -> ("Featuring: " + d.topic_names.join(', ')))
+
+  # params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
+  # # topic images and text
+  @append('div').selectAll('div.participant').data((d) -> d.topics).enter()
+      .append('div')
+      .attr('class', 'participant')
+      .call(construct_participant)
+
+  # @append('div').attr('class', 'actors').text((d) -> ("Featuring: " + d.topic_names.join(', ')))
+
+construct_participant = (data) ->
+  @selectAll('img')
+    .data((d) -> if d.image then [d.image] else [])
+    .enter()
+      .append('img')
+      .attr('src', (d) -> d.url)
+      .attr('width', (d) -> "#{d.size[0]}px")
+      .attr('height', (d) -> "#{d.size[1]}px")
+
+  @append('p').text((d) -> d.topic.name)
+  # params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
+
 
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one
