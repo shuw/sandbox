@@ -34,13 +34,10 @@ $ ->
         topics = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
           .filter((p) -> p.topic)
           .map((p) ->
-            image = (p.topic_images && get_image(p.topic_images[0], 200)) || {
+            image = (p.topic_images && get_image(p.topic_images[0], 50, 50)) || {
               url: 'http://wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
               size: [50, 50]
             }
-            # Scale image to 50px
-            scale = Math.min(50.0 / image.size[0], 50.0 / image.size[1])
-            image.size = [scale * image.size[0], scale * image.size[1]]
 
             {
               topic_id: p.topic_id
@@ -171,31 +168,32 @@ construct_image_cells = ->
       .attr('src', (d) -> d.event_image.url)
       .attr('width', column_width)
 
-
-  # params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
-  # # topic images and text
+  # create partcipant elements for each topic
   @append('div').selectAll('div.participant').data((d) -> d.topics).enter()
       .append('div')
       .attr('class', 'participant')
-      .call(construct_participant)
-
-  # @append('div').attr('class', 'actors').text((d) -> ("Featuring: " + d.topic_names.join(', ')))
-
-construct_participant = (data) ->
-  @selectAll('img')
-    .data((d) -> if d.image then [d.image] else [])
-    .enter()
-      .append('img')
-      .attr('src', (d) -> d.url)
-      .attr('width', (d) -> "#{d.size[0]}px")
-      .attr('height', (d) -> "#{d.size[1]}px")
-
-  @append('p').text((d) -> d.topic.name)
-  # params.map((p) -> p.topic_images && get_image(p.topic_images[0], 200)).compact().first(3).value()
-
+      .call(->
+        @selectAll('img')
+          .data((d) -> if d.image then [d.image] else [])
+          .enter()
+            .append('img')
+            .attr('src', (d) -> d.url)
+            .attr('width', (d) -> "#{d.size[0]}px")
+            .attr('height', (d) -> "#{d.size[1]}px")
+        @append('p').text((d) -> d.topic.name)
+      )
 
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one
-get_image = (generic_image, width) ->
+get_image = (generic_image, width, height) ->
   images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
-  images.find((i) -> i.size[0] >= width).value() || images.last().value()
+  image = images.find((i) -> i.size[0] >= width).value() || images.last().value()
+
+  if image
+    # Scale image to the desired size
+    width ||= image.size[0]
+    height ||= image.size[1]
+    scale = Math.min(width / image.size[0], height / image.size[1])
+    image.size = [scale * image.size[0], scale * image.size[1]]
+
+  image
