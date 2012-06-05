@@ -17,7 +17,7 @@ width = Math.max(800, $(window).width() - (root_left_right_padding * 2) - 10)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
-FAKE_REALTIME = false
+FAKE_REALTIME = true
 
 root = null
 filter_relation_type = 'all'
