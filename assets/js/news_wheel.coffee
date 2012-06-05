@@ -50,7 +50,8 @@ $ ->
           .value()
 
         {
-          event: n
+          relation_type: n.relation_type
+          news_event_id: n.news_event_id
           date: moment(n.date)
           headline: n.headline
           topics: topics,
@@ -75,9 +76,9 @@ $ ->
       _.delay(trickle, 5000)
 
     relation_types = news
-      .groupBy((n) -> n.event.relation_type)
+      .groupBy((n) -> n.relation_type)
       .sortBy((events, relation_type) -> events.length)
-      .map((events) -> { relation_type: events[0].event.relation_type, size: Math.min(max_cells, events.length)})
+      .map((events) -> { relation_type: events[0].relation_type, size: Math.min(max_cells, events.length)})
       .union([{relation_type: "all", size: Math.min(max_cells, news.size().value())}])
       .reverse().first(7).value()
 
@@ -94,11 +95,11 @@ $ ->
     update(news)
 
 update = (news) ->
-  news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.event.relation_type)
+  news = news.filter((n) -> filter_relation_type == 'all' || filter_relation_type == n.relation_type)
   apply_layout(news)
 
   # construct cells
-  cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.event.news_event_id)
+  cells = root.selectAll('div.cell').data(news.first(max_cells).value(), (d) -> d.news_event_id)
   cells.enter().append('div').call(construct_image_cells).call(update_positions)
   cells.exit().transition().duration(750).style('opacity', 0).remove()
 
@@ -161,14 +162,14 @@ construct_image_cells = ->
     .text((d) -> d.headline)
     .attr('title', (d) -> d.headline)
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+    .attr('href', (d) -> "http://wavii.com/news/#{d.news_event_id}")
   content.append('div').attr('class', 'date')
     .text((d) -> d.date.format("h:mm a, dddd M/YY"))
 
   # main event image
   content.append('a')
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
+    .attr('href', (d) -> "http://wavii.com/news/#{d.news_event_id}")
     .append('img').attr('class', 'event')
       .attr('src', (d) -> d.event_image.url)
       .attr('width', (d) -> d.event_image.size[0])
