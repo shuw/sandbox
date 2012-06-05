@@ -3,6 +3,11 @@ body {
   font-size: 12px;
 }
 
+a {
+  text-decoration: none;
+  color: #365D9B;
+}
+
 #filters {
   button {
     margin-right: 10px;
@@ -47,18 +52,29 @@ body {
       position: relative;
       height: 60px;
 
-      img {
+      .avatar {
+        width: 50px;
+        text-align: center;
         float: left;
         padding: 5px 10px 2px 0;
       }
 
-      p {
+      a.name, p.param_name {
         width: 200px;
         position: absolute;
-        left: 65px;
-        font-size: 14px;
-        color: #555;
+        left: 60px;
         float: left;
+
+        &.name {
+          top: 6px;
+          font-size: 14px;
+          color: #555;
+        }
+        &.param_name {
+          font-size: 12px;
+          color: #AAA;
+          top: 13px;
+        }
       }
     }
 

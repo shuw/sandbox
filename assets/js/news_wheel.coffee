@@ -31,6 +31,11 @@ $ ->
     # Transform news data to what we want
     news = _.chain(news).sortBy((n) -> moment(n.date)).reverse()
       .map((n) ->
+        # saturate params with their param name (i.e. 'location', 'person')
+        _(n.params).each (params, key) ->
+          if key != 'left_pkey' && key != 'right_pkey'
+            _(params).each (p) -> p.param_name = key
+
         topics = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
           .filter((p) -> p.topic)
           .map((p) ->
@@ -40,6 +45,7 @@ $ ->
             }
 
             {
+              param_name: p.param_name
               topic_id: p.topic_id
               topic: p.topic
               image: image
@@ -156,31 +162,44 @@ construct_image_cells = ->
     .text((d) -> d.headline)
     .attr('title', (d) -> d.headline)
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
+    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
   @append('div').attr('class', 'date')
     .text((d) -> d.date.format("h:mm a, dddd M/YY"))
 
   # main image
   @append('a')
     .attr('target', 'blank')
-    .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
+    .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
     .append('img').attr('class', 'event')
       .attr('src', (d) -> d.event_image.url)
       .attr('width', (d) -> d.event_image.size[0])
+      .attr('height', (d) -> d.event_image.size[1])
 
   # create partcipant elements for each topic
   @append('div').selectAll('div.participant').data((d) -> d.topics).enter()
       .append('div')
       .attr('class', 'participant')
       .call(->
-        @selectAll('img')
+        @selectAll('a')
           .data((d) -> if d.image then [d.image] else [])
           .enter()
-            .append('img')
-            .attr('src', (d) -> d.url)
-            .attr('width', (d) -> "#{d.size[0]}px")
-            .attr('height', (d) -> "#{d.size[1]}px")
-        @append('p').text((d) -> d.topic.name)
+            .append('a')
+              .attr('class', 'avatar')
+              .attr('target', '_blank')
+              .attr('href', (d) -> "http://wavii.com/topics/#{d.topic_id}")
+              .append('img')
+                .attr('src', (d) -> d.url)
+                .attr('width', (d) -> "#{d.size[0]}px")
+                .attr('height', (d) -> "#{d.size[1]}px")
+
+        @append('a')
+          .attr('class', 'name')
+          .attr('target', '_blank')
+          .attr('href', (d) -> "http://wavii.com/topics/#{d.topic_id}")
+          .text((d) -> d.topic.name)
+        @append('p')
+          .attr('class', 'param_name')
+          .text((d) -> d.param_name)
       )
 
 # First tries to find an image equal or bigger than requested,
