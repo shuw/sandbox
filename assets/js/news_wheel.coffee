@@ -51,7 +51,7 @@ $ ->
           date: moment(n.date)
           headline: n.headline
           topics: topics,
-          event_image: _.chain(n.images).map((i) -> get_image(i, 400)).compact().value()[0]
+          event_image: _.chain(n.images).map((i) -> get_image(i, column_width)).compact().value()[0]
         })
       .filter((n) -> n.event_image).uniq((n) -> n.event_image.url)
 
@@ -130,10 +130,10 @@ apply_layout = (news) ->
         show_from_now: show_from_now
 
       # push column by stretched image size + padding (to account for topic images)
-      height_of_cell = (column_width * n.event_image.size[1]) / n.event_image.size[0] + 90
+      height_of_cell = n.event_image.size[1]
       height_of_cell += from_now_header_height if show_from_now
-
-      height_of_cell += n.topics.length * 55
+      height_of_cell += n.topics.length * 60
+      height_of_cell += 70 # buffer
 
       c_pos[column.index] += height_of_cell
     )
@@ -166,7 +166,7 @@ construct_image_cells = ->
     .attr('href', (d) -> "http://wavii.com/news/be#{d.event.external_id}")
     .append('img').attr('class', 'event')
       .attr('src', (d) -> d.event_image.url)
-      .attr('width', column_width)
+      .attr('width', (d) -> d.event_image.size[0])
 
   # create partcipant elements for each topic
   @append('div').selectAll('div.participant').data((d) -> d.topics).enter()
@@ -190,10 +190,14 @@ get_image = (generic_image, width, height) ->
   image = images.find((i) -> i.size[0] >= width).value() || images.last().value()
 
   if image
-    # Scale image to the desired size
-    width ||= image.size[0]
-    height ||= image.size[1]
-    scale = Math.min(width / image.size[0], height / image.size[1])
+    if height
+      # scale to fit in box
+      width ||= image.size[0]
+      height ||= image.size[1]
+      scale = Math.min(width / image.size[0], height / image.size[1])
+    else
+      scale = width / image.size[0]
+
     image.size = [scale * image.size[0], scale * image.size[1]]
 
   image
