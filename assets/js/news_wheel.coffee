@@ -3,7 +3,6 @@
 # - infinite scroll
 #
 # UI Suggestions from Allen:
-# > make sure headline is 2 lines (at least they can tell what news it is)
 # > What do you think of a small [Follow] button below each topic unfollowed? quick way to add, and also signifies they are topics
 # > or we can make a small pin when u hover over topic images and click on them = pin them (following them)
 
@@ -17,7 +16,7 @@ width = Math.max(800, $(window).width() - (root_left_right_padding * 2) - 10)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
-FAKE_REALTIME = true
+FAKE_REALTIME = false
 
 root = null
 filter_relation_type = 'all'
@@ -137,7 +136,7 @@ apply_layout = (news) ->
       height_of_cell = n.event_image.size[1]
       height_of_cell += from_now_header_height if show_from_now
       height_of_cell += n.topics.length * 60
-      height_of_cell += 100 # buffer
+      height_of_cell += 130 # buffer for headline, and padding
 
       c_pos[column.index] += height_of_cell
     )
