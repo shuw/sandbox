@@ -7,12 +7,12 @@
 # > or we can make a small pin when u hover over topic images and click on them = pin them (following them)
 
 
-columns_count = 5
 padding = 8
 max_cells = 100
 
 root_left_right_padding = 100
 width = Math.max(800, $(window).width() - (root_left_right_padding * 2) - 10)
+columns_count = Math.floor(width / 250)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
