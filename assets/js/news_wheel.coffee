@@ -1,21 +1,19 @@
 # TODO:
-# - layout topics verticalls and linked
-# - set height on images so there is no jumping around
 # - build API in Wavii frontend-website to get data in real time
 # - infinite scroll
 #
 # UI Suggestions from Allen:
 # > make sure headline is 2 lines (at least they can tell what news it is)
-# > add border so each cluster is within it's own region (seem less scattered)
-# > Need to be clear topic images are topics (or just move your Featuring: xxx line to above the topic images)
 # > What do you think of a small [Follow] button below each topic unfollowed? quick way to add, and also signifies they are topics
 # > or we can make a small pin when u hover over topic images and click on them = pin them (following them)
 
 
 columns_count = 5
-padding = 10
+padding = 8
 max_cells = 100
-width = Math.max(800, $(window).width() - 20)
+
+root_left_right_padding = 100
+width = Math.max(800, $(window).width() - (root_left_right_padding * 2) - 10)
 column_width = (width / columns_count) - (padding * 2)
 
 # Use for demonstration purposes.... move all news events to recent and trickle in new news events
@@ -39,9 +37,9 @@ $ ->
         topics = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
           .filter((p) -> p.topic)
           .map((p) ->
-            image = (p.topic_images && get_image(p.topic_images[0], 50, 50)) || {
+            image = (p.topic_images && get_image(p.topic_images[0], 40, 40)) || {
               url: 'http://wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
-              size: [50, 50]
+              size: [40, 40]
             }
 
             {
@@ -57,7 +55,7 @@ $ ->
           date: moment(n.date)
           headline: n.headline
           topics: topics,
-          event_image: _.chain(n.images).map((i) -> get_image(i, column_width)).compact().value()[0]
+          event_image: _.chain(n.images).map((i) -> get_image(i, column_width - 30)).compact().value()[0]
         })
       .filter((n) -> n.event_image).uniq((n) -> n.event_image.url)
 
@@ -122,7 +120,7 @@ apply_layout = (news) ->
         from_now_prev = n.date.fromNow()
 
         # new date header, so align all columns and push
-        from_now_header_height = 56
+        from_now_header_height = 61
         new_pos = _(c_pos).max() + (if i then 50 else 0) # add 50px between date clusters
         c_pos = _(c_pos).map (v, i) -> new_pos + (if i then from_now_header_height else 0)
         column = pos: c_pos[0], index: 0
@@ -131,7 +129,7 @@ apply_layout = (news) ->
       column = _.chain(c_pos).map((v, i) -> {pos: v, index: i}).min((d) -> d.pos).value()
 
       _(n).extend
-        x: column.index * (column_width + (padding * 2)) + 10
+        x: column.index * (column_width + (padding * 2)) + root_left_right_padding
         y: column.pos
         show_from_now: show_from_now
 
@@ -139,7 +137,7 @@ apply_layout = (news) ->
       height_of_cell = n.event_image.size[1]
       height_of_cell += from_now_header_height if show_from_now
       height_of_cell += n.topics.length * 60
-      height_of_cell += 70 # buffer
+      height_of_cell += 100 # buffer
 
       c_pos[column.index] += height_of_cell
     )
@@ -157,17 +155,19 @@ construct_image_cells = ->
 
   # main body
   @append('div').attr('class', 'from_now').text((d) -> d.date.fromNow())
-  @append('div').attr('class', 'headline')
+
+  content = @append('div').attr('class', 'content')
+  content.append('div').attr('class', 'headline')
     .append('a')
     .text((d) -> d.headline)
     .attr('title', (d) -> d.headline)
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
-  @append('div').attr('class', 'date')
+  content.append('div').attr('class', 'date')
     .text((d) -> d.date.format("h:mm a, dddd M/YY"))
 
-  # main image
-  @append('a')
+  # main event image
+  content.append('a')
     .attr('target', 'blank')
     .attr('href', (d) -> "http://wavii.com/news/#{d.event.news_event_id}")
     .append('img').attr('class', 'event')
@@ -176,7 +176,9 @@ construct_image_cells = ->
       .attr('height', (d) -> d.event_image.size[1])
 
   # create partcipant elements for each topic
-  @append('div').selectAll('div.participant').data((d) -> d.topics).enter()
+  content.append('div')
+    .attr('class', 'participants')
+    .selectAll('div.participant').data((d) -> d.topics).enter()
       .append('div')
       .attr('class', 'participant')
       .call(->
