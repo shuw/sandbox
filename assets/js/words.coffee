@@ -43,6 +43,10 @@ $ ->
       .first(200)
       .value()
 
+
+    _dates = _.chain(news).map((n) -> moment(n.date))
+    $('#date_range').text "from " + _dates.min().value().fromNow() + ' - ' + _dates.max().value().fromNow()
+
     redo_layout = _.debounce (-> layout(top_words)), 4000
     $('#root')
       .attr("width", width)
@@ -59,7 +63,7 @@ layout = (weighted_words) ->
 
   font_size = d3.scale
     .linear()
-    .range([10, 80])
+    .range([10, 70])
     .domain([_(weighted_words).last().size, _(weighted_words).first().size])
 
   d3.layout.cloud()
