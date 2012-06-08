@@ -17,8 +17,8 @@ _.mixin(_.string.exports())
 
 skip_topic_names = true
 
-$ ->
-  d3.json 'data/news_data.json', (news) ->
+window.words_init = (data_path, test_mode=false) ->
+  d3.json data_path, (news) ->
     stop_words_dict = {}
     _(stop_words).each (w) -> stop_words_dict[w] = 1
 
