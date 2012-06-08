@@ -12,7 +12,7 @@ headline_line_height = 25
 headline_line_avg_chars = 25
 
 # a chained collection of all news
-all_news = _.chain([])
+_all_news = _.chain([])
 
 # window onhashchange handler
 hash_change_handler = null
@@ -104,7 +104,7 @@ reset_background_fetcher = ->
 fetches_in_progress = {} # de-duplicates fetches by purpose
 error_backoff_ms = 5000
 fetch_news = (options) ->
-  return if all_news.size().value() > max_cells
+  return if _all_news.size().value() > max_cells
 
   d3.select('#last_updated').text 'updating...'
   return if fetches_in_progress[options.purpose]
@@ -122,7 +122,7 @@ fetch_news = (options) ->
       if test_mode
         news = _(news).first(100)
 
-      original_size = all_news.size().value()
+      original_size = _all_news.size().value()
       if news.length
         local_oldest = _.chain(news).map((d) -> moment(d.date)).min().value().utc()
         if !oldest_date || local_oldest < oldest_date
@@ -130,7 +130,7 @@ fetch_news = (options) ->
         add_news(news)
 
       # invokes callback with number of new events added
-      options.callback?(all_news.size().value() - original_size)
+      options.callback?(_all_news.size().value() - original_size)
     error: ->
       d3.select('#filters').text("having trouble contacting base, try again soon") unless options.background_poll
       d3.select('#last_updated').text ''
@@ -138,17 +138,17 @@ fetch_news = (options) ->
       error_backoff_ms *= 2
 
 
-# takes an array of news and adds it to the global all_news chained collection
+# takes an array of news and adds it to the global _all_news chained collection
 add_news = (new_news) ->
   # Transform the new news data from the server and add it to our main collection
-  all_news = all_news
+  _all_news = _all_news
     .union(_(new_news).map(transform_news_data))
     .uniq(false, (n) -> n.news_event_id)
     .sortBy((n) -> n.date).reverse()
     .filter((n) -> n.headline && (n.images.length || n.snippets.length))
 
-  available_vertical_ids = all_news.map((n) -> n.vertical_ids).compact().flatten().uniq()
-  verticals = _.chain([
+  available_vertical_ids = _all_news.map((n) -> n.vertical_ids).compact().flatten().uniq()
+  _verticals = _.chain([
     { id: 'all', name: 'All' },
     { id: 3, name: 'Business' },
     { id: 2, name: 'Technology' },
@@ -159,7 +159,7 @@ add_news = (new_news) ->
   filters = d3.select('#filters')
     .text('')
     .selectAll('a')
-    .data(verticals.value())
+    .data(_verticals.value())
   filters.enter()
     .append('a')
     .text((d) -> d.name)
@@ -170,9 +170,9 @@ add_news = (new_news) ->
 
   # update news with filter selected by current location hash, then listen for further hash changes
   (filter_and_update = ->
-    vertical_id = verticals.filter((v) -> "##{v.name.toLowerCase()}" == location.hash).first().value()?.id || 'all'
+    vertical_id = _verticals.filter((v) -> "##{v.name.toLowerCase()}" == location.hash).first().value()?.id || 'all'
     filters.classed('active', (d) -> d.id == vertical_id)
-    news = all_news.filter((n) -> vertical_id == 'all' || _.include(n.vertical_ids, vertical_id))
+    news = _all_news.filter((n) -> vertical_id == 'all' || _.include(n.vertical_ids, vertical_id))
     update_cells(news)
   )()
 
@@ -383,8 +383,8 @@ construct_cells = ->
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one
 get_image = (generic_image, width, height) ->
-  images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
-  image = images.find((i) -> i.size[0] >= width).value() || images.last().value()
+  _images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
+  image = _images.find((i) -> i.size[0] >= width).value() || _images.last().value()
 
   if image
     if height
