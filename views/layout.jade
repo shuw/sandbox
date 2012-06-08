@@ -2,10 +2,13 @@
 html(lang="en")
   head
     meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0")
+    meta(name="apple-mobile-web-app-capable", content="yes")
     title= title
     != js('vendor/d3')
     != js('vendor/jquery-1.7.1')
     != js('vendor/underscore')
+    != js('vendor/underscore_string')
     != js('vendor/moment')
   body
     != body
