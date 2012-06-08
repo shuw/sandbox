@@ -1,3 +1,8 @@
+# Author: Shu Wu
+#
+# TODO: Calculate inverse document frequency offline using larger corpus
+
+
 #= require vendor/d3.layout.cloud
 
 width = 1000
@@ -10,10 +15,18 @@ df = {}
 
 _.mixin(_.string.exports())
 
+skip_topic_names = true
+
 $ ->
   d3.json 'data/news_data.json', (news) ->
     stop_words_dict = {}
     _(stop_words).each (w) -> stop_words_dict[w] = 1
+
+    if skip_topic_names
+      _(news).each (n) ->
+        topics = (if n.summary then _.chain(n.summary.entities) else _.chain(n.params).flatten())
+        topics
+          .each (t) -> _.chain(t.topic?.name? && t.topic.name).words().each((w) -> stop_words_dict[w.toLowerCase()] = 1)
 
     # we should really be using a more general IDF index calculated over many weeks of news
     # but this is just a prototype so...
@@ -21,7 +34,7 @@ $ ->
       _words = _.chain(n.articles).map((a) ->
           _.chain(a.surrounding_sentences)
             .words()
-            .filter((w) -> !stop_words_dict[w]?)
+            .filter((w) -> !stop_words_dict[w.toLowerCase()])
             .map((w) -> w.replace(/[^\w\s]|_/g, '').split("'")[0])
             .value()
         )
@@ -37,11 +50,11 @@ $ ->
       .map((count, w) -> { word: w, size: count / df[w.toLowerCase()].length })
       .sortBy((d) -> d.size)
       .reverse()
-      .first(200)
+      .first(175)
       .value()
 
     _dates = _.chain(news).map((n) -> moment(n.date))
-    $('#date_range').text "from " + _dates.min().value().fromNow() + ' - ' + _dates.max().value().fromNow()
+    $('#description > .date_range').text "from " + _dates.min().value().fromNow() + ' - ' + _dates.max().value().fromNow()
 
     redo_layout = _.debounce (-> layout(top_words)), 4000
     $('#root')
