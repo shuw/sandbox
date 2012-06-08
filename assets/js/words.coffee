@@ -21,7 +21,7 @@ $ ->
       _words = _.chain(n.articles).map((a) ->
           _.chain(a.surrounding_sentences)
             .words()
-            .filter((w) -> w.length > 2 && !stop_words_dict[w]?)
+            .filter((w) -> !stop_words_dict[w]?)
             .map((w) -> w.replace(/[^\w\s]|_/g, '').split("'")[0])
             .value()
         )
