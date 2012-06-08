@@ -1,19 +1,17 @@
 #= require vendor/d3.layout.cloud
 
-_.mixin(_.string.exports())
-
 width = 1000
 height = 600
 
 # word count
 tf = {}
-
 # document frequency hash (also maps word -> news events)
 df = {}
 
+_.mixin(_.string.exports())
+
 $ ->
   d3.json 'data/news_data.json', (news) ->
-
     stop_words_dict = {}
     _(stop_words).each (w) -> stop_words_dict[w] = 1
 
@@ -28,7 +26,6 @@ $ ->
             .value()
         )
         .flatten()
-
       _words.each (w) -> tf[w] = (tf[w] || 0) + 1
       _words.uniq().each (w) ->
         w_lower = w.toLowerCase()
@@ -42,7 +39,6 @@ $ ->
       .reverse()
       .first(200)
       .value()
-
 
     _dates = _.chain(news).map((n) -> moment(n.date))
     $('#date_range').text "from " + _dates.min().value().fromNow() + ' - ' + _dates.max().value().fromNow()
@@ -60,12 +56,10 @@ $ ->
 # based on https://github.com/jasondavies/d3-cloud/blob/master/examples/simple.html
 layout = (weighted_words) ->
   return unless weighted_words.length > 2
-
   font_size = d3.scale
     .linear()
     .range([10, 70])
     .domain([_(weighted_words).last().size, _(weighted_words).first().size])
-
   d3.layout.cloud()
     .timeInterval(10)
     .size([width, height])
@@ -79,14 +73,13 @@ layout = (weighted_words) ->
     .on("end", draw)
     .start()
 
+
 draw = (words) ->
   color = d3.scale.category10()
-
   text = d3.select("#root g")
     .attr("transform", "translate(#{width/2},#{height/2})")
     .selectAll("text")
     .data(words, (w) -> w.text)
-
   text.transition().duration(1000)
     .style("font-size", (d) -> "#{d.size}px")
     .attr("transform", (d) -> "translate(#{[d.x, d.y]})rotate(#{d.rotate})")
@@ -99,11 +92,11 @@ draw = (words) ->
     .style("fill", (d) -> color(d.text))
     .text((d) -> d.text)
     .style("opacity", 0).transition().duration(1000).style("opacity", 1)
-
-  text.on 'mouseover', (data) -> render_news(data.text)
+  text.on 'mouseover', (data) -> show_news(data.text)
   text.exit().remove()
 
-render_news = (word) ->
+
+show_news = (word) ->
   news = d3.select('#news')
     .selectAll('div')
     .data(df[word.toLowerCase()], (d) -> d.news_event_id)
@@ -113,6 +106,7 @@ render_news = (word) ->
     .text((d) -> d.headline)
   news.exit()
     .remove()
+
 
 # from http://www.ranks.nl/resources/stopwords.html
 stop_words = ["a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours ","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves"]
