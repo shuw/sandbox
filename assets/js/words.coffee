@@ -56,13 +56,13 @@ $ ->
     _dates = _.chain(news).map((n) -> moment(n.date))
     $('#description > .date_range').text "from " + _dates.min().value().fromNow() + ' - ' + _dates.max().value().fromNow()
 
-    redo_layout = _.debounce (-> layout(top_words)), 4000
+    debounced_layout = _.debounce (-> layout(top_words)), 4000
     $('#root')
       .attr("width", width)
       .attr("height", height)
-      .mousemove(redo_layout) # will cancel layout redraw for 4 seconds
+      .mousemove(debounced_layout) # will cancel layout redraw for 4 seconds
 
-    setInterval(redo_layout, 5000)
+    setInterval(debounced_layout, 5000)
     layout(top_words)
 
 
@@ -87,6 +87,8 @@ layout = (weighted_words) ->
     .start()
 
 
+paused = false
+unpause_debounced = _.debounce((-> pause = false), 5000)
 draw = (words) ->
   color = d3.scale.category10()
   text = d3.select("#root g")
@@ -105,20 +107,29 @@ draw = (words) ->
     .style("fill", (d) -> color(d.text))
     .text((d) -> d.text)
     .style("opacity", 0).transition().duration(1000).style("opacity", 1)
-  text.on 'mouseover', (data) -> show_news(data.text)
+  text.on 'mouseover', (data) -> show_news(data.text) unless paused
+  text.on 'click', (data) ->
+    $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+    show_news(data.text, true)
+    paused = true
+    unpause_debounced()
   text.exit().remove()
 
 
-show_news = (word) ->
+show_news = (word, highlight=false) ->
   news = d3.select('#news')
-    .selectAll('div')
+    .selectAll('.headline')
     .data(df[word.toLowerCase()], (d) -> d.news_event_id)
-  news.enter()
-    .append('div')
+
+  news.enter().append('a')
     .classed('headline', true)
+    .attr('target', '_blank')
+    .attr('href', (d) -> "https://wavii.com/news/#{d.news_event_id}")
     .text((d) -> d.headline)
-  news.exit()
-    .remove()
+
+  news.exit().remove()
+
+  news.classed('highlight', highlight)
 
 
 # from http://www.ranks.nl/resources/stopwords.html
