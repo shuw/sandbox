@@ -1,7 +1,3 @@
-# UI Suggestions from Allen:
-# > What do you think of a small [Follow] button below each topic unfollowed? quick way to add, and also signifies they are topics
-# > or we can make a small pin when u hover over topic images and click on them = pin them (following them)
-
 _.mixin(_.string.exports())
 
 max_cells = 2000
@@ -39,7 +35,7 @@ infinite_scroll_backoff_ms = 4000
 # as that requires the news server
 test_mode = false
 
-window.news_wheel_init = (p_data_path, p_test_mode) ->
+window.news_stream_init = (p_data_path, p_test_mode) ->
   test_mode = p_test_mode
   data_path = p_data_path
   calculate_element_sizes()
