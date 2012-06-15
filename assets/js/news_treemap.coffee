@@ -19,6 +19,7 @@ $ ->
 
     $('#date-range').text "Showing events from " + news[0].date.fromNow() + ' to ' + news[news.length - 1].date.fromNow()
 
+    debugger
     # Layout
     root.data([construct_news_tree(news)])
       .selectAll('div')
