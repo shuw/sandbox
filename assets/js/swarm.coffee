@@ -1,3 +1,5 @@
+# TODO: swarm is incomplete
+
 width = $(window).width()
 height = $(window).height()
 
