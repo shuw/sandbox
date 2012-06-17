@@ -16,9 +16,28 @@ got_data = (news) ->
     })
     .sortBy((d) -> d.date)
 
+  draw_relations()
+
 
   draw_histogram()
 
+
+draw_relations = ->
+  relations = _news.groupBy('relation_type').map((events, relation_type) -> {
+      events: events,
+      relation_type: relation_type
+    })
+    .sortBy((d) -> d.events.length)
+    .reverse()
+    .take(10)
+    .value()
+
+  d3.select('#relations').selectAll('.relation')
+      .data(relations)
+    .enter()
+      .append('div')
+      .classed('relation', true)
+      .text((d) -> "#{d.relation_type} (#{d.events.length})")
 
 draw_histogram = ->
   by_date = _news.groupBy((d) -> d.date.format('MM/YY')).value()
