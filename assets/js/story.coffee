@@ -43,6 +43,11 @@ draw_relations = ->
     .take(10)
     .value()
 
+  select = (relation) ->
+    _events = _.chain(relation.events)
+    draw_events(_events)
+    draw_histogram(_events)
+
   d3.select('#relations').selectAll('.relation')
       .data(relations)
     .enter()
@@ -50,16 +55,51 @@ draw_relations = ->
       .attr('href', '#')
       .classed('relation', true)
       .text((d) -> "#{_(d.relation_type).humanize()} (#{d.events.length})")
-      .on 'click', (d) ->
-        _events = _.chain(d.events)
-        draw_events(_events)
-        draw_histogram(_events)
+      .on 'click', select
+
+  select(relations[0]) if relations.length
+
+
 
 draw_events = (_events) ->
   # _events = _.chain(events)
 
-  # _events.each (d) ->
-  #   debugger
+  topics = _events
+    .map((e) -> e.topics)
+    .flatten()
+    .select((t) -> t.label?)
+    .groupBy('label')
+    .map((topics, label) ->
+      topic_images = topics[0].topic_images
+      image = (topic_images && get_image(topic_images[0], 100, 100)) || {
+        url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
+        size: [100, 100]
+      }
+
+      {
+        occurences: topics.length
+        image: image
+        label: label
+      })
+    .sortBy((d) -> d.occurences)
+    .reverse()
+    .value()
+
+  divs = d3.select('#events').selectAll('.topic')
+      .data(topics, (d) -> d.label)
+  divs.enter()
+      .append('div')
+        .classed('topic', true)
+        .call ->
+          @append('img')
+            .attr('src', (d) -> d.image.url)
+            .attr('width', (d) -> d.image.size[0])
+            .attr('height', (d) -> d.image.size[1])
+          @append('div')
+            .text((d) -> "#{d.label} (#{d.occurences})")
+  divs.exit()
+      .remove()
+
 
 
 draw_histogram = (_events) ->
@@ -92,3 +132,23 @@ draw_histogram = (_events) ->
   recs.transition().duration(500)
       .attr("y", (d) -> height - y((by_date[d] || []).length))
       .attr("height", (d) -> y((by_date[d] || []).length))
+
+
+# First tries to find an image equal or bigger than requested,
+# otherwise, settles for a slightly smaller one
+get_image = (generic_image, width, height) ->
+  _images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
+  image = _images.find((i) -> i.size[0] >= width).value() || _images.last().value()
+
+  if image
+    if height
+      # scale to fit in box
+      width ||= image.size[0]
+      height ||= image.size[1]
+      scale = Math.min(width / image.size[0], height / image.size[1])
+    else
+      scale = width / image.size[0]
+
+    image.size = [scale * image.size[0], scale * image.size[1]]
+
+  image
