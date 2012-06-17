@@ -2,13 +2,13 @@ width = 1000
 height = 300
 
 
-_news = _.chain([])
+_all_events = _.chain([])
 
 window.story_init = (p_data_path, p_test_mode) ->
   $.ajax p_data_path, success: got_data
 
-got_data = (news) ->
-  _news = _.chain(news).map((d) ->
+got_data = (events) ->
+  _all_events = _.chain(events).map((d) ->
     {
       id: d.news_event_id,
       relation_type: d.relation_type
@@ -23,7 +23,7 @@ got_data = (news) ->
 
 
 draw_relations = ->
-  relations = _news.groupBy('relation_type').map((events, relation_type) -> {
+  relations = _all_events.groupBy('relation_type').map((events, relation_type) -> {
       events: events,
       relation_type: relation_type
     })
@@ -35,16 +35,24 @@ draw_relations = ->
   d3.select('#relations').selectAll('.relation')
       .data(relations)
     .enter()
-      .append('div')
+      .append('a')
       .classed('relation', true)
       .text((d) -> "#{d.relation_type} (#{d.events.length})")
+      .on 'click', (d) ->
+        debugger
+
+draw_all_events = (events) ->
+  _events = _.chain(events)
+
+  
+
 
 draw_histogram = ->
-  by_date = _news.groupBy((d) -> d.date.format('MM/YY')).value()
+  by_date = _all_events.groupBy((d) -> d.date.format('MM/YY')).value()
 
   months = []
-  oldest = _news.first().value().date
-  newest = _news.last().value().date
+  oldest = _all_events.first().value().date
+  newest = _all_events.last().value().date
   while oldest < newest
     months.push oldest.format('MM/YY')
     oldest = oldest.add('months', 1)
