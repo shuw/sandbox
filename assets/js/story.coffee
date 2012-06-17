@@ -1,4 +1,4 @@
-width = 1000
+width = $(window).width() - 50
 height = 300
 
 _.mixin(_.string.exports())
@@ -40,13 +40,14 @@ draw_relations = ->
     })
     .sortBy((d) -> d.events.length)
     .reverse()
-    .take(10)
+    .take(30)
     .value()
 
   select = (relation) ->
     _events = _.chain(relation.events)
-    draw_events(_events)
+    draw_topics(_events)
     draw_histogram(_events)
+    draw_events(_events)
 
   d3.select('#relations').selectAll('.relation')
       .data(relations)
@@ -60,8 +61,10 @@ draw_relations = ->
   select(relations[0]) if relations.length
 
 
-
 draw_events = (_events) ->
+  
+
+draw_topics = (_events) ->
   # _events = _.chain(events)
 
   topics = _events
@@ -83,9 +86,10 @@ draw_events = (_events) ->
       })
     .sortBy((d) -> d.occurences)
     .reverse()
+    .take(10)
     .value()
 
-  divs = d3.select('#events').selectAll('.topic')
+  divs = d3.select('#topics').selectAll('.topic')
       .data(topics, (d) -> d.label)
   divs.enter()
       .append('div')
