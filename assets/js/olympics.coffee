@@ -1,103 +1,46 @@
+events_by_relation_type = {}
+
 window.olympics_init = (data_path) ->
-  $.ajax data_path, success: (events) -> init(events)
+  $.ajax data_path, success: (events) -> 
+    events_by_relation_type = transform_events(events)
 
 
-init = (events) ->
+# returns relation_type -> [transformed_events]
+transform_events = (events) ->
   _events = _(events).chain()
-
-  for_relations = (rels) ->
-    _(rels).each
-
-
-  for_relation = (r) -> _events.filter (e) -> e.relation_type == r
-  get_param = (e, name) ->
-    e.params[name]?.length && (p = e.params[name][0]) && {
-      label: p.label
-      image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
-    }
-
-  # TODO:
-  # "person_injured_at_event",
-  # "person_suspected_of_cheating"
-
-  _awards = for_relation('person_wins_event').map (e) ->
-    {
-      person: get_param(e, 'left_pkey')
-      event: get_param(e, 'right_pkey')
-      team: get_param(e, 'for__organization')
-      award: get_param(e, 'the_award')
-      country: label: 'United States'
-    }
-  _org_awards = for_relation('organization_wins_award').map (e) ->
-    {
-      team: get_param(e, 'left_pkey')
-      award: get_param(e, 'right_pkey')
-      event: get_param(e, 'in_event')
-    }
-
-  _person_advances = for_relation('person_advances_in_event').map (e) ->
-    {
-      person: get_param(e, 'left_pkey')
-      event: get_param(e, 'right_pkey')
-      team: get_param(e, 'for__organization')
-    }
-
-  _org_advances = for_relation('organization_advances_in_event').map (e) ->
-    {
-      team: get_param(e, 'left_pkey')
-      event: get_param(e, 'right_pkey')
-    }
-
-  _person_record = for_relation('person_sets_olympic_record').map (e) ->
-    {
-      person: get_param(e, 'pkey')
-      team: get_param(e, 'for__organization')
-      event: get_param(e, 'in_event')
-    }
-  _person_world_record = for_relation('person_sets_world_record').map (e) ->
-    {
-      person: get_param(e, 'pkey')
-      team: get_param(e, 'for__organization')
-      event: get_param(e, 'in_event')
-    }
-
-  _org_record = for_relation('organization_sets_olympic_record').map (e) ->
-    {
-      team: get_param(e, 'pkey')
-      event: get_param(e, 'in_event')
-    }
-  _org_world_record = for_relation('organization_sets_world_record').map (e) ->
-    {
-      team: get_param(e, 'pkey')
-      event: get_param(e, 'in_event')
-    }
-
-  _person_disqualified = for_relation('person_disqualified_from_event').map (e) ->
-    {
-      person: get_param(e, 'left_pkey')
-      team: get_param(e, 'for__organization')
-      event: get_param(e, 'right_pkey')
-    }
-
-  _org_disqualified = for_relation('organization_disqualified_from_event').map (e) ->
-    {
-      team: get_param(e, 'left_pkey')
-      event: get_param(e, 'right_pkey')
-    }
-
-  _person_disqualified = for_relation('person_eliminated_from_event').map (e) ->
-    {
-      person: get_param(e, 'left_pkey')
-      team: get_param(e, 'for__organization')
-      event: get_param(e, 'right_pkey')
-    }
-
-  _org_disqualified = for_relation('organization_eliminated_from_event').map (e) ->
-    {
-      team: get_param(e, 'left_pkey')
-      event: get_param(e, 'right_pkey')
-    }
-
+  results = {}
+  _({
+    person_wins_event:                    { team: 'for__organization', person: 'left_pkey', award: 'the_award', event: 'right_pkey' }
+    organization_wins_award:              { team: 'left_pkey', award: 'right_pkey' }
+    person_advances_in_event:             { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
+    organization_advances_in_event:       { team: 'left_pkey', event: 'right_pkey' }
+    person_sets_olympic_record:           { team: 'for__organization', person: 'pkey', event: 'in_event' }
+    person_sets_world_record:             { team: 'for__organization', person: 'pkey', event: 'in_event' }
+    organization_sets_olympic_record:     { team: 'pkey', event: 'in_event' }
+    organization_sets_world_record:       { team: 'pkey', event: 'in_event' }
+    person_disqualified_from_event:       { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
+    organization_disqualified_from_event: { team: 'left_pkey', event: 'right_pkey' }
+    person_eliminated_from_event:         { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
+    organization_eliminated_from_event:   { team: 'left_pkey', event: 'right_pkey' }
+    person_injured_at_event:              { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
+    person_suspected_of_cheating:         { team: 'for__organization', person: 'pkey' }
+  }).each (mappings, relation_type) ->
+    results[relation_type] =
+      _events
+        .filter((e) -> e.relation_type == relation_type)
+        .map((e) ->
+          result = {}
+          _(mappings).map (param_key, key) ->
+            if e.params[param_key]?.length
+              result[key] = (p = e.params[param_key][0]) && {
+                label: p.label
+                image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
+              }
+            else
+              console.warn "#{relation_type} missing #{param_key}"
+          result
+        ).value()
+  results
 
 
 # First tries to find an image equal or bigger than requested,
@@ -116,5 +59,4 @@ get_image = (generic_image, width, height) ->
       scale = width / image.size[0]
 
     image.size = [scale * image.size[0], scale * image.size[1]]
-
   image
