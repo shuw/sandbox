@@ -64,15 +64,15 @@ transform_events = (events) ->
 get_image = (generic_image, width, height) ->
   _images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
   image = _images.find((i) -> i.size[0] >= width).value() || _images.last().value()
+  return unless image
 
-  if image
-    if height
-      # scale to fit in box
-      width ||= image.size[0]
-      height ||= image.size[1]
-      scale = Math.min(width / image.size[0], height / image.size[1])
-    else
-      scale = width / image.size[0]
+  if height
+    # scale to fit in box
+    width ||= image.size[0]
+    height ||= image.size[1]
+    scale = Math.min(width / image.size[0], height / image.size[1])
+  else
+    scale = width / image.size[0]
 
-    image.size = [scale * image.size[0], scale * image.size[1]]
+  image.size = [scale * image.size[0], scale * image.size[1]]
   image
