@@ -1,27 +1,22 @@
-events_by_rel = {}
+g_events_by_rel = {}
 
 window.olympics_init = (data_path) ->
   $.ajax data_path, success: (events) ->
-    events_by_rel = transform_events(events)
-    debugger
-
+    g_events_by_rel = transform_events(events)
     score_board()
 
 
-
 score_board = ->
-  by_country = _.chain(events_by_rel['person_wins_event'])
-    .union(events_by_rel['organization_wins_award'])
-    .groupBy((d) -> d.team.label)
-    .value()
+  by_team = _(g_events_by_rel['awards']).groupBy((d) -> d.team.label)
+  debugger
 
 
-
-
-# returns relation_type -> [transformed_events]
+# returns normalized_relations -> [normalized_events]
 transform_events = (events) ->
   _events = _(events).chain()
-  _({
+
+  # normalize events
+  rels = _({
     person_wins_event:                    { team: 'for__organization', person: 'left_pkey', award: 'the_award', event: 'right_pkey' }
     organization_wins_award:              { team: 'left_pkey', award: 'right_pkey' }
     person_advances_in_event:             { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
@@ -40,18 +35,29 @@ transform_events = (events) ->
     rels[relation_type] = _events
       .filter((e) -> e.relation_type == relation_type)
       .map((e) ->
-        _(mappings).reduce(((event, param_key, key) ->
-          if e.params[param_key]?.length
-            event[key] = (p = e.params[param_key][0]) && {
+        _(mappings).reduce(((event, param_key, normalized_key) ->
+          p = e.params[param_key]?[0]
+          if p
+            event[normalized_key] =
               label: p.label
               image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
-            }
+          else
+            console.warn "#{relation_type} missing #{param_key}"
           event
         ), {})
       ).value()
     rels
   ), {})
 
+
+  # normalize relations
+  _({
+    awards: ['person_wins_event', 'organization_wins_award']
+    advancements: ['person_advances_in_event', 'organization_advances_in_event']
+  }).reduce(((normalized_rels, relation_types, normalized_relation_type) ->
+    normalized_rels[normalized_relation_type] = _(relation_types).chain().map((r) -> rels[r] || []).flatten().value()
+    normalized_rels
+  ), {})
 
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one
