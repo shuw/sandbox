@@ -1,14 +1,26 @@
-events_by_relation_type = {}
+events_by_rel = {}
 
 window.olympics_init = (data_path) ->
-  $.ajax data_path, success: (events) -> 
-    events_by_relation_type = transform_events(events)
+  $.ajax data_path, success: (events) ->
+    events_by_rel = transform_events(events)
+    debugger
+
+    score_board()
+
+
+
+score_board = ->
+  by_country = _.chain(events_by_rel['person_wins_event'])
+    .union(events_by_rel['organization_wins_award'])
+    .groupBy((d) -> d.team.label)
+    .value()
+
+
 
 
 # returns relation_type -> [transformed_events]
 transform_events = (events) ->
   _events = _(events).chain()
-  results = {}
   _({
     person_wins_event:                    { team: 'for__organization', person: 'left_pkey', award: 'the_award', event: 'right_pkey' }
     organization_wins_award:              { team: 'left_pkey', award: 'right_pkey' }
@@ -24,23 +36,21 @@ transform_events = (events) ->
     organization_eliminated_from_event:   { team: 'left_pkey', event: 'right_pkey' }
     person_injured_at_event:              { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
     person_suspected_of_cheating:         { team: 'for__organization', person: 'pkey' }
-  }).each (mappings, relation_type) ->
-    results[relation_type] =
-      _events
-        .filter((e) -> e.relation_type == relation_type)
-        .map((e) ->
-          result = {}
-          _(mappings).map (param_key, key) ->
-            if e.params[param_key]?.length
-              result[key] = (p = e.params[param_key][0]) && {
-                label: p.label
-                image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
-              }
-            else
-              console.warn "#{relation_type} missing #{param_key}"
-          result
-        ).value()
-  results
+  }).reduce(((rels, mappings, relation_type) ->
+    rels[relation_type] = _events
+      .filter((e) -> e.relation_type == relation_type)
+      .map((e) ->
+        _(mappings).reduce(((event, param_key, key) ->
+          if e.params[param_key]?.length
+            event[key] = (p = e.params[param_key][0]) && {
+              label: p.label
+              image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
+            }
+          event
+        ), {})
+      ).value()
+    rels
+  ), {})
 
 
 # First tries to find an image equal or bigger than requested,
