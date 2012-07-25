@@ -20,15 +20,17 @@ init = (events) ->
   # "person_injured_at_event",
   # "person_suspected_of_cheating"
 
-  _awards = for_relation('celebrity_won_award').map (e) ->
+  _awards = for_relation('person_wins_event').map (e) ->
     {
-      award: get_param(e, 'award')
-      event: get_param(e, 'occurred_at_event')
+      person: get_param(e, 'left_pkey')
+      event: get_param(e, 'right_pkey')
+      team: get_param(e, 'for__organization')
+      award: get_param(e, 'the_award')
       country: label: 'United States'
     }
   _org_awards = for_relation('organization_wins_award').map (e) ->
     {
-      org: get_param(e, 'award')
+      team: get_param(e, 'left_pkey')
       award: get_param(e, 'right_pkey')
       event: get_param(e, 'in_event')
     }
@@ -83,6 +85,18 @@ init = (events) ->
       event: get_param(e, 'right_pkey')
     }
 
+  _person_disqualified = for_relation('person_eliminated_from_event').map (e) ->
+    {
+      person: get_param(e, 'left_pkey')
+      team: get_param(e, 'for__organization')
+      event: get_param(e, 'right_pkey')
+    }
+
+  _org_disqualified = for_relation('organization_eliminated_from_event').map (e) ->
+    {
+      team: get_param(e, 'left_pkey')
+      event: get_param(e, 'right_pkey')
+    }
 
 
 
