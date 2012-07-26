@@ -29,8 +29,8 @@ update_scoreboard = ->
     .data(by_team, (d) -> d.team.id)
   teams.enter()
     .append('div')
-    .classed('team', true)
-    .call ->
+    .classed('team link', true)
+    .call(->
       @append('img')
         .attr('src', (d) -> d.team.image.url)
         .attr('height', 30)
@@ -43,7 +43,14 @@ update_scoreboard = ->
         .enter()
           .append('span').classed('award link', true)
           .text((d) -> d.length)
-          .on('click', (awards) -> show_events(awards))
+          .on('click', (awards) ->
+            show_events(awards)
+            d3.event.stopPropagation()
+          )
+    )
+    .on 'click', (d) ->
+      show_events _(d.grouped_awards).flatten()
+
   teams.exit().remove()
 
 
