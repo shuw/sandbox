@@ -1,6 +1,11 @@
+_.mixin(_.string.exports())
+
 g_relations = {}
+g_stream = null
 
 window.olympics_init = (data_path) ->
+  g_stream = new OlympicStream '#stream_root'
+
   $.ajax data_path, success: (events) ->
     g_relations = normalize_relations(events)
     update_scoreboard()
@@ -14,7 +19,7 @@ update_scoreboard = ->
       {
         team: events[0].team
         count: events.length
-        awards: [awards['Gold Medal'] || [], awards['Silver Medal'] || [], awards['Bronze Medal'] || []]
+        grouped_awards: [awards['Gold Medal'] || [], awards['Silver Medal'] || [], awards['Bronze Medal'] || []]
       })
     .sortBy((d) -> -d.count)
     .value()
@@ -33,16 +38,18 @@ update_scoreboard = ->
         .text((d) -> d.team.label)
       @append('span').classed('awards', true)
         .selectAll('.award')
-        .data((d) -> d.awards)
+        .data((d) -> d.grouped_awards)
         .enter()
           .append('span').classed('award link', true)
           .text((d) -> d.length)
-          .on 'click', (d) ->
-            debugger
+          .on('click', (awards) ->
+            news_events = _(awards).map (d) -> d.news_event
+            g_stream.update(news_events)
+          )
   teams.exit().remove()
 
 
-# returns { normalized_relations -> [data] }
+# returns { normalized_relations -> event_wrappers[] }
 normalize_relations = (events) ->
   _events = _(events).chain()
 
@@ -71,12 +78,12 @@ normalize_relations = (events) ->
           if p
             data[normalized_key] =
               id:    p.topic_id
-              label: p.label
-              image: p.topic_images? && get_image(p.topic_images[0], 100, 100)
+              label: ENTITY_ABBREVIATED[p.topic_id] || p.label
+              image: p.topic_images? && p.topic_images[0].sizes[0]
           else
             console.warn "#{relation_type} missing #{param_key}"
           data
-        ), {original_event: e})
+        ), {news_event: e})
       ).value()
     rels
   ), {})
@@ -91,20 +98,5 @@ normalize_relations = (events) ->
     normalized_rels
   ), {})
 
-# First tries to find an image equal or bigger than requested,
-# otherwise, settles for a slightly smaller one
-get_image = (generic_image, width, height) ->
-  _images = _.chain(generic_image.sizes).sortBy((i) -> i.size[0])
-  image = _images.find((i) -> i.size[0] >= width).value() || _images.last().value()
-  return unless image
 
-  if height
-    # scale to fit in box
-    width ||= image.size[0]
-    height ||= image.size[1]
-    scale = Math.min(width / image.size[0], height / image.size[1])
-  else
-    scale = width / image.size[0]
-
-  image.size = [scale * image.size[0], scale * image.size[1]]
-  image
+ENTITY_ABBREVIATED = { 567952: 'ETH', 595341: 'AFG', 595342: 'ALB', 595343: 'DZA', 595344: 'ASM', 595345: 'AND', 595346: 'AGO', 595347: 'ATG', 595348: 'ARG', 595349: 'ARM', 595350: 'ABW', 595351: 'AUS', 595386: 'AUT', 595352: 'AZE', 595354: 'BHR', 595388: 'BGD', 595355: 'BRB', 595356: 'BLR', 595389: 'BEL', 595357: 'BEN', 595390: 'BMU', 595358: 'BTN', 595359: 'BOL', 595361: 'BWA', 595362: 'BRA', 595363: 'VGB', 595364: 'BGR', 595365: 'BDI', 595366: 'KHM', 595367: 'CMR', 595369: 'CAN', 595393: 'CPV', 595394: 'CYM', 595370: 'CAF', 595395: 'TCD', 595371: 'CHL', 595372: 'CHN', 595398: 'COL', 595399: 'COM', 595374: 'COK', 595375: 'CRI', 595376: 'HRV', 595403: 'CUB', 595404: 'CYP', 595405: 'CZE', 595408: 'DNK', 595409: 'DJI', 595410: 'DMA', 595377: 'DOM', 595378: 'ECU', 595380: 'EGY', 595381: 'SLV', 595382: 'GNQ', 595383: 'ERI', 595384: 'FJI', 595385: 'FIN', 595387: 'FRA', 595391: 'GAB', 595397: 'DEU', 595401: 'GHA', 595412: 'GRC', 595414: 'GRD', 595413: 'GUM', 595415: 'GTM', 595416: 'GIN', 595417: 'GUY', 595418: 'HTI', 595419: 'HND', 595420: 'HKG', 595421: 'HUN', 595422: 'ISL', 595424: 'IND', 595425: 'IDN', 595426: 'IRN', 595427: 'IRQ', 595429: 'ISR', 595430: 'ITA', 595431: 'JAM', 595432: 'JPN', 595433: 'JOR', 595434: 'KAZ', 595435: 'KEN', 595436: 'KWT', 595437: 'KGZ', 595438: 'LVA', 595439: 'LBN', 595440: 'LSO', 595441: 'LBR', 595442: 'LBY', 595443: 'LIE', 595444: 'LTU', 595445: 'LUX', 595446: 'MKD', 595447: 'MWI', 595448: 'MYS', 595449: 'MDV', 595450: 'MLI', 595451: 'MLT', 595452: 'MEX', 595454: 'MDA', 595455: 'MNG', 595456: 'MNE', 595457: 'MAR', 595458: 'MOZ', 595459: 'MMR', 595460: 'NAM', 595461: 'NRU', 595462: 'NPL', 595463: 'NLD', 595464: 'NZL', 595465: 'NIC', 595466: 'NER', 595468: 'NGA', 595469: 'PRK', 595470: 'NOR', 595471: 'OMN', 595472: 'PAK', 595473: 'PLW', 595475: 'PAN', 595476: 'PNG', 595477: 'PRY', 595478: 'PER', 595479: 'PHL', 595480: 'POL', 595481: 'PRT', 595482: 'PRI', 595484: 'QAT', 595485: 'ROU', 595486: 'RUS', 595487: 'RWA', 595489: 'LCA', 595491: 'WSM', 595492: 'SMR', 595493: 'SAU', 595494: 'SEN', 595495: 'SRB', 595496: 'SYC', 595497: 'SLE', 595498: 'SGP', 595499: 'SVK', 595500: 'SVN', 595501: 'ZAF', 595502: 'KOR', 595503: 'ESP', 595504: 'LKA', 595505: 'SDN', 595506: 'SUR', 595507: 'SWE', 595508: 'CHE', 595509: 'SYR', 595510: 'TJK', 595511: 'TZA', 595514: 'THA', 595512: 'TGO', 595513: 'TON', 595515: 'TTO', 595516: 'TUN', 595517: 'TUR', 595518: 'TKM', 595519: 'UGA', 595520: 'UKR', 595521: 'ARE', 595522: 'URY', 595523: 'UZB', 595524: 'VUT', 595525: 'VEN', 595526: 'VNM', 595528: 'YEM', 595529: 'ZMB', 595530: 'ZWE', 595531: 'BFA', 562357: 'USA' }

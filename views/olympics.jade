@@ -1,7 +1,14 @@
 != js('olympics')
+!= js('widgets/olympic_stream')
 != css('olympics')
 
 header
 body
-  #scoreboard
+  table
+    tr
+      td
+        #scoreboard
+      td
+        #stream_root
+
   script $(function() { olympics_init('/data/olympics.json', true) })
