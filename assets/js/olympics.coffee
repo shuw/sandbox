@@ -9,6 +9,7 @@ window.olympics_init = (data_path) ->
   $.ajax data_path, success: (events) ->
     g_relations = normalize_relations(events)
     update_scoreboard()
+    show_events _(g_relations).chain().map((events) -> events).flatten().value()
 
 
 update_scoreboard = ->
@@ -42,12 +43,12 @@ update_scoreboard = ->
         .enter()
           .append('span').classed('award link', true)
           .text((d) -> d.length)
-          .on('click', (awards) ->
-            news_events = _(awards).map (d) -> d.news_event
-            g_stream.update(news_events)
-          )
+          .on('click', (awards) -> show_events(awards))
   teams.exit().remove()
 
+
+show_events = (events) ->
+  g_stream.update _(events).map (d) -> d.news_event
 
 # returns { normalized_relations -> event_wrappers[] }
 normalize_relations = (events) ->

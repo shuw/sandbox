@@ -11,6 +11,17 @@ body {
   overflow-x: hidden;
 }
 
+body > table {
+  td.scoreboard {
+    vertical-align: top;
+    width: 150px;
+  }
+  td.stream {
+    vertical-align: top;
+  }
+
+}
+
 #scoreboard {
   font-size: 14px;
 
@@ -45,7 +56,12 @@ body {
   position: relative;
   margin: 0 8px 20px 0;
 
-  &.cell {
+  a {
+    text-decoration: none;
+    color: #365d9b;
+  }
+
+  .cell {
     -webkit-transition: opacity 750ms, left 750ms, top 750ms, -webkit-transform 750ms;
     -moz-transition: opacity 750ms, left 750ms, top 750ms, -webkit-transform 750ms;
     -ms-transition: opacity 750ms, left 750ms, top 750ms, -webkit-transform 750ms;
@@ -121,6 +137,22 @@ body {
     float: left;
     padding: 5px 10px 2px 0;
   }
+
+  a.follow {
+    position: absolute;
+    right: 7px;
+    top: 22px;
+    font-weight: bold;
+    color: white;
+    background-color: @palette-blue;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    &.disabled {
+      display: none;
+    }
+  }
+
   .cell .content .participants .participant a.name, .cell .content .participants .participant p.param_name {
     width: 140px;
     position: absolute;
