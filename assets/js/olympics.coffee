@@ -1,13 +1,13 @@
-g_events_by_rel = {}
+g_relations = {}
 
 window.olympics_init = (data_path) ->
   $.ajax data_path, success: (events) ->
-    g_events_by_rel = normalize_events(events)
+    g_relations = normalize_relations(events)
     update_scoreboard()
 
 
 update_scoreboard = ->
-  by_team = _(g_events_by_rel['awards']).chain()
+  by_team = _(g_relations['awards']).chain()
     .groupBy((d) -> d.team.label)
     .map((events) ->
       awards = _(events).groupBy((d) -> d.award.label)
@@ -35,15 +35,15 @@ update_scoreboard = ->
         .selectAll('.award')
         .data((d) -> d.awards)
         .enter()
-          .append('span').classed('award', true)
+          .append('span').classed('award link', true)
           .text((d) -> d.length)
-
-
+          .on 'click', (d) ->
+            debugger
   teams.exit().remove()
 
 
-# returns { normalized_relations -> [normalized_events] }
-normalize_events = (events) ->
+# returns { normalized_relations -> [data] }
+normalize_relations = (events) ->
   _events = _(events).chain()
 
   # normalize events
@@ -66,17 +66,17 @@ normalize_events = (events) ->
     rels[relation_type] = _events
       .filter((e) -> e.relation_type == relation_type)
       .map((e) ->
-        _(mappings).reduce(((event, param_key, normalized_key) ->
+        _(mappings).reduce(((data, param_key, normalized_key) ->
           p = e.params[param_key]?[0]
           if p
-            event[normalized_key] =
+            data[normalized_key] =
               id:    p.topic_id
               label: p.label
               image: p.topic_images? && get_image(p.topic_images[0], 100, 100)
           else
             console.warn "#{relation_type} missing #{param_key}"
-          event
-        ), {})
+          data
+        ), {original_event: e})
       ).value()
     rels
   ), {})
