@@ -4,3 +4,27 @@ body {
 #root {
   font-size: 18px;
 }
+
+#scoreboard {
+  .team {
+    height: 30px;
+    > * {
+      vertical-align: middle;
+    }
+    .name {
+      display: inline-block;
+      width: 100px;
+      margin-left: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .awards {
+      .award {
+        margin-left: 10px;
+      }
+    }
+  }
+
+}

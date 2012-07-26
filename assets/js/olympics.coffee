@@ -2,17 +2,48 @@ g_events_by_rel = {}
 
 window.olympics_init = (data_path) ->
   $.ajax data_path, success: (events) ->
-    g_events_by_rel = transform_events(events)
-    score_board()
+    g_events_by_rel = normalize_events(events)
+    update_scoreboard()
 
 
-score_board = ->
-  by_team = _(g_events_by_rel['awards']).groupBy((d) -> d.team.label)
-  debugger
+update_scoreboard = ->
+  by_team = _(g_events_by_rel['awards']).chain()
+    .groupBy((d) -> d.team.label)
+    .map((events) ->
+      awards = _(events).groupBy((d) -> d.award.label)
+      {
+        team: events[0].team
+        count: events.length
+        awards: [awards['Gold Medal'] || [], awards['Silver Medal'] || [], awards['Bronze Medal'] || []]
+      })
+    .sortBy((d) -> -d.count)
+    .value()
+
+  teams = d3.select('#scoreboard').selectAll('.team')
+    .data(by_team, (d) -> d.team.id)
+  teams.enter()
+    .append('div')
+    .classed('team', true)
+    .call ->
+      @append('img')
+        .attr('src', (d) -> d.team.image.url)
+        .attr('height', 30)
+        .attr('width', 30)
+      @append('span').classed('name', true)
+        .text((d) -> d.team.label)
+      @append('span').classed('awards', true)
+        .selectAll('.award')
+        .data((d) -> d.awards)
+        .enter()
+          .append('span').classed('award', true)
+          .text((d) -> d.length)
 
 
-# returns normalized_relations -> [normalized_events]
-transform_events = (events) ->
+  teams.exit().remove()
+
+
+# returns { normalized_relations -> [normalized_events] }
+normalize_events = (events) ->
   _events = _(events).chain()
 
   # normalize events
@@ -39,8 +70,9 @@ transform_events = (events) ->
           p = e.params[param_key]?[0]
           if p
             event[normalized_key] =
+              id:    p.topic_id
               label: p.label
-              image: p.topic_images? && get_image(p.topic_images[0], 200, 200)
+              image: p.topic_images? && get_image(p.topic_images[0], 100, 100)
           else
             console.warn "#{relation_type} missing #{param_key}"
           event
