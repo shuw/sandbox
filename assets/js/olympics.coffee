@@ -55,11 +55,11 @@ update_scoreboard = ->
 
 
 show_events = (events) ->
-  g_stream.update _(events).map (d) -> d.news_event
+  g_stream.update events
 
 # returns { normalized_relations -> event_wrappers[] }
-normalize_relations = (events) ->
-  _events = _(events).chain()
+normalize_relations = (news_events) ->
+  _news_events = _(news_events).chain()
 
   # normalize events
   rels = _({
@@ -78,11 +78,11 @@ normalize_relations = (events) ->
     person_injured_at_event:              { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
     person_suspected_of_cheating:         { team: 'for__organization', person: 'pkey' }
   }).reduce(((rels, mappings, relation_type) ->
-    rels[relation_type] = _events
-      .filter((e) -> e.relation_type == relation_type)
-      .map((e) ->
+    rels[relation_type] = _news_events
+      .filter((n) -> n.relation_type == relation_type)
+      .map((n) ->
         _(mappings).reduce(((data, param_key, normalized_key) ->
-          p = e.params[param_key]?[0]
+          p = n.params[param_key]?[0]
           if p
             data[normalized_key] =
               id:    p.topic_id
@@ -91,7 +91,7 @@ normalize_relations = (events) ->
           else
             console.warn "#{relation_type} missing #{param_key}"
           data
-        ), {news_event: e})
+        ), {news_event: n})
       ).value()
     rels
   ), {})
