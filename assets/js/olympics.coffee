@@ -108,17 +108,17 @@ normalize_relations = (news_events) ->
           if p
             event[normalized_key] =
               id:    p.topic_id
-              label: ENTITY_ABBREVIATED[p.topic_id] || p.label
+              label: ENTITY_ABBREVIATED[p.topic_id] || p.topic.name
               image: p.topic_images?[0]
           else
-            console.warn "#{relation_type} missing #{param_key}"
+            console.warn "NewsEvent #{relation_type} missing #{param_key}"
           event
         ), event)
 
         if event.event
           event
         else
-          console.warn "#{n.id} does not have a event param"
+          console.warn "NewsEvent #{n.news_event_id} does not have a event param"
 
       ).compact().value()
     rels
@@ -154,7 +154,6 @@ normalize_relations = (news_events) ->
     result
   ), {})
 
-
   # assign dates to aggregated events
   _(agg_events).each (agg) ->
     agg.date = _(agg.rels).chain().flatten().map((e) -> e.date).max().value()
@@ -166,4 +165,4 @@ normalize_relations = (news_events) ->
 
 
 
-ENTITY_ABBREVIATED = { 567952: 'ETH', 595341: 'AFG', 595342: 'ALB', 595343: 'DZA', 595344: 'ASM', 595345: 'AND', 595346: 'AGO', 595347: 'ATG', 595348: 'ARG', 595349: 'ARM', 595350: 'ABW', 595351: 'AUS', 595386: 'AUT', 595352: 'AZE', 595354: 'BHR', 595388: 'BGD', 595355: 'BRB', 595356: 'BLR', 595389: 'BEL', 595357: 'BEN', 595390: 'BMU', 595358: 'BTN', 595359: 'BOL', 595361: 'BWA', 595362: 'BRA', 595363: 'VGB', 595364: 'BGR', 595365: 'BDI', 595366: 'KHM', 595367: 'CMR', 595369: 'CAN', 595393: 'CPV', 595394: 'CYM', 595370: 'CAF', 595395: 'TCD', 595371: 'CHL', 595372: 'CHN', 595398: 'COL', 595399: 'COM', 595374: 'COK', 595375: 'CRI', 595376: 'HRV', 595403: 'CUB', 595404: 'CYP', 595405: 'CZE', 595408: 'DNK', 595409: 'DJI', 595410: 'DMA', 595377: 'DOM', 595378: 'ECU', 595380: 'EGY', 595381: 'SLV', 595382: 'GNQ', 595383: 'ERI', 595384: 'FJI', 595385: 'FIN', 595387: 'FRA', 595391: 'GAB', 595397: 'DEU', 595401: 'GHA', 595412: 'GRC', 595414: 'GRD', 595413: 'GUM', 595415: 'GTM', 595416: 'GIN', 595417: 'GUY', 595418: 'HTI', 595419: 'HND', 595420: 'HKG', 595421: 'HUN', 595422: 'ISL', 595424: 'IND', 595425: 'IDN', 595426: 'IRN', 595427: 'IRQ', 595429: 'ISR', 595430: 'ITA', 595431: 'JAM', 595432: 'JPN', 595433: 'JOR', 595434: 'KAZ', 595435: 'KEN', 595436: 'KWT', 595437: 'KGZ', 595438: 'LVA', 595439: 'LBN', 595440: 'LSO', 595441: 'LBR', 595442: 'LBY', 595443: 'LIE', 595444: 'LTU', 595445: 'LUX', 595446: 'MKD', 595447: 'MWI', 595448: 'MYS', 595449: 'MDV', 595450: 'MLI', 595451: 'MLT', 595452: 'MEX', 595454: 'MDA', 595455: 'MNG', 595456: 'MNE', 595457: 'MAR', 595458: 'MOZ', 595459: 'MMR', 595460: 'NAM', 595461: 'NRU', 595462: 'NPL', 595463: 'NLD', 595464: 'NZL', 595465: 'NIC', 595466: 'NER', 595468: 'NGA', 595469: 'PRK', 595470: 'NOR', 595471: 'OMN', 595472: 'PAK', 595473: 'PLW', 595475: 'PAN', 595476: 'PNG', 595477: 'PRY', 595478: 'PER', 595479: 'PHL', 595480: 'POL', 595481: 'PRT', 595482: 'PRI', 595484: 'QAT', 595485: 'ROU', 595486: 'RUS', 595487: 'RWA', 595489: 'LCA', 595491: 'WSM', 595492: 'SMR', 595493: 'SAU', 595494: 'SEN', 595495: 'SRB', 595496: 'SYC', 595497: 'SLE', 595498: 'SGP', 595499: 'SVK', 595500: 'SVN', 595501: 'ZAF', 595502: 'KOR', 595503: 'ESP', 595504: 'LKA', 595505: 'SDN', 595506: 'SUR', 595507: 'SWE', 595508: 'CHE', 595509: 'SYR', 595510: 'TJK', 595511: 'TZA', 595514: 'THA', 595512: 'TGO', 595513: 'TON', 595515: 'TTO', 595516: 'TUN', 595517: 'TUR', 595518: 'TKM', 595519: 'UGA', 595520: 'UKR', 595521: 'ARE', 595522: 'URY', 595523: 'UZB', 595524: 'VUT', 595525: 'VEN', 595526: 'VNM', 595528: 'YEM', 595529: 'ZMB', 595530: 'ZWE', 595531: 'BFA', 562357: 'USA' }
+ENTITY_ABBREVIATED = { 'yVVkq': 'ETH', 'y4a98': 'AFG', 'ynT8m': 'ALB', 'yTRCJ': 'DZA', 'yVYWr': 'ASM', 'yADqp': 'AND', 'y5PfN': 'AGO', 'ykN9P': 'ATG', 'ycg33': 'ARG', 'yBhaK': 'ARM', 'y9f7k': 'ABW', 'ym6dW': 'AUS', 'yNx7L': 'AUT', 'ySwpd': 'AZE', 'yHdQx': 'BHR', 'yUtfu': 'BGD', 'ysQF9': 'BRB', 'yUBxc': 'BLR', 'yJK9C': 'BEL', 'yJkKG': 'BEN', 'yjw8Y': 'BMU', 'yjJRF': 'BTN', 'yCmHs': 'BOL', 'y76RU': 'BWA', 'yDhAh': 'BRA', 'yerKg': 'VGB', 'ycDps': 'BGR', 'yBnnB': 'BDI', 'y9H8E': 'KHM', 'ym7C2': 'CMR', 'yxvqn': 'CAN', 'y7mqd': 'CPV', 'yDsfe': 'CYM', 'yHkut': 'CAF', 'yeF9x': 'TCD', 'ysCNM': 'CHL', 'yPE3a': 'CHN', 'yN37f': 'COL', 'ymSdF': 'COM', 'ynQ7y': 'COK', 'yCVLq': 'CRI', 'yVTh7': 'HRV', 'ysAFk': 'CUB', 'yPMxA': 'CYP', 'y4XEN': 'CZE', 'yVAyy': 'DNK', 'yA4gq': 'DJI', 'y5WAv': 'DMA', 'yARjH': 'DOM', 'y5FQb': 'ECU', 'yPVxT': 'EGY', 'y4PEe': 'SLV', 'ynYRQ': 'GNQ', 'yT5Hd': 'ERI', 'yYjGJ': 'FJI', 'yWBgA': 'FIN', 'yvJdr': 'FRA', 'yCqT3': 'GAB', 'yBygc': 'DEU', 'yxjn3': 'GHA', 'yc2pn': 'GRC', 'y9L8M': 'GRD', 'yBEnD': 'GUM', 'ym8CR': 'GTM', 'yYSWU': 'GIN', 'yWUqV': 'GUY', 'yNcug': 'HTI', 'yvHNm': 'HND', 'yUa3B': 'HKG', 'yJpaj': 'HUN', 'yjuj2': 'ISL', 'yyLhm': 'IND', 'y78jJ': 'IDN', 'yDKQ8': 'IRN', 'ye3FL': 'IRQ', 'yBsEu': 'ISR', 'y9eu5': 'ITA', 'ymTNY': 'JAM', 'ySRGR': 'JPN', 'yxMgT': 'JOR', 'yHpAS': 'KAZ', 'ysbdQ': 'KEN', 'yUUfw': 'KWT', 'yJ99b': 'KGZ', 'yj587': 'LVA', 'yCjCH': 'LBN', 'yVbWF': 'LSO', 'yA2qs': 'LBR', 'y5XuG': 'LBY', 'ykdNE': 'LIE', 'yPn3X': 'LTU', 'y4Wah': 'LUX', 'ynA79': 'MKD', 'yT4dU': 'MWI', 'yYmpp': 'MYS', 'yWgna': 'MDV', 'yNCQP': 'MLI', 'yvuFy': 'MLT', 'yDyAK': 'MEX', 'y7SRW': 'MDA', 'yFDHn': 'MNG', 'yySJ7': 'MNE', 'y7U3H': 'MAR', 'yDchb': 'MOZ', 'yeHjf': 'MMR', 'yYgVT': 'NAM', 'yWpue': 'NRU', 'yNuxQ': 'NPL', 'yvMEd': 'NLD', 'yV26J': 'NZL', 'yAEAA': 'NIC', 'y5LGL': 'NER', 'yPWBu': 'NGA', 'y4e8C': 'PRK', 'yn4pY': 'NOR', 'yTv93': 'OMN', 'yy8SW': 'PAK', 'yAyfn': 'PLW', 'ykSqM': 'PAN', 'ycsMa': 'PNG', 'yBF7v': 'PRY', 'y9mGy': 'PER', 'ymgaq': 'PHL', 'ySM4s': 'POL', 'yxXQB': 'PRT', 'yHbpE': 'PRI', 'yU9yh': 'QAT', 'yJARg': 'ROU', 'yjjxU': 'RUS', 'yCWEV': 'RWA', 'y7gA6': 'LCA', 'yeuR5': 'WSM', 'ycy4V': 'SMR', 'yBc88': 'SAU', 'y9Spm': 'SEN', 'ymDnJ': 'SRB', 'ySjVq': 'SYC', 'yxWuw': 'SLE', 'yHAW4': 'SGP', 'ys4q7': 'SVK', 'yPXMD': 'SVN', 'y4d7S': 'ZAF', 'yn23R': 'KOR', 'yTEaT': 'ESP', 'yV44d': 'LKA', 'yAsQX': 'SDN', 'y5ehx': 'SUR', 'ykTj9': 'SWE', 'ycEVc': 'CHE', 'yB3RG': 'SYR', 'y98xF': 'TJK', 'yTyEs': 'TZA', 'yN5Gk': 'THA', 'yYUM3': 'TGO', 'yW97K': 'TON', 'yvjgW': 'TTO', 'yUpBN': 'TUN', 'yJb8P': 'TUR', 'yjMfp': 'TKM', 'yCt9a': 'UGA', 'yy7SF': 'UKR', 'y7Bfs': 'ARE', 'yDxWG': 'URY', 'yeJqE': 'UZB', 'yYtMX': 'VUT', 'yWK7h': 'VEN', 'yNwG9': 'VNM', 'ySV4p': 'YEM', 'yxPQa': 'ZMB', 'yHYhP': 'ZWE', 'ys5jy': 'BFA', 'y4SGs': 'USA' }
