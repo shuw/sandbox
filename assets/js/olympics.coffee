@@ -4,7 +4,7 @@ g_relations = {}
 g_stream = null
 
 window.olympics_init = (data_path) ->
-  g_stream = new OlympicStream '#stream_root'
+  g_stream = new OlympicStream '#stream'
 
   $.ajax data_path, success: (events) ->
     g_relations = normalize_relations(events)
@@ -32,7 +32,7 @@ update_scoreboard = ->
     .classed('team link', true)
     .call(->
       @append('img')
-        .attr('src', (d) -> d.team.image.url)
+        .attr('src', (d) -> d.team.image?.sizes[0].url)
         .attr('height', 30)
         .attr('width', 30)
       @append('span').classed('name', true)
@@ -90,7 +90,7 @@ normalize_relations = (news_events) ->
             event[normalized_key] =
               id:    p.topic_id
               label: ENTITY_ABBREVIATED[p.topic_id] || p.label
-              image: p.topic_images? && p.topic_images[0].sizes[0]
+              image: p.topic_images?[0]
           else
             console.warn "#{relation_type} missing #{param_key}"
           event

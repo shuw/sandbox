@@ -10,22 +10,35 @@ class window.OlympicStream
   # updates the cells on screen given a list of events
   # if events not passed in, then will simply update the layout
   update: (agg_events) ->
+    _this = @
     # construct cells
     cells = d3.select(@root_selector).selectAll('.cell').data(agg_events, (d) -> d.news_event_id)
     cells.enter()
       .append('div')
-      .call(@_construct_events)
+      .classed('event-cell', true)
+      .call(-> @each (d) -> _this._construct_event(d, @) )
       .call(-> _.defer => @classed('visible', true))
     cells.exit()
       .classed('visible', false).transition().duration(750).remove()
 
-  _construct_events: ->
-    debugger
-    @classed('cell', true)
-      .style('width', "#{column_width}px")
-      .append('div')
-        .classed('from_now', true)
-        .text((d) -> d.date.fromNow())
+  _construct_event: (d, el) ->
+    $el = $(el)
+    $el.append('<div class="date">').text moment(d.date).fromNow()
+
+    $content = $el.append('<div class="content">')
+    if d.image
+      img = get_image(d.image, 100, 100)
+      $content.append \
+        "<img class='event' width='#{img.size[0]}px' height='#{img.size[1]}px' src='#{img.url}'>"
+
+
+    # @append('div')
+    #   .classed('date', true)
+    #   .text((d) -> moment(d.date).fromNow())
+
+    # @append('div')
+    #   .classed('img')
+    #   .attr('src')
 
 
 # First tries to find an image equal or bigger than requested,
@@ -35,6 +48,8 @@ get_image = (generic_image, width, height) ->
   image = images.find((i) -> i.size[0] >= width).value() || images.last().value()
 
   if image
+    if image.url == 'https://wavii-images.s3.amazonaws.com/topic/e8AT/44bed403d75e274c879deaf0614f2578/orig.jpg'
+      debugger
     if height
       # scale to fit in box
       width ||= image.size[0]
@@ -43,6 +58,6 @@ get_image = (generic_image, width, height) ->
     else
       scale = width / image.size[0]
 
-    image.size = [scale * image.size[0], scale * image.size[1]]
+    image.size = [Math.floor(scale * image.size[0]), Math.floor(scale * image.size[1])]
 
   image
