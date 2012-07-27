@@ -22,7 +22,7 @@ class window.OlympicStream
   _construct_event: (d, el) ->
     cell$ = $(el)
     $('<div class="date">').appendTo(cell$).text moment(d.date).format("h:mma, dddd M/DD")
-    event$ = $('<div class="event">').appendTo(cell$)
+    event$ = $('<h2>').appendTo(cell$)
     $('<div class="name">').appendTo(event$).text(d.label)
 
     # TODO: Re-enable event images when they are prettier
@@ -52,18 +52,22 @@ class window.OlympicStream
               .text((d) -> d.award.label)
             @append('a').classed('person', true).call(create_link('person'))
 
-    if d.rels.advancements
-      rel = d3.select($('<div class="relation advancements">').appendTo(rels$)[0])
-      rel.append('h3').text('Advancements')
+    _(['world_records', 'olympic_records', 'advancements', 'eliminations', 'disqualifications', 'injuries', 'cheating']).each (rel_type) ->
+      return unless d.rels[rel_type]
+      rel = d3.select($('<div class="relation events">').appendTo(rels$)[0])
+      rel.append('h3').text(rel_type.replace('_', ' '))
 
-      advancements = rel.selectAll('advancement').data _(d.rels.advancements).sortBy (d) -> d.date
-      advancements.enter()
-          .append('div')
-          .classed('advancement', true)
-      advancements.append('span').classed('date', true).text((d) -> moment(d.date).fromNow())
-      advancements.call(create_team_flag)
-      advancements.append('a').call(create_link('person'))
-      advancements.append('a').call(create_link('team'))
+      events = rel.selectAll('event').data _(d.rels[rel_type]).sortBy (d) -> d.date
+      events.enter().append('div').classed('event', true)
+      events.append('span').classed('date', true).text((d) -> moment(d.date).fromNow())
+      events.call(create_team_flag)
+      events.append('a').call(create_link('person'))
+      events.append('a').call(create_link('team'))
+      events.append('a')
+        .classed('read_more', true)
+        .text('(read more)')
+        .attr('target', '_blank')
+        .attr('href', (d) -> "https://wavii.com/news/#{d.id}")
 
 create_team_flag = ->
   @append('a')

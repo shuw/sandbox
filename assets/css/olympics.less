@@ -2,7 +2,7 @@
 @palette-blue: #276b8c;
 @palette-light-blue: #d6dfe3;
 @palette-light-grey: #95938f;
-@palette-grey: #555;
+@palette-grey: #777;
 
 body {
   font-family: sans-serif;
@@ -90,14 +90,14 @@ a, .link {
       margin-top: 5px;
       float: right;
     }
-    .event .name {
+    h2 {
+      color: @palette-grey;
       font-size: 20px;
       margin-bottom: 10px;
     }
 
     .rels {
       .relation {
-
         h3 {
           text-transform: uppercase;
           margin-bottom: 7px;
@@ -127,7 +127,7 @@ a, .link {
           }
         }
 
-        &.advancements .advancement {
+        &.events .event {
           line-height: 22px;
           font-weight: 600;
 
@@ -139,18 +139,17 @@ a, .link {
             margin-right: 10px;
           }
 
-
           img.flag {
             vertical-align: top;
             height: 20px;
             width: 20px;
           }
 
+          .read_more {
+            font-weight: normal;
+          }
         }
-
       }
     }
-
-
   }
 }

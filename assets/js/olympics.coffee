@@ -101,6 +101,7 @@ normalize_relations = (news_events) ->
           date: new Date(n.date)
           images: n.images || []
           headline: n.headline
+          id: n.news_event_id
 
         _(mappings).reduce(((event, param_key, normalized_key) ->
           p = n.params[param_key]?[0]
@@ -113,7 +114,13 @@ normalize_relations = (news_events) ->
             console.warn "#{relation_type} missing #{param_key}"
           event
         ), event)
-      ).value()
+
+        if event.event
+          event
+        else
+          console.warn "#{n.id} does not have a event param"
+
+      ).compact().value()
     rels
   ), {})
 
@@ -123,6 +130,10 @@ normalize_relations = (news_events) ->
     advancements: ['person_advances_in_event', 'organization_advances_in_event']
     olympic_records: ['organization_sets_olympic_record', 'person_sets_olympic_record']
     world_records: ['organization_sets_world_record', 'person_sets_world_record']
+    eliminations: ['person_eliminated_from_event', 'organization_eliminated_from_event']
+    disqualifications: ['person_disqualified_from_event', 'organization_disqualified_from_event']
+    injuries: ['person_injured_at_event']
+    cheating: ['person_suspected_of_cheating']
   }).reduce(((normalized_rels, relation_types, normalized_relation_type) ->
     normalized_rels[normalized_relation_type] = _(relation_types).chain().map((r) -> rels[r] || []).flatten().value()
     normalized_rels
@@ -131,17 +142,14 @@ normalize_relations = (news_events) ->
   # aggregated events (i.e. Men's 100) with individual events (i.e. Gold Medal Men's 100, Silver Medal Men's 100, etc)
   agg_events = _(normalized_relations).reduce(((result, events, relation_type) ->
     _(events).each (e) ->
-      if e.event
-        agg_event = result[e.event.id] ||= {
-          id: e.event.id
-          image: e.event.image
-          label: e.event.label
-          rels: {}         # i.e. awards, advancements, world_records
-        }
-        agg_event.rels[relation_type] ||= []
-        agg_event.rels[relation_type].push(e)
-      else
-        console.warn "#{e} is not associated with an event"
+      agg_event = result[e.event.id] ||= {
+        id: e.event.id
+        image: e.event.image
+        label: e.event.label
+        rels: {}         # i.e. awards, advancements, world_records
+      }
+      agg_event.rels[relation_type] ||= []
+      agg_event.rels[relation_type].push(e)
 
     result
   ), {})
