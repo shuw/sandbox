@@ -44,8 +44,6 @@ update_scoreboard = ->
     .call(->
       @append('img')
         .attr('src', (d) -> d.team.image?.sizes[0].url)
-        .attr('height', 30)
-        .attr('width', 30)
         .on 'click', (d) ->
           update_selected @
           show_events _(d.grouped_awards).flatten()
@@ -99,7 +97,9 @@ normalize_relations = (news_events) ->
     rels[relation_type] = _news_events
       .filter((n) -> n.relation_type == relation_type)
       .map((n) ->
-        event = date: new Date(n.date)
+        event =
+          date: new Date(n.date)
+          images: n.images || []
         _(mappings).reduce(((event, param_key, normalized_key) ->
           p = n.params[param_key]?[0]
           if p

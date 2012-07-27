@@ -38,19 +38,27 @@ class window.OlympicStream
           when 10239 then 3 # bronze medal
           else 4            # unknown medal
 
-
       d3.select($('<div class="awards">').appendTo(rels$)[0])
         .selectAll('award')
         .data(award_events)
         .enter()
           .append('div')
           .classed('award', true)
-          .text((d) -> d.award.label)
+          .call ->
+            @append('img')
+              .classed('winning_team', true)
+              .attr('src', (d) -> get_image(d.team.image, 50, 50).url)
+            @append('div')
+            @append('div')
+              .classed('label', true)
+              .text((d) -> d.award.label)
+            @append('a')
+              .attr('href', (d) -> "https://wavii.com/topics/#{d.person.id}" if d.person?)
+              .classed('person', true)
+              .text((d) -> d.person?.label)
 
-      # awards$ = $('<div class="awards">').appendTo(rels$)
-      # _(d.rels.awards).each (d) ->
-      #   award$ = $('<div class="award">').appendTo(awards$)
-      #   award$.append('<')
+    if d.rels.advancements
+      _(d.rels.advancements).sortBy (d) -> d.date
 
 
     # @append('div')

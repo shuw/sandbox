@@ -20,23 +20,23 @@ body > table {
   td.stream {
     vertical-align: top;
   }
+}
 
+a, .link {
+  text-decoration: none;
+  color: @palette-blue;
+  cursor: pointer;
+
+  &.selected {
+    color: black;
+  }
 }
 
 #scoreboard {
   margin: 5px 10px 10px 10px;
   font-size: 18px;
 
-  .link {
-    color: @palette-blue;
-    cursor: pointer;
-
-    &.selected {
-      color: black;
-    }
-  }
-
-  .all {
+  .all.link {
     text-align: left;
     margin-bottom: 10px;
   }
@@ -47,6 +47,12 @@ body > table {
     > * {
       vertical-align: middle;
     }
+
+    img {
+      height: 30px;
+      width: 30px;
+    }
+
     .name {
       display: inline-block;
       width: 50px;
@@ -66,20 +72,40 @@ body > table {
 
 #stream {
   margin-top: 10px;
+  color: @palette-light-grey;
 
   .cell {
     width: 600px;
     margin-bottom: 30px;
     .date {
-      color: @palette-light-grey;
     }
     .event {
       .name {
-        color: @palette-light-grey;
         font-size: 20px;
       }
-
     }
+
+    .rels {
+      .awards .award {
+        width: 130px;
+        display: inline-block;
+
+        img.winning_team {
+          height: 30px;
+          width: 30px;
+        }
+
+        > * {
+          font-weight: 600;
+          vertical-align: top;
+          display: inline-block;
+        }
+        .label {
+          margin: 8px 0 0 5px;
+        }
+      }
+    }
+
 
   }
 }
