@@ -56,8 +56,8 @@ update_scoreboard = ->
 
 show_events = (events) ->
   agg_events = _(events).chain().map((e) -> e.agg_event).uniq().value()
-  debugger
   g_stream.update agg_events
+
 
 # returns { normalized_relations -> event_wrappers[] }
 normalize_relations = (news_events) ->
