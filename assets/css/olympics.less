@@ -24,12 +24,21 @@ body > table {
 }
 
 #scoreboard {
-  margin-top: 50px;
+  margin: 5px 10px 10px 10px;
   font-size: 18px;
 
   .link {
     color: @palette-blue;
     cursor: pointer;
+
+    &.selected {
+      color: black;
+    }
+  }
+
+  .all {
+    text-align: left;
+    margin-bottom: 10px;
   }
 
   .team {
@@ -56,6 +65,8 @@ body > table {
 }
 
 #stream {
+  margin-top: 10px;
+
   .cell {
     width: 600px;
     margin-bottom: 30px;

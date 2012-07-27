@@ -25,20 +25,35 @@ update_scoreboard = ->
     .sortBy((d) -> -d.count)
     .value()
 
-  teams = d3.select('#scoreboard').selectAll('.team')
-    .data(by_team, (d) -> d.team.id)
+  update_selected = (selected_el) -> $('#scoreboard .link').each (x) -> $(@).toggleClass('selected', @ == selected_el)
+
+  all_events = _(g_relations).flatten()
+  scoreboard = d3.select('#scoreboard')
+  scoreboard
+    .append('div')
+    .classed('all link selected', true)
+    .text((d) -> "All Events")
+    .on 'click', ->
+      update_selected @
+      show_events all_events
+
+  teams = scoreboard.selectAll('.team').data(by_team, (d) -> d.team.id)
   teams.enter()
     .append('div')
-    .classed('team link', true)
+    .classed('team', true)
     .call(->
       @append('img')
         .attr('src', (d) -> d.team.image?.sizes[0].url)
         .attr('height', 30)
         .attr('width', 30)
-        .on 'click', (d) -> show_events _(d.grouped_awards).flatten()
-      @append('span').classed('name', true)
+        .on 'click', (d) ->
+          update_selected @
+          show_events _(d.grouped_awards).flatten()
+      @append('span').classed('name link', true)
         .text((d) -> d.team.label)
-        .on 'click', (d) -> show_events _(d.grouped_awards).flatten()
+        .on 'click', (d) ->
+          update_selected @
+          show_events _(d.grouped_awards).flatten()
       @append('span').classed('awards', true)
         .selectAll('.award')
         .data((d) -> d.grouped_awards)
@@ -46,7 +61,8 @@ update_scoreboard = ->
           .append('span').classed('award link', true)
           .text((d) -> d.length)
           .on('click', (awards) ->
-            show_events(awards)
+            update_selected @
+            show_events awards
             d3.event.stopPropagation()
           )
     )
