@@ -49,7 +49,6 @@ class window.OlympicStream
               .classed('winning_team', true)
               .attr('src', (d) -> get_image(d.team.image, 50, 50).url)
             @append('div')
-            @append('div')
               .classed('label', true)
               .text((d) -> d.award.label)
             @append('a')

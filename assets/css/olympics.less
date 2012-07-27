@@ -13,6 +13,8 @@ body {
 }
 
 body > table {
+  margin: 0 auto;
+
   td.scoreboard {
     vertical-align: top;
     width: 170px;
@@ -33,7 +35,7 @@ a, .link {
 }
 
 #scoreboard {
-  margin: 5px 10px 10px 10px;
+  margin: 15px 10px 10px 10px;
   font-size: 18px;
 
   .all.link {
@@ -71,23 +73,27 @@ a, .link {
 }
 
 #stream {
-  margin-top: 10px;
+  margin: 10px 0 0 10px;
   color: @palette-light-grey;
 
   .cell {
     width: 600px;
-    margin-bottom: 30px;
+    margin: 15px 0 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #DDD;
+
     .date {
+      margin-top: 5px;
+      float: right;
     }
-    .event {
-      .name {
-        font-size: 20px;
-      }
+    .event .name {
+      font-size: 20px;
+      margin-bottom: 10px;
     }
 
     .rels {
       .awards .award {
-        width: 130px;
+        width: 200px;
         display: inline-block;
 
         img.winning_team {
@@ -98,10 +104,15 @@ a, .link {
         > * {
           font-weight: 600;
           vertical-align: top;
-          display: inline-block;
         }
+
         .label {
           margin: 8px 0 0 5px;
+          display: inline-block;
+        }
+
+        a.person {
+          display: block;
         }
       }
     }
