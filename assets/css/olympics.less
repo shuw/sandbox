@@ -35,7 +35,7 @@ a, .link {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 #scoreboard {
@@ -108,7 +108,12 @@ a, .link {
           display: inline-block;
           font-weight: 600;
 
+          img.medal {
+            height: 40px;
+          }
+
           img.flag {
+            margin-top: 3px;
             height: 30px;
             width: 30px;
           }
@@ -117,13 +122,13 @@ a, .link {
             vertical-align: top;
           }
 
-          .label {
-            margin: 8px 0 0 5px;
-            display: inline-block;
-          }
-
           a.person {
-            display: block;
+            margin: 12px 5px 0 5px;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
           }
         }
 

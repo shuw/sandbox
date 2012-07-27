@@ -45,12 +45,9 @@ class window.OlympicStream
           .append('div')
           .classed('award', true)
           .call ->
-            @call(create_team_flag)
-            @append('img')
-            @append('div')
-              .classed('label', true)
-              .text((d) -> d.award.label)
+            @append('img').classed('medal', true).attr('src', (d) -> MEDAL_IMAGES[d.award.id])
             @append('a').classed('person', true).call(create_link('person'))
+            @call(create_team_flag)
 
     _(['world_records', 'olympic_records', 'advancements', 'eliminations', 'disqualifications', 'injuries', 'cheating']).each (rel_type) ->
       return unless d.rels[rel_type]

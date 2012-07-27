@@ -17,7 +17,6 @@ update_scoreboard = ->
     .groupBy((d) -> d.team.label)
     .map((events) ->
       awards = _(events).groupBy((d) -> d.award.label)
-      debugger
       {
         team: events[0].team
         count: events.length
