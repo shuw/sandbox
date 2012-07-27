@@ -35,8 +35,10 @@ update_scoreboard = ->
         .attr('src', (d) -> d.team.image?.sizes[0].url)
         .attr('height', 30)
         .attr('width', 30)
+        .on 'click', (d) -> show_events _(d.grouped_awards).flatten()
       @append('span').classed('name', true)
         .text((d) -> d.team.label)
+        .on 'click', (d) -> show_events _(d.grouped_awards).flatten()
       @append('span').classed('awards', true)
         .selectAll('.award')
         .data((d) -> d.grouped_awards)
@@ -48,8 +50,6 @@ update_scoreboard = ->
             d3.event.stopPropagation()
           )
     )
-    .on 'click', (d) ->
-      show_events _(d.grouped_awards).flatten()
 
   teams.exit().remove()
 
@@ -66,7 +66,7 @@ normalize_relations = (news_events) ->
   # normalize events
   rels = _({
     person_wins_event:                    { team: 'for__organization', person: 'left_pkey', award: 'the_award', event: 'right_pkey' }
-    for:              { team: 'left_pkey', award: 'right_pkey' }
+    organization_wins_award:              { team: 'left_pkey', award: 'right_pkey', event: 'in_event' }
     person_advances_in_event:             { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
     organization_advances_in_event:       { team: 'left_pkey', event: 'right_pkey' }
     person_sets_olympic_record:           { team: 'for__organization', person: 'pkey', event: 'in_event' }
@@ -78,7 +78,7 @@ normalize_relations = (news_events) ->
     person_eliminated_from_event:         { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
     organization_eliminated_from_event:   { team: 'left_pkey', event: 'right_pkey' }
     person_injured_at_event:              { team: 'for__organization', person: 'left_pkey', event: 'right_pkey' }
-    person_suspected_of_cheating:         { team: 'for__organization', person: 'pkey' }
+    person_suspected_of_cheating:         { team: 'for__organization', person: 'pkey', event: 'in_event' }
   }).reduce(((rels, mappings, relation_type) ->
     rels[relation_type] = _news_events
       .filter((n) -> n.relation_type == relation_type)
@@ -122,6 +122,9 @@ normalize_relations = (news_events) ->
         }
         agg_event.rels[relation_type] ||= []
         agg_event.rels[relation_type].push(e)
+      else
+        console.warn "#{e} is not associated with an event"
+
     result
   ), {})
 
@@ -132,6 +135,7 @@ normalize_relations = (news_events) ->
 
   # now saturate events with aggregated events
   _(normalized_relations).chain().flatten().each (e) -> e.agg_event = agg_events[e.event.id]
+  debugger
 
   normalized_relations
 

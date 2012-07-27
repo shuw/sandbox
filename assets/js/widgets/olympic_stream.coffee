@@ -12,20 +12,20 @@ class window.OlympicStream
   update: (agg_events) ->
     _this = @
     # construct cells
-    cells = d3.select(@root_selector).selectAll('.cell').data(agg_events, (d) -> d.news_event_id)
+    cells = d3.select(@root_selector).selectAll('.cell').data(agg_events, (d) -> d.id)
     cells.enter()
       .append('div')
-      .classed('event-cell', true)
+      .classed('cell', true)
       .call(-> @each (d) -> _this._construct_event(d, @) )
       .call(-> _.defer => @classed('visible', true))
-    cells.exit()
-      .classed('visible', false).transition().duration(750).remove()
+    cells.exit().remove()
 
   _construct_event: (d, el) ->
     $el = $(el)
     $el.append('<div class="date">').text moment(d.date).fromNow()
 
     $content = $el.append('<div class="content">')
+
     if d.image
       img = get_image(d.image, 100, 100)
       $content.append \
@@ -48,8 +48,6 @@ get_image = (generic_image, width, height) ->
   image = images.find((i) -> i.size[0] >= width).value() || images.last().value()
 
   if image
-    if image.url == 'https://wavii-images.s3.amazonaws.com/topic/e8AT/44bed403d75e274c879deaf0614f2578/orig.jpg'
-      debugger
     if height
       # scale to fit in box
       width ||= image.size[0]
