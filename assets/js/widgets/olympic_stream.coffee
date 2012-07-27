@@ -21,7 +21,7 @@ class window.OlympicStream
 
   _construct_event: (d, el) ->
     $cell = $(el)
-    $('<div class="date">').appendTo($cell).text moment(d.date).fromNow()
+    $('<div class="date">').appendTo($cell).text moment(d.date).format("h:mma, dddd M/DD")
 
     $event = $('<div class="event">').appendTo($cell)
     $('<div class="name">').appendTo($event).text d.label
