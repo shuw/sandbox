@@ -20,16 +20,37 @@ class window.OlympicStream
     cells.exit().remove()
 
   _construct_event: (d, el) ->
-    $cell = $(el)
-    $('<div class="date">').appendTo($cell).text moment(d.date).format("h:mma, dddd M/DD")
+    cell$ = $(el)
+    $('<div class="date">').appendTo(cell$).text moment(d.date).format("h:mma, dddd M/DD")
+    event$ = $('<div class="event">').appendTo(cell$)
+    $('<div class="name">').appendTo(event$).text(d.label)
 
-    $event = $('<div class="event">').appendTo($cell)
-    $('<div class="name">').appendTo($event).text d.label
+    # TODO: Re-enable event images when they are prettier
+    # if d.image && (img = get_image(d.image, 100, 100))
+    #   event$.append("<img class='event' width='#{img.size[0]}px' height='#{img.size[1]}px' src='#{img.url}'>")
 
-    if d.image
-      img = get_image(d.image, 100, 100)
-      $event.append \
-        "<img class='event' width='#{img.size[0]}px' height='#{img.size[1]}px' src='#{img.url}'>"
+    rels$ = $('<div class="rels">').appendTo(cell$)
+    if d.rels.awards
+      award_events = _(d.rels.awards).sortBy (d) ->
+        switch (d.award.id)
+          when 52511 then 1 # gold medal
+          when 959029 then 2 # silver medal
+          when 10239 then 3 # bronze medal
+          else 4            # unknown medal
+
+
+      d3.select($('<div class="awards">').appendTo(rels$)[0])
+        .selectAll('award')
+        .data(award_events)
+        .enter()
+          .append('div')
+          .classed('award', true)
+          .text((d) -> d.award.label)
+
+      # awards$ = $('<div class="awards">').appendTo(rels$)
+      # _(d.rels.awards).each (d) ->
+      #   award$ = $('<div class="award">').appendTo(awards$)
+      #   award$.append('<')
 
 
     # @append('div')
