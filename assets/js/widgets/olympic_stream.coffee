@@ -38,36 +38,46 @@ class window.OlympicStream
           when 10239 then 3 # bronze medal
           else 4            # unknown medal
 
-      d3.select($('<div class="awards">').appendTo(rels$)[0])
+      d3.select($('<div class="relation awards">').appendTo(rels$)[0])
         .selectAll('award')
         .data(award_events)
         .enter()
           .append('div')
           .classed('award', true)
           .call ->
+            @call(create_team_flag)
             @append('img')
-              .classed('winning_team', true)
-              .attr('src', (d) -> get_image(d.team.image, 50, 50).url)
             @append('div')
               .classed('label', true)
               .text((d) -> d.award.label)
-            @append('a')
-              .attr('href', (d) -> "https://wavii.com/topics/#{d.person.id}" if d.person?)
-              .classed('person', true)
-              .text((d) -> d.person?.label)
+            @append('a').classed('person', true).call(create_link('person'))
 
     if d.rels.advancements
-      _(d.rels.advancements).sortBy (d) -> d.date
+      rel = d3.select($('<div class="relation advancements">').appendTo(rels$)[0])
+      rel.append('h3').text('Advancements')
 
+      advancements = rel.selectAll('advancement').data _(d.rels.advancements).sortBy (d) -> d.date
+      advancements.enter()
+          .append('div')
+          .classed('advancement', true)
+      advancements.append('span').classed('date', true).text((d) -> moment(d.date).fromNow())
+      advancements.call(create_team_flag)
+      advancements.append('a').call(create_link('person'))
+      advancements.append('a').call(create_link('team'))
 
-    # @append('div')
-    #   .classed('date', true)
-    #   .text((d) -> moment(d.date).fromNow())
+create_team_flag = ->
+  @append('a')
+    .call(create_link('team', true))
+    .append('img')
+      .classed('flag', true)
+      .attr('src', (d) -> get_image(d.team.image, 50, 50).url)
+      .attr('title', (d) -> d.team.label)
 
-    # @append('div')
-    #   .classed('img')
-    #   .attr('src')
-
+create_link = (param_key, hide_text=false) ->
+  -> @text((d) -> d[param_key]?.label unless hide_text)
+      .attr('href', (d) -> "https://wavii.com/topics/#{d[param_key].id}" if d[param_key])
+      .attr('target', '_blank')
+      .classed('hidden', (d) -> !d[param_key]?)
 
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one

@@ -34,6 +34,10 @@ a, .link {
   }
 }
 
+.hidden {
+  display: none;
+}
+
 #scoreboard {
   margin: 15px 10px 10px 10px;
   font-size: 18px;
@@ -82,7 +86,7 @@ a, .link {
     padding-bottom: 20px;
     border-bottom: 1px solid #DDD;
 
-    .date {
+    > .date {
       margin-top: 5px;
       float: right;
     }
@@ -92,28 +96,58 @@ a, .link {
     }
 
     .rels {
-      .awards .award {
-        width: 200px;
-        display: inline-block;
+      .relation {
 
-        img.winning_team {
-          height: 30px;
-          width: 30px;
+        h3 {
+          text-transform: uppercase;
+          margin-bottom: 7px;
         }
 
-        > * {
-          font-weight: 600;
-          vertical-align: top;
-        }
-
-        .label {
-          margin: 8px 0 0 5px;
+        &.awards .award {
+          width: 200px;
           display: inline-block;
+          font-weight: 600;
+
+          img.flag {
+            height: 30px;
+            width: 30px;
+          }
+
+          > * {
+            vertical-align: top;
+          }
+
+          .label {
+            margin: 8px 0 0 5px;
+            display: inline-block;
+          }
+
+          a.person {
+            display: block;
+          }
         }
 
-        a.person {
-          display: block;
+        &.advancements .advancement {
+          line-height: 22px;
+          font-weight: 600;
+
+          > * {
+            margin-right: 5px;
+          }
+
+          .date {
+            margin-right: 10px;
+          }
+
+
+          img.flag {
+            vertical-align: top;
+            height: 20px;
+            width: 20px;
+          }
+
         }
+
       }
     }
 

@@ -100,6 +100,8 @@ normalize_relations = (news_events) ->
         event =
           date: new Date(n.date)
           images: n.images || []
+          headline: n.headline
+
         _(mappings).reduce(((event, param_key, normalized_key) ->
           p = n.params[param_key]?[0]
           if p
