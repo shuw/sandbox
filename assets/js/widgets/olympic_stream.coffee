@@ -17,18 +17,18 @@ class window.OlympicStream
       .append('div')
       .classed('cell', true)
       .call(-> @each (d) -> _this._construct_event(d, @) )
-      .call(-> _.defer => @classed('visible', true))
     cells.exit().remove()
 
   _construct_event: (d, el) ->
-    $el = $(el)
-    $el.append('<div class="date">').text moment(d.date).fromNow()
+    $cell = $(el)
+    $('<div class="date">').appendTo($cell).text moment(d.date).fromNow()
 
-    $content = $el.append('<div class="content">')
+    $event = $('<div class="event">').appendTo($cell)
+    $('<div class="name">').appendTo($event).text d.label
 
     if d.image
       img = get_image(d.image, 100, 100)
-      $content.append \
+      $event.append \
         "<img class='event' width='#{img.size[0]}px' height='#{img.size[1]}px' src='#{img.url}'>"
 
 

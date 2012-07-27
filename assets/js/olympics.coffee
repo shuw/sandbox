@@ -135,8 +135,6 @@ normalize_relations = (news_events) ->
 
   # now saturate events with aggregated events
   _(normalized_relations).chain().flatten().each (e) -> e.agg_event = agg_events[e.event.id]
-  debugger
-
   normalized_relations
 
 

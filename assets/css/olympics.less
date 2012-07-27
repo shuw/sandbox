@@ -1,7 +1,8 @@
 @palette-dark-blue: #1b4b63;
 @palette-blue: #276b8c;
 @palette-light-blue: #d6dfe3;
-
+@palette-light-grey: #95938f;
+@palette-grey: #555;
 
 body {
   font-family: sans-serif;
@@ -55,6 +56,17 @@ body > table {
 }
 
 #stream {
+  .cell {
+    margin-bottom: 30px;
+    .date {
+      color: @palette-light-grey;
+    }
+    .event {
+      .name {
+        color: @palette-light-grey;
+        font-size: 20px;
+      }
+    }
 
-
+  }
 }
