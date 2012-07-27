@@ -33,9 +33,9 @@ class window.OlympicStream
     if d.rels.awards
       award_events = _(d.rels.awards).sortBy (d) ->
         switch (d.award.id)
-          when 52511 then 1 # gold medal
-          when 959029 then 2 # silver medal
-          when 10239 then 3 # bronze medal
+          when 'yC4gq' then 1 # gold medal
+          when 'yBQ2g' then 2 # silver medal
+          when 'yF5Fy' then 3 # bronze medal
           else 4            # unknown medal
 
       d3.select($('<div class="relation awards">').appendTo(rels$)[0])
