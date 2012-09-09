@@ -24,7 +24,7 @@ window.elections_init = (data_path) ->
         .sortBy((events) -> -events.length)
         .value()
 
-      d3.select('#root')
+      d3.select('#raw_headlines')
         .selectAll('.relation')
         .data(grouped_events)
       .enter()
@@ -55,10 +55,24 @@ group_stuff = (events, min_group_threshold = 5) ->
             param: events[0].params[param_key][0],
             events: events
           }
-      ).compact().value()
+      )
+      .compact()
+      .sortBy((d) -> -d.events.length)
+      .value()
 
-  by_occured_at_event = consume_group('occurred_at_event')
-  debugger
+  groups = _.union(
+    consume_group('occurred_at_event'),
+    consume_group('pkey'),
+  )
+
+  d3.select('#root')
+    .selectAll('.event_group')
+    .data(groups)
+  .enter()
+    .append('div').classed('event_group', true)
+    .call(-> @append('h1').text((d) -> d.param.topic.name))
+
+
 
   # # group by event
   # by_event = _(all_events).chain()
