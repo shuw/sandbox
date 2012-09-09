@@ -4,17 +4,23 @@ window.elections_init = (data_path) ->
     $.ajax data_path, success: (events) ->
       events_by_relation = _(events).groupBy((event) -> event.relation_type)
 
-      draw_speeches events_by_relation['person_gave_a_speech']
+      # Normalize events and reverse sort by date
+      _(events).each((e) -> e.date = new Date(e.date))
+      events = _(events).chain()
+        .reject((e) ->
+            # filter mentions for now...
+            e.relation_type == 'source_published_article_about_subjects' \
+            || e.relation_type == 'author_wrote_article_about_subjects' \
+            || e.relation_type == 'author_from_source_wrote_article_about_subjects' \
+            || e.relation_type == 'authors_wrote_articles_about_subject' \
+            || e.relation_type == 'summary' # and summaries
+        )
+        .sortBy((e) -> -e.date)
+        .value()
+
+      group_stuff(events)
 
       grouped_events = _(events_by_relation).chain()
-        .reject((events, relation_type) ->
-          # filter mentions for now...
-          relation_type == 'source_published_article_about_subjects' \
-          || relation_type == 'author_wrote_article_about_subjects' \
-          || relation_type == 'author_from_source_wrote_article_about_subjects' \
-          || relation_type == 'authors_wrote_articles_about_subject' \
-          || relation_type == 'summary' # and summaries
-        )
         .sortBy((events) -> -events.length)
         .value()
 
@@ -33,18 +39,35 @@ window.elections_init = (data_path) ->
         .text((e) -> "#{e.headline} (#{e.news_event_id})")
 
 
-draw_speeches = (speeches) ->
-  min_group_threshold = 5
+group_stuff = (events, min_group_threshold = 5) ->
+  events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
-  # group by event
-  by_event = _(speeches).chain()
-    .groupBy((e) -> e.params?.occurred_at_event?[0]?.topic_id)
-    .filter((events) -> events.length > min_group_threshold)
+  consume_group = (param_key) ->
+    return _(events_by_id).chain()
+      .values()
+      .groupBy((e) -> e.params[param_key]?[0]?.topic_id)
+      .map((events, topic_id) ->
+        if topic_id != 'undefined' && events.length > min_group_threshold
+          # delete events from maste rlist so they are consumed
+          _(events).each (e) -> delete events_by_id[e.news_event_id]
+          {
+            date: events[0].date
+            param: events[0].params[param_key][0],
+            events: events
+          }
+      ).compact().value()
 
+  by_occured_at_event = consume_group('occurred_at_event')
+  debugger
 
-  by_location = _(speeches).groupBy((d) -> d.params?.in_location?[0]?.topic_id)
-  by_entity = _(speeches).groupBy((d) -> d.params?.pkey?[0]?.topic_id)
-  by_articles_count = _(speeches).groupBy((d) -> d.articles.length)
+  # # group by event
+  # by_event = _(all_events).chain()
+  #   .groupBy((e) -> e.params?.occurred_at_event?[0]?.topic_id)
+  #   .filter((events) -> events.length > min_group_threshold)
+
+  # by_location = _(all_events).groupBy((d) -> d.params?.in_location?[0]?.topic_id)
+  # by_entity = _(all_events).groupBy((d) -> d.params?.pkey?[0]?.topic_id)
+  # by_articles_count = _(all_events).groupBy((d) -> d.articles.length)
 
 
 politicians =
