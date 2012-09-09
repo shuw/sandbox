@@ -1,45 +1,30 @@
 _.mixin(_.string.exports())
 
+
+# Filter summaries and these relations because we don't handle them well yet...
+filtered_relations = _([
+  'source_published_article_about_subjects',
+  'author_wrote_article_about_subjects',
+  'author_from_source_wrote_article_about_subjects',
+  'authors_wrote_articles_about_subject',
+  'summary'
+]).groupBy((k) -> k)
+
 window.elections_init = (data_path) ->
-    $.ajax data_path, success: (events) ->
-      events_by_relation = _(events).groupBy((event) -> event.relation_type)
+  $.ajax data_path, success: (events) ->
 
-      # Normalize events and reverse sort by date
-      _(events).each((e) -> e.date = new Date(e.date))
-      events = _(events).chain()
-        .reject((e) ->
-            # filter mentions for now...
-            e.relation_type == 'source_published_article_about_subjects' \
-            || e.relation_type == 'author_wrote_article_about_subjects' \
-            || e.relation_type == 'author_from_source_wrote_article_about_subjects' \
-            || e.relation_type == 'authors_wrote_articles_about_subject' \
-            || e.relation_type == 'summary' # and summaries
-        )
-        .sortBy((e) -> -e.date)
-        .value()
+    # Normalize events and reverse sort by date
+    events = _(events).chain()
+      .map((e) -> e.date = new Date(e.date); e)
+      .reject((e) -> filtered_relations[e.relation_type]?)
+      .sortBy((e) -> -e.date)
+      .value()
 
-      group_stuff(events)
-
-      grouped_events = _(events_by_relation).chain()
-        .sortBy((events) -> -events.length)
-        .value()
-
-      d3.select('#raw_headlines')
-        .selectAll('.relation')
-        .data(grouped_events)
-      .enter()
-        .append('div')
-        .classed('relation', true)
-        .call(-> @append('h1').text((events) -> "#{events[0].relation_type} (#{events.length})"))
-        .selectAll('.event')
-        .data((events) -> events)
-      .enter()
-        .append('div')
-        .classed('event', true)
-        .text((e) -> "#{e.headline} (#{e.news_event_id})")
+    draw_grouped_events(events)
+    draw_raw_data(events)
 
 
-group_stuff = (events, min_group_threshold = 5) ->
+draw_grouped_events = (events, min_group_threshold = 5) ->
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
   consume_group = (param_key) ->
@@ -55,24 +40,15 @@ group_stuff = (events, min_group_threshold = 5) ->
             param: events[0].params[param_key][0],
             events: events
           }
-      )
-      .compact()
-      .sortBy((d) -> -d.events.length)
-      .value()
+      ).compact().sortBy((d) -> -d.events.length).value()
 
-  groups = _.union(
-    consume_group('occurred_at_event'),
-    consume_group('pkey'),
-  )
-
+  groups = _.union consume_group('occurred_at_event'),consume_group('pkey')
   d3.select('#root')
     .selectAll('.event_group')
     .data(groups)
   .enter()
     .append('div').classed('event_group', true)
     .call(-> @append('h1').text((d) -> d.param.topic.name))
-
-
 
   # # group by event
   # by_event = _(all_events).chain()
@@ -82,6 +58,46 @@ group_stuff = (events, min_group_threshold = 5) ->
   # by_location = _(all_events).groupBy((d) -> d.params?.in_location?[0]?.topic_id)
   # by_entity = _(all_events).groupBy((d) -> d.params?.pkey?[0]?.topic_id)
   # by_articles_count = _(all_events).groupBy((d) -> d.articles.length)
+
+
+# Draw raw data for exploring
+draw_raw_data = (events) ->
+  events_by_relation = _(events).groupBy((event) -> event.relation_type)
+  grouped_events = _(events_by_relation).chain()
+    .sortBy((events) -> -events.length)
+    .map((events) ->
+      {
+        events: events,
+        param_histogram: _(events).chain()
+          .map((e) -> (e.params && _(e.params).keys()) || [])
+          .flatten()
+          .groupBy((k) -> k)
+          .map((l, k) -> { count: l.length, name: k })
+          .sortBy('count')
+          .value()
+      }
+    )
+    .value()
+
+  relations_sel = d3.select('#raw_headlines')
+    .selectAll('.relation')
+    .data(grouped_events)
+  .enter()
+    .append('div')
+    .classed('relation', true)
+    .call(-> @append('h1').text((d) -> "#{d.events[0].relation_type} (#{d.events.length})"))
+
+  relations_sel.append('ul').selectAll('.param')
+    .data((d) -> d.param_histogram)
+  .enter()
+    .append('li').classed('param', true)
+    .text((p) -> "#{p.name} (#{p.count})")
+
+  relations_sel.append('ul').selectAll('.event')
+    .data((d) -> d.events)
+  .enter()
+    .append('li').classed('event', true)
+    .text((e) -> "#{e.headline} (#{e.news_event_id})")
 
 
 politicians =
