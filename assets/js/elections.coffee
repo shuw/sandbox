@@ -1,3 +1,4 @@
+#= require_tree politics
 _.mixin(_.string.exports())
 
 # Filter summaries and these relations because we don't handle them well yet...
@@ -33,11 +34,11 @@ window.elections_init = (data_path) ->
       .sortBy((e) -> -e.date)
       .value()
 
-    draw_grouped_events(events)
+    draw_groups(events)
     draw_raw_data(events)
 
 
-draw_grouped_events = (events, min_group_threshold = 5) ->
+draw_groups = (events, min_group_threshold = 5) ->
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
   consume_group = (param_key) ->
@@ -62,6 +63,16 @@ draw_grouped_events = (events, min_group_threshold = 5) ->
   .enter()
     .append('div').classed('event_group', true)
     .call(-> @append('h1').text((d) -> d.param.topic.name))
+    .each(draw_group)
+
+
+
+draw_group = (group) ->
+  by_relation = _(group.events).groupBy((event) -> event.relation_type)
+
+  speeches = by_relation['person_gave_a_speech']
+  debugger
+
 
   # # group by event
   # by_event = _(all_events).chain()
@@ -71,43 +82,3 @@ draw_grouped_events = (events, min_group_threshold = 5) ->
   # by_location = _(all_events).groupBy((d) -> d.params?.in_location?[0]?.topic_id)
   # by_entity = _(all_events).groupBy((d) -> d.params?.pkey?[0]?.topic_id)
   # by_articles_count = _(all_events).groupBy((d) -> d.articles.length)
-
-
-# Draw raw data for exploring
-draw_raw_data = (events) ->
-  events_by_relation = _(events).groupBy((event) -> event.relation_type)
-  grouped_events = _(events_by_relation).chain()
-    .sortBy((events) -> -events.length)
-    .map((events) ->
-      {
-        events: events,
-        param_histogram: _(events).chain()
-          .map((e) -> _(e.params).keys())
-          .flatten()
-          .groupBy((k) -> k)
-          .map((l, k) -> { count: l.length, name: k })
-          .sortBy('count')
-          .value()
-      }
-    )
-    .value()
-
-  relations_sel = d3.select('#raw_headlines')
-    .selectAll('.relation')
-    .data(grouped_events)
-  .enter()
-    .append('div')
-    .classed('relation', true)
-    .call(-> @append('h1').text((d) -> "#{d.events[0].relation_type} (#{d.events.length})"))
-
-  relations_sel.append('ul').selectAll('.param')
-    .data((d) -> d.param_histogram)
-  .enter()
-    .append('li').classed('param', true)
-    .text((p) -> "#{p.name} (#{p.count})")
-
-  relations_sel.append('ul').selectAll('.event')
-    .data((d) -> d.events)
-  .enter()
-    .append('li').classed('event', true)
-    .text((e) -> "#{e.headline} (#{e.news_event_id})")
