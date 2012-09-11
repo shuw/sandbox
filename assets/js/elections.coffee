@@ -73,6 +73,16 @@ draw_group = (group) ->
     .groupBy((event) -> event.relation_type)
     .map((events, relation_type) ->
       switch relation_type
+        # TODO: relations to handle
+        # person_has_polling_numbers
+        # person_gave_a_speech
+        # person_holds_campaign_rally
+        # person_raised_campaign_funding
+        # person_holds_fundraiser
+        # person_runs_political_ad
+        # organization_runs_political_ad
+        # person_won_party_nomination
+        # person_criticized_person
         when 'person_gave_a_speech'
           draw_function = draw_speeches
         else console.log("Don't know how to draw #{relation_type}")
