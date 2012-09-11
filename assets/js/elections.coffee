@@ -59,35 +59,40 @@ draw_groups = (events) ->
       ).compact().sortBy((d) -> -d.events.length).value()
 
   groups = _.union consume_group('for_event'),consume_group('pkey')
-  d3.select('#root')
-    .selectAll('.event_group')
+
+  d3.select(@).selectAll('.group')
     .data(groups)
   .enter()
-    .append('div').classed('event_group', true)
+    .append('div').classed('group', true)
     .call(-> @append('h1').text((d) -> d.param.topic.name))
     .each(draw_group)
 
 
 
 draw_group = (group) ->
-  by_relation = _(group.events).groupBy((event) -> event.relation_type)
-
-
-  # @sleact
-
-  speeches = by_relation['person_gave_a_speech']
-  quotes = _(speeches).chain()
-    .map((d) -> d.params.quote_commonentity).compact()
+  relation_groups = _(group.events).chain()
+    .groupBy((event) -> event.relation_type)
+    .map((events, relation_type) -> {
+      relation_type: relation_type
+      events: events
+    })
+    .sortBy((d) -> -d.events.length)
     .value()
 
+  d3.select(@).selectAll('.relation')
+    .data(relation_groups)
+  .enter()
+    .append('div').classed('relation', true)
+    .call(-> @append('h2').text((d) -> d.relation_type))
+    .each((group) ->
+      if group.relation_type == 'person_gave_a_speech'
+        draw_speeches(group.events)
+      else
+        console.log("Don't know how to draw #{group.relation_type}")
+    )
+
 draw_speeches = (speeches) ->
-
-
-  # # group by event
-  # by_event = _(all_events).chain()
-  #   .groupBy((e) -> e.params?.for_event?[0]?.topic_id)
-  #   .filter((events) -> events.length > MIN_GROUP_THRESHOLD = 5)
-
-  # by_location = _(all_events).groupBy((d) -> d.params?.in_location?[0]?.topic_id)
-  # by_entity = _(all_events).groupBy((d) -> d.params?.pkey?[0]?.topic_id)
-  # by_articles_count = _(all_events).groupBy((d) -> d.articles.length)
+  debugger
+  # quotes = _(speeches).chain()
+  #   .map((d) -> d.params.quote_commonentity).compact()
+  #   .value()
