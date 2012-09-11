@@ -6,14 +6,14 @@ window.draw_groups = (events) ->
   consume_group = (param_key) ->
     return _(events_by_id).chain()
       .values()
-      .groupBy((e) -> e.params[param_key]?[0]?.topic_id)
+      .groupBy((e) -> e.params[param_key]?.topic_id)
       .map((events, topic_id) ->
         if topic_id != 'undefined' && events.length > MIN_GROUP_THRESHOLD
           # delete events from maste rlist so they are consumed
           _(events).each (e) -> delete events_by_id[e.news_event_id]
           {
             date: events[0].date
-            param: events[0].params[param_key][0],
+            param: events[0].params[param_key],
             events: events
           }
       ).compact().sortBy((d) -> -d.events.length).value()
@@ -74,13 +74,13 @@ draw_speeches = (speeches) ->
   # Normalized speeches
   speeches = _(speeches).chain()
     .map((e) ->
-      return unless e.params.pkey?.length
-      speaker = e.params.pkey[0]
+      return unless e.params.pkey?
+      speaker = e.params.pkey
       gimage = speaker.topic_images?[0]
 
       {
         name: speaker.label,
-        quote: e.params.quote_commonentity?[0]?.label,
+        quote: e.params.quote_commonentity?.label,
         image: gimage && _get_image(gimage, 40, 40) || {
           url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
           size: [40, 40]

@@ -21,17 +21,25 @@ window.elections_init = ->
     .map((e) ->
       e.date = new Date(e.date)
 
+      affiliations = {}
+      normalized_params = {}
       _(e.params).each (params, key) ->
-        if new_key = NORMALIZE_PARAMS[key]
-          e.params[new_key] = params
-          delete e.params[key]
+        primary_param = params[0]
+        if primary_param?.topic_id && affiliation = get_affiliation(primary_param.topic_id)
+          primary_param.affiliation = affiliation
+          affiliations[affiliation] = true
 
+        normalized_params[NORMALIZE_PARAMS[key] or key] = primary_param
+
+      e.affiliations = _(affiliations).keys()
+      e.params = normalized_params
       e.relation_type = NORMALIZE_PARAMS[e.relation_type] || e.relation_type
       e
     )
     .sortBy((e) -> -e.date)
     .value()
 
+  draw_filters()
 
   d3.selectAll('#root')
     .data([events])
