@@ -31,7 +31,14 @@ window.draw_groups = (events) ->
     .data(groups, (d) -> d.unique_id)
   sel.enter()
     .append('div').classed('group', true)
-    .call(-> @append('h1').text((d) -> d.param.topic.name))
+    .call(->
+      @append('h1').text((d) -> d.param.topic.name)
+      @append('time').text((d) ->
+        end = moment(d.events[Math.floor(d.events.length * 0.05)].date).format('dddd M/D')
+        start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date).format('dddd M/D')
+        if start != end then "#{start} - #{end}" else start
+      )
+    )
     .each(draw_group)
   sel.exit().remove()
 
@@ -75,7 +82,9 @@ draw_group = (group) ->
   .enter()
     .append('div')
       .classed('relation', true)
-      .call(-> @append('h2').text((d) -> d.relation_type))
+      .call(->
+        @append('h2').text((d) -> d.relation_type)
+      )
       .each((d) -> d.draw_function.call(@, d.events))
 
 
