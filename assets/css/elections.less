@@ -10,18 +10,33 @@ body {
   margin: 0;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+  width: 1000px;
+  margin: 0 auto;
 }
 
+#filters {
+  width: 200px;
+  float: left;
+}
 
-.group {
+#root {
+  width: 800px;
+  float: left;
 
-  .relation {
+  .group {
 
-    &.person_gave_a_speech {
-      .avatar {
-        vertical-align: middle;
+    .relation {
+
+      &.person_gave_a_speech {
+        .avatar {
+          vertical-align: middle;
+        }
       }
-    }
 
+    }
   }
+}
+
+#raw_headlines {
+  clear: both;
 }
