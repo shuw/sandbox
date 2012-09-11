@@ -72,10 +72,20 @@ draw_groups = (events) ->
 draw_group = (group) ->
   relation_groups = _(group.events).chain()
     .groupBy((event) -> event.relation_type)
-    .map((events, relation_type) -> {
-      relation_type: relation_type
-      events: events
-    })
+    .map((events, relation_type) ->
+      switch relation_type
+        when 'person_gave_a_speech'
+          draw_function = draw_speeches
+        else console.log("Don't know how to draw #{group.relation_type}")
+
+      if draw_function
+        {
+          relation_type: relation_type
+          events: events
+          draw_function: draw_function
+        }
+    )
+    .compact()
     .sortBy((d) -> -d.events.length)
     .value()
 
@@ -84,15 +94,15 @@ draw_group = (group) ->
   .enter()
     .append('div').classed('relation', true)
     .call(-> @append('h2').text((d) -> d.relation_type))
-    .each((group) ->
-      if group.relation_type == 'person_gave_a_speech'
-        draw_speeches(group.events)
-      else
-        console.log("Don't know how to draw #{group.relation_type}")
-    )
+    .each((d) -> d.draw_function.call(@, d.events))
 
 draw_speeches = (speeches) ->
-  debugger
+  root = d3.select(@)
+  root.append('h3')
+    .text((d) -> "#{speeches.length} speeches were made")
+
+  d3.select(@).selectAll('.speech')
+    .data(speeches)
   # quotes = _(speeches).chain()
   #   .map((d) -> d.params.quote_commonentity).compact()
   #   .value()
