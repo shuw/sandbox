@@ -34,9 +34,12 @@ window.draw_groups = (events) ->
     .call(->
       @append('h1').text((d) -> d.param.topic.name)
       @append('time').text((d) ->
-        end = moment(d.events[Math.floor(d.events.length * 0.05)].date).format('dddd M/D')
-        start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date).format('dddd M/D')
-        if start != end then "#{start} - #{end}" else start
+        end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
+        start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
+        if start.format('dddd M/D') != end
+          "#{start.format('M/D')} - #{end.format('dddd M/D')}"
+        else
+          start.format('dddd M/D')
       )
     )
     .each(draw_group)
