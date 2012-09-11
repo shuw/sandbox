@@ -91,9 +91,11 @@ draw_group = (group) ->
   d3.select(@).selectAll('.relation')
     .data(relation_groups)
   .enter()
-    .append('div').classed('relation', true)
-    .call(-> @append('h2').text((d) -> d.relation_type))
-    .each((d) -> d.draw_function.call(@, d.events))
+    .append('div')
+      .attr('class', (d) -> d.relation_type)
+      .classed('relation', true)
+      .call(-> @append('h2').text((d) -> d.relation_type))
+      .each((d) -> d.draw_function.call(@, d.events))
 
 
 draw_speeches = (speeches) ->
@@ -135,7 +137,7 @@ draw_speeches = (speeches) ->
   .enter()
     .append('div').classed('quote', true)
     .call(_avatar_creator())
-    .append('p')
+    .append('span')
       .text((d) -> d.quote)
 
   # quotes = _(speeches).chain()
@@ -146,6 +148,7 @@ draw_speeches = (speeches) ->
 _avatar_creator = (options = {}) ->
   return ->
     @append('img')
+      .classed('avatar', true)
       .attr('title', (d) -> d.name)
       .attr('src', (d) -> d.image.url)
       .attr('width', (d) -> (options.size || d.image.size)[0])
