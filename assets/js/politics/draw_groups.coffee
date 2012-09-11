@@ -33,6 +33,10 @@ draw_group = (group) ->
     .groupBy((event) -> event.relation_type)
     .map((events, relation_type) ->
       switch relation_type
+        # TODO:
+        #   for some relations consider rejecting
+        #   events without affiliation x.reject((e) -> e.affiliations.length == 0)
+
         # TODO: relations to handle
         # person_has_polling_numbers
         # person_gave_a_speech
