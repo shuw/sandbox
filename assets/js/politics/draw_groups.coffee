@@ -79,10 +79,11 @@ draw_speeches = (speeches) ->
       gimage = speaker.topic_images?[0]
 
       {
-        name: speaker.label,
-        quote: e.params.quote_commonentity?.label,
+        affiliation: speaker.affiliation
+        name: speaker.label
+        quote: e.params.quote_commonentity?.label
         image: gimage && _get_image(gimage, 40, 40) || {
-          url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png',
+          url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png'
           size: [40, 40]
         }
       }
@@ -114,6 +115,7 @@ draw_speeches = (speeches) ->
 _avatar_creator = (options = {}) ->
   return ->
     @append('img')
+      .attr('class', (d) -> d.affiliation || 'unknown')
       .classed('avatar', true)
       .attr('title', (d) -> d.name)
       .attr('src', (d) -> d.image.url)
