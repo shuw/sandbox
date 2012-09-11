@@ -50,30 +50,24 @@ draw_group = (group) ->
   relation_groups = _(group.events).chain()
     .groupBy((event) -> event.relation_type)
     .map((events, relation_type) ->
-      switch relation_type
-        # TODO:
-        #   for some relations consider rejecting
-        #   events without affiliation x.reject((e) -> e.affiliations.length == 0)
+      # TODO:
+      #   for some relations consider rejecting
+      #   events without affiliation x.reject((e) -> e.affiliations.length == 0)
 
-        # TODO: relations to handle
-        # person_has_polling_numbers
-        # person_gave_a_speech
-        # person_holds_campaign_rally
-        # person_raised_campaign_funding
-        # person_holds_fundraiser
-        # person_runs_political_ad
-        # organization_runs_political_ad
-        # person_won_party_nomination
-        # person_criticized_person
-        when 'person_gave_a_speech'
-          draw_function = draw_speeches
-        else console.log("Don't know how to draw #{relation_type}")
+      # TODO: relations to handle
+      # person_has_polling_numbers
+      # person_gave_a_speech
+      # person_holds_campaign_rally
+      # person_raised_campaign_funding
+      # person_holds_fundraiser
+      # person_won_party_nomination
+      # person_criticized_person
 
-      if draw_function
+      if drawer = window["render_#{relation_type}"]
         {
           relation_type: relation_type
           events: events
-          draw_function: draw_function
+          drawer: drawer
         }
     )
     .compact()
@@ -88,6 +82,6 @@ draw_group = (group) ->
       .call(->
         @append('h2').text((d) -> d.relation_type)
       )
-      .each((d) -> d.draw_function.call(@, d.events))
+      .each((d) -> d.drawer.call(@, d.events))
 
 

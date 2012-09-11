@@ -15,6 +15,7 @@ NORMALIZE_PARAMS = {
 NORMALIZE_RELATIONS = {
   'person_runs_political_ad': 'political_ad'
   'organization_runs_political_ad': 'political_ad'
+  'person_gave_a_speech': 'speech'
 }
 
 window.normalize_events = (events) ->

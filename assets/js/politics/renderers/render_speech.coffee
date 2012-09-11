@@ -1,4 +1,4 @@
-window.draw_speeches = (speeches) ->
+window.render_speech = (speeches) ->
   root = d3.select(@).classed('speeches', true)
 
   # Normalized speeches
