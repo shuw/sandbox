@@ -1,5 +1,4 @@
 #= require_tree politics
-#= require vendor/moment_range
 
 _.mixin(_.string.exports())
 
