@@ -1,5 +1,5 @@
 window.draw_speeches = (speeches) ->
-  root = d3.select(@)
+  root = d3.select(@).classed('speeches', true)
 
   # Normalized speeches
   speeches = _(speeches).chain()

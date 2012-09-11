@@ -74,7 +74,6 @@ draw_group = (group) ->
     .data(relation_groups)
   .enter()
     .append('div')
-      .attr('class', (d) -> d.relation_type)
       .classed('relation', true)
       .call(-> @append('h2').text((d) -> d.relation_type))
       .each((d) -> d.draw_function.call(@, d.events))

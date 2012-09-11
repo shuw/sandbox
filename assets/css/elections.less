@@ -28,6 +28,18 @@ a, .link {
   }
 }
 
+.avatar {
+  &.democrat {
+    border: 1px solid blue;
+  }
+  &.republican {
+    border: 1px solid red;
+  }
+  &.neutral {
+    border: 1px solid gray;
+  }
+}
+
 #filters {
   margin-top: 20px;
   width: 200px;
@@ -43,22 +55,20 @@ a, .link {
 
     .relation {
 
-      &.person_gave_a_speech {
-        .avatar {
-          vertical-align: middle;
+      &.speeches {
 
-          &.democrat {
-            border: 1px solid blue;
-          }
-          &.republican {
-            border: 1px solid red;
-          }
-          &.neutral {
-            border: 1px solid gray;
+        .speaker {
+          margin-right: 5px;
+        }
+
+        .quote {
+          margin-bottom: 10px;
+
+          .avatar {
+            vertical-align: middle;
           }
         }
       }
-
     }
   }
 }
