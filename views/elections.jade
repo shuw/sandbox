@@ -4,11 +4,9 @@
 header
 body
   #filters
-    | I'm a filter
   #root
   #raw_headlines
 
   script window.POLITICS_DATA = []
   script(src='/data/politics.js')
-
   script $(function() { elections_init() })

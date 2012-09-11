@@ -12,6 +12,7 @@ FILTERED_RELATIONS = _([
 
 NORMALIZE_PARAMS = {
   'occurred_at_event': 'for_event'
+  'speaker': 'pkey'
 }
 
 window.elections_init = ->
@@ -39,11 +40,10 @@ window.elections_init = ->
     .sortBy((e) -> -e.date)
     .value()
 
-  draw_filters()
-
-  d3.selectAll('#root')
-    .data([events])
-    .each(draw_groups)
-    .each(draw_raw_data)
-
+  init_filters(events, (selected) ->
+    d3.selectAll('#root')
+      .data([selected])
+      .each(draw_groups)
+      .each(draw_raw_data)
+  )
 

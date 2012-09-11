@@ -14,9 +14,25 @@ body {
   margin: 0 auto;
 }
 
+a, .link {
+  text-decoration: none;
+  color: @palette-blue;
+  cursor: pointer;
+
+  &.selected {
+    color: black;
+  }
+
+  &.disabled {
+    color: @palette-grey;
+  }
+}
+
 #filters {
+  margin-top: 20px;
   width: 200px;
   float: left;
+  font-size: 14px;
 }
 
 #root {

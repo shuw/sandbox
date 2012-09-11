@@ -9,23 +9,31 @@ window.draw_groups = (events) ->
       .groupBy((e) -> e.params[param_key]?.topic_id)
       .map((events, topic_id) ->
         if topic_id != 'undefined' && events.length > MIN_GROUP_THRESHOLD
+          events = _(events).sortBy (e) -> -e.date
+
+          unique_id = ''
           # delete events from maste rlist so they are consumed
-          _(events).each (e) -> delete events_by_id[e.news_event_id]
+          _(events).each (e) ->
+            delete events_by_id[e.news_event_id]
+            unique_id += e.news_event_id
+
           {
             date: events[0].date
-            param: events[0].params[param_key],
+            param: events[0].params[param_key]
             events: events
+            unique_id: unique_id
           }
       ).compact().sortBy((d) -> -d.events.length).value()
 
   groups = _.union consume_group('for_event'),consume_group('pkey')
 
-  d3.select(@).selectAll('.group')
-    .data(groups)
-  .enter()
+  sel = d3.select(@).selectAll('.group')
+    .data(groups, (d) -> d.unique_id)
+  sel.enter()
     .append('div').classed('group', true)
     .call(-> @append('h1').text((d) -> d.param.topic.name))
     .each(draw_group)
+  sel.exit().remove()
 
 
 draw_group = (group) ->
@@ -94,7 +102,7 @@ draw_speeches = (speeches) ->
     )
     .compact().value()
 
-  top_speakers = _sort_by_occurrences(speeches, (d) -> d.name)
+  top_speakers = sort_by_occurrences(speeches, (d) -> d.name)
   root.selectAll('.speaker')
     .data(top_speakers[..4])
   .enter()
@@ -126,14 +134,6 @@ _avatar_creator = (options = {}) ->
       .attr('width', (d) -> (options.size || d.image.size)[0])
       .attr('height', (d) -> (options.size || d.image.size)[1])
 
-
-# Groups by key and returns the most frequent items first
-_sort_by_occurrences = (list, key_func) ->
-  _(list).chain()
-    .groupBy(key_func || ((d) -> d))
-    .sortBy((group, key) -> group.length)
-    .map((group) -> group[0])
-    .value()
 
 # First tries to find an image equal or bigger than requested,
 # otherwise, settles for a slightly smaller one
