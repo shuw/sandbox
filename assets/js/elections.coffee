@@ -16,6 +16,11 @@ NORMALIZE_PARAMS = {
   'speaker': 'pkey'
 }
 
+NORMALIZE_RELATIONS = {
+  'person_runs_political_ad': 'political_ad'
+  'organization_runs_political_ad': 'political_ad'
+}
+
 window.elections_init = ->
   # Normalize events and reverse sort by date
   events = _(POLITICS_DATA).chain()
@@ -35,7 +40,7 @@ window.elections_init = ->
 
       e.affiliations = _(affiliations).keys()
       e.params = normalized_params
-      e.relation_type = NORMALIZE_PARAMS[e.relation_type] || e.relation_type
+      e.relation_type = NORMALIZE_RELATIONS[e.relation_type] || e.relation_type
       e
     )
     .sortBy((e) -> -e.date)
