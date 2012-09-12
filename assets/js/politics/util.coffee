@@ -1,6 +1,6 @@
 
 # Groups by key and returns the most frequent items first
-window.sort_by_occurrences = (list, key_func, uniq=true) ->
+window.sort_by_occurrences = (list, key_func, uniq) ->
   _(list).chain()
     .groupBy(key_func || ((d) -> d))
     .filter((group, key) -> key != 'undefined')
@@ -9,15 +9,14 @@ window.sort_by_occurrences = (list, key_func, uniq=true) ->
     .value()
 
 
-window.avatar_creator = (options = {}) ->
-  return ->
-    @append('img')
-      .attr('class', (d) -> d.affiliation || 'unknown')
-      .classed('avatar', true)
-      .attr('title', (d) -> d.name)
-      .attr('src', (d) -> d.image.url)
-      .attr('width', (d) -> (options.size || d.image.size)[0])
-      .attr('height', (d) -> (options.size || d.image.size)[1])
+window.avatar_creator = ->
+  @append('img')
+    .attr('class', (d) -> d.affiliation || 'unknown')
+    .classed('avatar', true)
+    .attr('title', (d) -> d.label)
+    .attr('src', (d) -> d.avatar_image.url)
+    .attr('width', (d) -> (d.avatar_image.size)[0])
+    .attr('height', (d) -> (d.avatar_image.size)[1])
 
 
 # First tries to find an image equal or bigger than requested,

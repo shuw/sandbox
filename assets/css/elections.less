@@ -6,7 +6,7 @@
 
 body {
   font-family: sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
@@ -44,7 +44,6 @@ a, .link {
   margin-top: 20px;
   width: 200px;
   float: left;
-  font-size: 14px;
 }
 
 #root {
@@ -59,14 +58,40 @@ a, .link {
 
     > time {
       margin-top: 20px;
-      font-size: 14px;
       float: right;
     }
 
     .relation {
       clear: both;
 
-      &.speeches {
+      &.criticism {
+        .sources, .target {
+          display: inline-block;
+          .avatar {
+            vertical-align: middle
+          }
+        }
+        .sources {
+          width: 400px;
+
+          .source {
+            .avatar, .reason {
+              display: inline-block;
+            }
+            .reason {
+              margin-left: 5px;
+              width: 300px;
+            }
+          }
+        }
+
+        .target {
+          display: inline-block;
+          width: 100px;
+        }
+      }
+
+      &.speech {
 
         .speaker {
           margin-right: 5px;

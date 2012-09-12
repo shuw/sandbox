@@ -46,6 +46,10 @@ window.draw_groups = (events) ->
   sel.exit().remove()
 
 
+RELATION_SORT_ORDER = {
+  'criticism' : 1
+  'speech': 2
+}
 draw_group = (group) ->
   relation_groups = _(group.events).chain()
     .groupBy((event) -> event.relation_type)
@@ -55,6 +59,7 @@ draw_group = (group) ->
       #   events without affiliation x.reject((e) -> e.affiliations.length == 0)
 
       # TODO: relations to handle
+      # political_ad (need media field of news_data)
       # person_has_polling_numbers
       # person_gave_a_speech
       # person_holds_campaign_rally
@@ -71,13 +76,14 @@ draw_group = (group) ->
         }
     )
     .compact()
-    .sortBy((d) -> -d.events.length)
+    .sortBy((d) -> RELATION_SORT_ORDER[d.relation_type] || 100000)
     .value()
 
   d3.select(@).selectAll('.relation')
     .data(relation_groups)
   .enter()
     .append('div')
+      .attr('class', (d) -> d.relation_type)
       .classed('relation', true)
       .call(->
         @append('h2').text((d) -> d.relation_type)

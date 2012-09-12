@@ -1,5 +1,5 @@
 window.init_filters = (events, on_events_selected) ->
-  by_pkey = sort_by_occurrences(events, ((d) -> d.params.pkey?.topic_id), false)
+  by_pkey = sort_by_occurrences(events, ((d) -> d.params.pkey?.topic_id))
 
   root = d3.select('#filters')
 

@@ -16,6 +16,7 @@ NORMALIZE_RELATIONS = {
   'person_runs_political_ad': 'political_ad'
   'organization_runs_political_ad': 'political_ad'
   'person_gave_a_speech': 'speech'
+  'person_criticized_person': 'criticism'
 }
 
 window.normalize_events = (events) ->
@@ -28,6 +29,12 @@ window.normalize_events = (events) ->
       normalized_params = {}
       _(e.params).each (params, key) ->
         primary_param = params[0]
+        gimage = primary_param.topic_images?[0]
+        primary_param.avatar_image = gimage && get_image(gimage, 40, 40) || {
+          url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png'
+          size: [40, 40]
+        }
+
         if primary_param?.topic_id && affiliation = get_affiliation(primary_param.topic_id)
           primary_param.affiliation = affiliation
           affiliations[affiliation] = true
