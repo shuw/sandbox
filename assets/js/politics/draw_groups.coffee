@@ -67,6 +67,9 @@ draw_group = (group) ->
       # person_holds_fundraiser
       # person_won_party_nomination
       # person_criticized_person
+      # person_interviewed
+      # person_arrived_in
+
 
       if drawer = window["render_#{relation_type}"]
         {
