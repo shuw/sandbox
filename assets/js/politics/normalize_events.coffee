@@ -1,28 +1,27 @@
-# Filter summaries and these relations because we don't handle them well yet...
-FILTERED_RELATIONS = _([
-  'source_published_article_about_subjects',
-  'author_wrote_article_about_subjects',
-  'author_from_source_wrote_article_about_subjects',
-  'authors_wrote_articles_about_subject',
-  'summary',
-]).groupBy((k) -> k)
+NORMALIZE_RELATIONS = {
+  'person_runs_political_ad': 'political_ad'
+  'organization_runs_political_ad': 'political_ad'
+  'person_gave_a_speech': 'speech'
+  'person_criticized_person': 'criticism'
+  'person_has_polling_numbers': 'polling_numbers'
+  'person_holds_campaign_rally': 'campaign_rally'
+  'person_raised_campaign_funding': 'campaign_funding'
+  'person_holds_fundraiser': 'fundraiser'
+  'person_won_party_nomination': 'party_nomination'
+  'person_interviewed': 'interviewed'
+  'person_arrived_in': 'arrived_in'
+}
 
 NORMALIZE_PARAMS = {
   'occurred_at_event': 'for_event'
   'speaker': 'pkey'
 }
 
-NORMALIZE_RELATIONS = {
-  'person_runs_political_ad': 'political_ad'
-  'organization_runs_political_ad': 'political_ad'
-  'person_gave_a_speech': 'speech'
-  'person_criticized_person': 'criticism'
-}
-
 window.normalize_events = (events) ->
   _(POLITICS_DATA).chain()
-    .reject((e) -> FILTERED_RELATIONS[e.relation_type]?)
     .map((e) ->
+      return unless NORMALIZE_RELATIONS[e.relation_type]
+
       e.date = new Date(e.date)
 
       affiliations = {}
@@ -43,8 +42,9 @@ window.normalize_events = (events) ->
 
       e.affiliations = _(affiliations).keys()
       e.params = normalized_params
-      e.relation_type = NORMALIZE_RELATIONS[e.relation_type] || e.relation_type
+      e.relation_type = NORMALIZE_RELATIONS[e.relation_type]
       e
     )
+    .compact()
     .sortBy((e) -> -e.date)
     .value()
