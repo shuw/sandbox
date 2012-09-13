@@ -47,8 +47,9 @@ window.draw_groups = (events) ->
 
 
 RELATION_SORT_ORDER = {
-  'criticism' : 1
-  'speech': 2
+  'political_ad' : 1
+  'criticism' : 1002
+  'speech': 1003
 }
 
 draw_group = (group) ->
