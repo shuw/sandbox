@@ -6,16 +6,15 @@ HEIGHT = 240
 
   render: (events) ->
     root = d3.select(@)
-
     events = _(events).map (e) ->
       {
         link: e.media.link
       }
 
-    root.selectAll('.advertisement')
+    root.selectAll('.video')
       .data(events)
     .enter()
-      .append('div').classed('advertisement', true)
+      .append('div').classed('video', true)
       .html((d) ->
         "<iframe class=\"youtube-player\" type=\"text/html\" width=\"#{WIDTH}\" height=\"#{HEIGHT}\" src=\"http://www.youtube.com/embed/#{d.link}\" frameborder=\"0\">
         </iframe>"
