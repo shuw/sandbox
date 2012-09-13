@@ -1,5 +1,6 @@
 (window.relations ||= {}).political_ad =
-  renderable: (political_ad) -> true
+  renderable: (event) -> event.media?
 
-  render: (political_ads) ->
+  render: (events) ->
     root = d3.select(@)
+    debugger

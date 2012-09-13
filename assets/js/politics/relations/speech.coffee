@@ -1,19 +1,19 @@
 (window.relations ||= {}).speech =
-  renderable: (speech) -> speech.params.pkey?
+  renderable: (event) -> event.params.pkey?
 
-  render: (speeches) ->
+  render: (events) ->
     root = d3.select(@)
 
-    # Normalized speeches
-    speeches = _(speeches)
-      .map((e) ->
-        _(e.params.pkey).chain().clone().defaults(
-          affiliation: e.params.pkey.affiliation
-          quote: e.params.quote_commonentity?.label
+    # Normalized events
+    events = _(events)
+      .map((event) ->
+        _(event.params.pkey).chain().clone().defaults(
+          affiliation: event.params.pkey.affiliation
+          quote: event.params.quote_commonentity?.label
         ).value()
       )
 
-    top_speakers = sort_by_occurrences(speeches, ((d) -> d.label), true)
+    top_speakers = sort_by_occurrences(events, ((d) -> d.label), true)
     root.selectAll('.speaker')
       .data(top_speakers[..4])
     .enter()
@@ -25,7 +25,7 @@
     root.append('span').text("#{prefix}gave a speech")
 
 
-    quotes = _(speeches).filter((d) -> d.quote?)
+    quotes = _(events).filter((d) -> d.quote?)
     root.selectAll('.quote')
       .data(quotes)
     .enter()

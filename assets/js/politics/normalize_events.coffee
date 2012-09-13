@@ -40,9 +40,12 @@ window.normalize_events = (events) ->
 
         normalized_params[NORMALIZE_PARAMS[key] or key] = primary_param
 
-      event.affiliations = _(affiliations).keys()
-      event.params = normalized_params
-      event.relation_type = NORMALIZE_RELATIONS[event.relation_type]
+      event = _({
+        affiliations: _(affiliations).keys()
+        params: normalized_params
+        media: event.media?[0]
+        relation_type: NORMALIZE_RELATIONS[event.relation_type]
+      }).defaults(event)
 
       if window.relations[event.relation_type]?.renderable(event)
         event
