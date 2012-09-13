@@ -50,6 +50,7 @@ RELATION_SORT_ORDER = {
   'criticism' : 1
   'speech': 2
 }
+
 draw_group = (group) ->
   relation_groups = _(group.events).chain()
     .groupBy((event) -> event.relation_type)
@@ -71,11 +72,11 @@ draw_group = (group) ->
       # person_arrived_in
 
 
-      if drawer = window["render_#{relation_type}"]
+      if relation = window.relations[relation_type]
         {
           relation_type: relation_type
           events: events
-          drawer: drawer
+          render: relation.render
         }
     )
     .compact()
@@ -91,6 +92,6 @@ draw_group = (group) ->
       .call(->
         @append('h2').text((d) -> d.relation_type)
       )
-      .each((d) -> d.drawer.call(@, d.events))
+      .each((d) -> d.render.call(@, d.events))
 
 
