@@ -11,6 +11,7 @@ window.init_filters = (events, on_events_selected) ->
     'topic': group_by_type(20, events, 'topic', (d) -> d.params.pkey?.label)
   }
 
+  current_path = null
   select_filter_path = (path) ->
     if path && path != ''
       parts = path.replace(/-/g, ' ').split('/')
@@ -22,7 +23,10 @@ window.init_filters = (events, on_events_selected) ->
 
     unless path == '' and !window.location.hash
       window.location.hash = path.replace(/\s/g, '-')
-    on_events_selected(filtered_events)
+
+    if path != current_path
+      on_events_selected(filtered_events)
+      current_path = path
 
   sorted_filter_groups = _(grouped_by_type).sortBy((d) -> TYPE_SORT_ORDER.indexOf(d.type))
 
