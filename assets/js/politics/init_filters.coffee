@@ -6,9 +6,9 @@ TYPE_SORT_ORDER = [
 
 window.init_filters = (events, on_events_selected) ->
   grouped_by_type = {
-    'event': group_by_type(10, events, 'event', (d) -> d.params.for_event?.label)
+    'event': group_by_type(10, events, 'event', (d) -> d.params.for_event?.topic?.name)
     'relation': group_by_type(10, events, 'relation', (d) -> d.relation_name)
-    'topic': group_by_type(20, events, 'topic', (d) -> d.params.pkey?.label)
+    'topic': group_by_type(20, events, 'topic', (d) -> d.params.pkey?.topic?.name)
   }
 
   current_path = null
