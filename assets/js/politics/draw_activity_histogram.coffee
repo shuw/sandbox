@@ -2,14 +2,15 @@ width = 800
 height = 100
 
 window.draw_activity_histogram = (events) ->
-  root = d3.select(@).select('svg.activity')
+  root = d3.select(@).select(".activity")
 
-  by_date =  _(events).groupBy((d) -> moment(d.date).format('DD/MM/YY'))
+  by_date =  _(events).groupBy((d) -> moment(d.date).format('MM/DD/YY'))
   oldest = moment(_(events).min((e) -> e.date).date)
   newest = moment(_(events).max((e) -> e.date).date)
 
-  days = [oldest.format('DD/MM/YY')]
-  days.push(oldest.add('days', 1).format('DD/MM/YY')) while oldest < newest
+  current = oldest.clone()
+  days = [current.format('DD/MM/YY')]
+  days.push(current.add('days', 1).format('MM/DD/YY')) while current < newest
 
   root.classed('hidden', days.length < 4)
 
@@ -22,9 +23,15 @@ window.draw_activity_histogram = (events) ->
     .attr("width", x.rangeBand())
     .attr("height", (d) -> y((by_date[d] || []).length))
 
-  recs = root
-    .selectAll("rect")
+  recs = root.select('svg').selectAll("rect")
     .data(days, (d) -> d)
   recs.enter().append("rect").call(update_graph)
   recs.exit().remove()
   recs.transition().duration(500).call(update_graph)
+
+
+  root.select('.labels').selectAll('.label')
+    .data([oldest, newest])
+  .enter()
+    .append('div').classed('label', true)
+    .text((d) -> d.format('MMM Do, YYYY'))

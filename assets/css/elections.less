@@ -2,7 +2,7 @@
 @palette-blue: #276b8c;
 @palette-light-blue: #d6dfe3;
 @palette-light-grey: #95938f;
-@palette-grey: #777;
+@palette-grey: #555;
 
 body {
   font-family: sans-serif;
@@ -12,6 +12,7 @@ body {
   overflow-x: hidden;
   width: 1000px;
   margin: 0 auto;
+  color: @palette-grey;
 }
 
 .hidden {
@@ -56,11 +57,25 @@ a, .link {
 
   .activity {
     margin-top: 20px;
-    height: 120px;
 
-    rect {
-      fill: @palette-blue;
-      stroke: white;
+    svg {
+      height: 105px;
+      rect {
+        fill: @palette-blue;
+        stroke: white;
+      }
+    }
+
+    .labels {
+      margin-bottom: 20px;
+      .label {
+        &:first-child {
+          float: left;
+        }
+        &:last-child {
+          float: right;
+        }
+      }
     }
   }
 
