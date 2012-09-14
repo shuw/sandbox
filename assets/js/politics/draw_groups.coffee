@@ -1,14 +1,21 @@
-MIN_GROUP_THRESHOLD = 5
-
 window.draw_groups = (events) ->
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
-  consume_group = (param_key, threshold = MIN_GROUP_THRESHOLD) ->
+  # try to create more interesting clusters first
+  create_clusters = ->
+    _.union(
+      cluster(5, (e) -> e.params.for_event?.label),
+      cluster(5, (e) -> e.params.pkey?.label),
+      cluster(10, ((e) -> e.relation_type), ((e) -> _(e.relation_type).humanize())),
+      cluster(0, (e) -> e.params.pkey?.label),
+    )
+
+  cluster = (min_cluster_size, key_func, name_func) ->
     return _(events_by_id).chain()
       .values()
-      .groupBy((e) -> e.params[param_key]?.topic_id)
+      .groupBy(key_func)
       .map((events, topic_id) ->
-        if topic_id != 'undefined' && events.length > threshold
+        if topic_id != 'undefined' && events.length > min_cluster_size
           events = _(events).sortBy (e) -> -e.date
 
           unique_id = ''
@@ -19,20 +26,20 @@ window.draw_groups = (events) ->
 
           {
             date: events[0].date
-            param: events[0].params[param_key]
+            label: (name_func || key_func)(events[0])
             events: events
             unique_id: unique_id
           }
       ).compact().sortBy((d) -> -d.events.length).value()
 
-  groups = _.union consume_group('for_event'), consume_group('pkey', 0)
+  groups = create_clusters()
 
   sel = d3.select(@).selectAll('.group')
     .data(groups, (d) -> d.unique_id)
   sel.enter()
     .append('div').classed('group', true)
     .call(->
-      @append('h1').text((d) -> d.param.topic.name)
+      @append('h1').text((d) -> d.label)
       @append('time').text((d) ->
         end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
         start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
