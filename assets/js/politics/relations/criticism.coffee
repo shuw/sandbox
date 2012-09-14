@@ -11,19 +11,19 @@
         ).value()
       ).value()
 
-    by_target = sort_by_occurrences(events, ((d) -> d.topic_id), false)
+    by_target = sort_by_occurrences(events, ((d) -> d.topic_id))
     root.selectAll('.criticism')
       .data(by_target)
     .enter()
       .append('div').classed('criticism', true)
       .each(draw_target_criticized)
 
-draw_target_criticized = (events_grouped) ->
+draw_target_criticized = (group) ->
   root = d3.select(@)
 
   root.append('div').classed('sources', true)
     .selectAll('.source')
-      .data(events_grouped)
+      .data(group.items)
     .enter()
       .append('div').classed('source', true)
         .call(avatar_creator)
@@ -31,7 +31,7 @@ draw_target_criticized = (events_grouped) ->
         .text((d) -> d.reason)
 
   root.selectAll('.target')
-    .data([events_grouped[0].target])
+    .data([group.items[0].target])
   .enter()
     .append('div').classed('target', true)
     .call(avatar_creator)

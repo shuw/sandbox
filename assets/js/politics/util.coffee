@@ -3,9 +3,12 @@
 window.sort_by_occurrences = (list, key_func, uniq) ->
   _(list).chain()
     .groupBy(key_func || ((d) -> d))
-    .filter((group, key) -> key != 'undefined')
-    .sortBy((group) -> -group.length)
-    .map((group) -> if uniq then group[0] else group)
+    .filter((items, key) -> key != 'undefined')
+    .sortBy((items) -> -items.length)
+    .map((items) -> if uniq then items[0] else {
+      items: items
+      key: key_func(items[0])
+    })
     .value()
 
 
