@@ -4,10 +4,10 @@ window.draw_groups = (events) ->
   # try to create more interesting clusters first
   create_clusters = ->
     _.union(
-      cluster(5, (e) -> e.params.for_event?.label),
-      cluster(3, (e) -> e.params.pkey?.label),
+      cluster(5, (e) -> e.params.for_event?.topic?.name),
+      cluster(2, (e) -> e.params.pkey?.topic?.name),
       cluster(10, ((e) -> e.relation_type), ((e) -> e.relation_name)),
-      cluster(0, (e) -> e.params.pkey?.label),
+      cluster(1, (e) -> e.params.pkey?.label),
     )
 
   cluster = (min_cluster_size, key_func, name_func) ->
@@ -15,7 +15,7 @@ window.draw_groups = (events) ->
       .values()
       .groupBy(key_func)
       .map((events, topic_id) ->
-        if topic_id != 'undefined' && events.length > min_cluster_size
+        if topic_id != 'undefined' && events.length >= min_cluster_size
           events = _(events).sortBy (e) -> -e.date
 
           unique_id = ''

@@ -14,8 +14,7 @@ HEIGHT = 240
     root.selectAll('.video')
       .data(events)
     .enter()
-      .append('div').classed('video', true)
-      .html((d) ->
-        "<iframe class=\"youtube-player\" type=\"text/html\" width=\"#{WIDTH}\" height=\"#{HEIGHT}\" src=\"http://www.youtube.com/embed/#{d.link}\" frameborder=\"0\">
-        </iframe>"
-      )
+      .append('a').classed('video', true)
+      .attr('href', (d) -> "http://www.youtube.com/watch?v=#{d.link}")
+      .append('img')
+      .attr('src', (d) -> "http://img.youtube.com/vi/#{d.link}/0.jpg")

@@ -1,6 +1,7 @@
 (window.relations ||= {}).criticism =
   renderable: (event) -> event.params.pkey? && event.params.target?
 
+  # TODO: Include subpredicate occurred_at_event if exists
   render: (events) ->
     root = d3.select(@)
 
