@@ -1,5 +1,6 @@
 window.init_filters = (events, on_events_selected) ->
-  by_pkey = sort_by_occurrences(events, ((d) -> d.params.pkey?.topic_id))
+  by_pkey = sort_by_occurrences(events, (d) -> d.params.pkey?.topic_id)
+  by_relation_type = sort_by_occurrences(events, (d) -> d.relation_type)
 
   root = d3.select('#filters')
 
@@ -8,12 +9,24 @@ window.init_filters = (events, on_events_selected) ->
     .text('All')
     .on('click', -> on_events_selected(events))
 
-  root.selectAll('.entity')
+  root
+    .call(-> @append('h2').text('Relations'))
+    .selectAll('.relation')
+      .data(by_relation_type)
+    .enter()
+      .append('div')
+      .classed('relation link', true)
+        .text((d) -> d[0].relation_type)
+        .on('click', on_events_selected)
+
+
+  root
+    .call(-> @append('h2').text('Entities'))
+    .selectAll('.entity')
     .data(by_pkey[..20])
   .enter()
     .append('div')
-    .classed('entity', true)
-      .append('div').classed('link', true)
+    .classed('entity link', true)
       .text((d) -> d[0].params.pkey.label)
       .on('click', on_events_selected)
 
