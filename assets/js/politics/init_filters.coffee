@@ -1,12 +1,14 @@
-TYPE_SORT_ORDER = {
-  'relation': 1
-  'topic': 2
-}
+TYPE_SORT_ORDER = [
+  'relation'
+  'event'
+  'topic'
+]
 
 window.init_filters = (events, on_events_selected) ->
   grouped_by_type = {
-    'topic': group_by_type(events, 'topic', (d) -> d.params.pkey?.label)
-    'relation': group_by_type(events, 'relation', (d) -> d.relation_type)
+    'event': group_by_type(10, events, 'event', (d) -> d.params.for_event?.label)
+    'relation': group_by_type(10, events, 'relation', (d) -> d.relation_type)
+    'topic': group_by_type(20, events, 'topic', (d) -> d.params.pkey?.label)
   }
 
   select_filter_path = (path) ->
@@ -22,7 +24,7 @@ window.init_filters = (events, on_events_selected) ->
       window.location.hash = path.replace(/\s/g, '-')
     on_events_selected(filtered_events)
 
-  sorted_filter_groups = _(grouped_by_type).sortBy((d) -> TYPE_SORT_ORDER[d.type])
+  sorted_filter_groups = _(grouped_by_type).sortBy((d) -> TYPE_SORT_ORDER.indexOf(d.type))
 
   root = d3.select('#filters')
   root.append('div').classed('link all', true)
@@ -34,10 +36,8 @@ window.init_filters = (events, on_events_selected) ->
     .append('div').classed('by_type', true)
     .call(-> @append('h2').text((d) -> "#{_(d.type).capitalize()}s"))
     .each((grouped_events) ->
-      root = d3.select(@)
-
-      root.selectAll('.link')
-        .data((d) -> _(grouped_events.items).values()[..20])
+      d3.select(@).selectAll('.link')
+        .data((d) -> _(grouped_events.items).values())
       .enter()
         .append('div').classed('link', true)
         .text((d) -> "#{d.key} (#{d.items.length})")
@@ -48,10 +48,12 @@ window.init_filters = (events, on_events_selected) ->
   window.onhashchange = onhashchange
   onhashchange()
 
-group_by_type = (events, type, key_func) ->
-  items = _(sort_by_occurrences(events, key_func))
-    .reduce(((memo, group) -> memo[group.key] = group; memo), {})
+
+group_by_type = (max_count, events, type, key_func) ->
   {
-    items: items
     type: type
+    items: _(sort_by_occurrences(events, key_func)).chain()
+      .take(max_count)
+      .reduce(((memo, group) -> memo[group.key] = group; memo), {})
+      .value()
   }
