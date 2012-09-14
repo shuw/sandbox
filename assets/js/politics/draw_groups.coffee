@@ -3,12 +3,12 @@ MIN_GROUP_THRESHOLD = 5
 window.draw_groups = (events) ->
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
-  consume_group = (param_key) ->
+  consume_group = (param_key, threshold = MIN_GROUP_THRESHOLD) ->
     return _(events_by_id).chain()
       .values()
       .groupBy((e) -> e.params[param_key]?.topic_id)
       .map((events, topic_id) ->
-        if topic_id != 'undefined' && events.length > MIN_GROUP_THRESHOLD
+        if topic_id != 'undefined' && events.length > threshold
           events = _(events).sortBy (e) -> -e.date
 
           unique_id = ''
@@ -25,7 +25,7 @@ window.draw_groups = (events) ->
           }
       ).compact().sortBy((d) -> -d.events.length).value()
 
-  groups = _.union consume_group('for_event'),consume_group('pkey')
+  groups = _.union consume_group('for_event'), consume_group('pkey', 0)
 
   sel = d3.select(@).selectAll('.group')
     .data(groups, (d) -> d.unique_id)
@@ -36,6 +36,7 @@ window.draw_groups = (events) ->
       @append('time').text((d) ->
         end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
         start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
+
         if start.format('dddd M/D') != end
           "#{start.format('M/D')} - #{end.format('dddd M/D')}"
         else
