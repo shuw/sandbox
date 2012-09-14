@@ -5,8 +5,8 @@ window.draw_groups = (events) ->
   create_clusters = ->
     _.union(
       cluster(5, (e) -> e.params.for_event?.label),
-      cluster(5, (e) -> e.params.pkey?.label),
-      cluster(10, ((e) -> e.relation_type), ((e) -> _(e.relation_type).humanize())),
+      cluster(3, (e) -> e.params.pkey?.label),
+      cluster(10, ((e) -> e.relation_type), ((e) -> e.relation_name)),
       cluster(0, (e) -> e.params.pkey?.label),
     )
 
@@ -83,7 +83,8 @@ draw_group = (group) ->
 
       if relation = window.relations[relation_type]
         {
-          relation_type: relation_type
+          relation_name: events[0].relation_name
+          relation_type: events[0].relation_type
           events: events
           render: relation.render
         }
@@ -99,7 +100,7 @@ draw_group = (group) ->
       .attr('class', (d) -> d.relation_type)
       .classed('relation', true)
       .call(->
-        @append('h2').text((d) -> d.relation_type)
+        @append('h2').text((d) -> d.relation_name)
       )
       .each((d) -> d.render.call(@, d.events))
 

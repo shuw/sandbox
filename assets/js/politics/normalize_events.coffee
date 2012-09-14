@@ -40,14 +40,18 @@ window.normalize_events = (events) ->
 
         normalized_params[NORMALIZE_PARAMS[key] or key] = primary_param
 
+
+      relation_type = NORMALIZE_RELATIONS[event.relation_type]
       event = _({
         affiliations: _(affiliations).keys()
         params: normalized_params
         media: event.media?[0]
-        relation_type: NORMALIZE_RELATIONS[event.relation_type]
+        relation_type: relation_type
       }).defaults(event)
 
-      if window.relations[event.relation_type]?.renderable(event)
+      relation_config = window.relations[event.relation_type]
+      if relation_config?.renderable(event)
+        event.relation_name = relation_config.friendly_name || "#{_(relation_type).humanize()}s"
         event
       # else
       #   console.debug("Skipping #{event.news_event_id}-#{event.relation_type} because it is not renderable")

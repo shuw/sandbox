@@ -1,4 +1,7 @@
 (window.relations ||= {}).speech =
+
+  friendly_name: 'Speeches'
+
   renderable: (event) -> event.params.pkey?
 
   render: (events) ->
