@@ -1,14 +1,19 @@
 (window.relations ||= {}).criticism =
-  renderable: (event) -> event.params.pkey? && event.params.target?
+  renderable: (event) ->
+    event.params.pkey? && event.params.target? && event.params.reason_commonentity?
 
   # TODO: Include subpredicate occurred_at_event if exists
   render: (events) ->
     root = d3.select(@)
 
     events = _(events).chain().map((d) ->
+        reason = d.params.reason_commonentity.label
+        for_event = d.params.for_event?.label
+        reason += " at #{for_event}" if for_event
+
         _(d.params.pkey).chain().clone().defaults(
           target: d.params.target
-          reason: d.params.reason_commonentity?.label
+          reason: reason
         ).value()
       ).value()
 
