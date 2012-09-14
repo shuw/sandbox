@@ -67,20 +67,6 @@ draw_group = (group) ->
       # TODO:
       #   for some relations consider rejecting
       #   events without affiliation x.reject((e) -> e.affiliations.length == 0)
-
-      # TODO: relations to handle
-      # political_ad (need media field of news_data)
-      # person_has_polling_numbers
-      # person_gave_a_speech
-      # person_holds_campaign_rally
-      # person_raised_campaign_funding
-      # person_holds_fundraiser
-      # person_won_party_nomination
-      # person_criticized_person
-      # person_interviewed
-      # person_arrived_in
-
-
       if relation = window.relations[relation_type]
         {
           relation_name: events[0].relation_name
