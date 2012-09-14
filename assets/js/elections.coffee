@@ -7,6 +7,7 @@ window.elections_init = ->
   init_filters(events, (selected) ->
     d3.selectAll('#root')
       .data([selected])
+      .each(draw_activity_histogram)
       .each(draw_groups)
       .each(draw_raw_data)
   )
