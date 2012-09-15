@@ -15,6 +15,7 @@ HEIGHT = 240
       .data(events)
     .enter()
       .append('a').classed('video', true)
-      .attr('href', (d) -> "http://www.youtube.com/watch?v=#{d.link}")
+      .attr('target', '_blank')
+      .attr('href', (d) -> "http://www.youtube.com/v/#{d.link}?autoplay=1")
       .append('img')
       .attr('src', (d) -> "http://img.youtube.com/vi/#{d.link}/0.jpg")
