@@ -18,15 +18,15 @@
 
     top_speakers = sort_by_occurrences(events, ((d) -> d.label), true)
 
-    summary = root.append('div').classed('summary', true)
-    summary.selectAll('.speaker')
-      .data(top_speakers[..4])
-    .enter()
-      .append('a')
-      .classed('speaker', true)
-      .call(avatar_creator)
-    prefix = (if top_speakers.length > 5 then "and #{top_speakers.length - 5} others " else "")
-    summary.append('span').text("#{prefix}gave a speech")
+    # summary = root.append('div').classed('summary', true)
+    # summary.selectAll('.speaker')
+    #   .data(top_speakers[..4])
+    # .enter()
+    #   .append('a')
+    #   .classed('speaker', true)
+    #   .call(avatar_creator)
+    # prefix = (if top_speakers.length > 5 then "and #{top_speakers.length - 5} others " else "")
+    # summary.append('span').text("#{prefix}gave a speech")
 
 
     quotes = _(events).filter((d) -> d.quote?)
