@@ -17,7 +17,7 @@ window.draw_groups = (events) ->
   # try to create more interesting clusters first
   create_clusters = ->
     _.union(
-      cluster(5, (e) -> e.params.for_event?.topic?.name),
+      cluster(2, (e) -> e.params.for_event?.topic?.name),
       cluster(2, (e) -> e.params.pkey?.topic?.name),
       cluster(10, ((e) -> e.relation_type), ((e) -> e.relation_name)),
       cluster(1, (e) -> e.params.pkey?.label),
@@ -45,7 +45,7 @@ window.draw_groups = (events) ->
           }
       ).compact().sortBy((d) -> -d.events.length).value()
 
-  groups = create_clusters()
+  groups = _(create_clusters()).sortBy((d) -> -d.events[0].date)
 
   sel = root.selectAll('.group')
     .data(groups, (d) -> d.unique_id)
@@ -56,6 +56,7 @@ window.draw_groups = (events) ->
     )
     .each(draw_group)
   sel.exit().remove()
+  sel.sort()
 
 
 
