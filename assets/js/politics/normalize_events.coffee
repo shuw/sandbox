@@ -3,7 +3,7 @@ NORMALIZE_RELATIONS = {
   'organization_runs_political_ad': 'political_ad'
   'person_gave_a_speech': 'speech'
   'person_criticized_person': 'criticism'
-  'person_has_polling_numbers': 'polling_numbers'
+  'person_has_polling_numbers': 'polling_number'
   'person_holds_campaign_rally': 'campaign_rally'
   'person_raised_campaign_funding': 'campaign_funding'
   'person_holds_fundraiser': 'fundraiser'

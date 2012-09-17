@@ -21,4 +21,5 @@ window.elections_init = ->
       .each(draw_groups)
       .each(draw_raw_data)
   )
+  $('#root').removeClass('hidden')
 
