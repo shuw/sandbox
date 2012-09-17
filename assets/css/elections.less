@@ -42,13 +42,17 @@ a, .link {
 }
 
 .avatar {
-  &.democrat {
+  width: 50px;
+  text-align: center;
+  display: inline-block;
+
+  &.democrat img {
     border: 2px solid blue;
   }
-  &.republican {
+  &.republican img {
     border: 2px solid red;
   }
-  &.neutral {
+  &.neutral img {
     border: 2px solid gray;
   }
 }
@@ -141,40 +145,53 @@ a, .link {
       }
 
       &.criticism {
-        .graph {
-          circle.node {
-            stroke: #fff;
-            stroke-width: 1.5px;
-          }
-
-          line.link {
-            stroke: #999;
-            stroke-opacity: .6;
-          }
-        }
-        .sources, .target {
+        .criticism {
+          margin-bottom: 10px;
+          width: 390px;
           display: inline-block;
-          .avatar {
-            vertical-align: middle
-          }
-        }
-        .sources {
-          width: 400px;
 
-          .source {
-            .avatar, .reason {
-              display: inline-block;
+          .graph {
+            circle.node {
+              stroke: #fff;
+              stroke-width: 1.5px;
             }
-            .reason {
-              margin-left: 5px;
-              width: 300px;
+
+            line.link {
+              stroke: #999;
+              stroke-opacity: .6;
             }
           }
-        }
+          .sources, .target {
+            vertical-align: middle;
+            display: inline-block;
+            .avatar {
+              vertical-align: middle
+            }
+          }
+          .sources {
+            .source {
+              margin-bottom: 5px;
 
-        .target {
-          display: inline-block;
-          width: 100px;
+              .avatar, .reason {
+                vertical-align: middle;
+                display: inline-block;
+              }
+              .reason {
+                width: 190px;
+                margin-left: 5px;
+              }
+            }
+          }
+
+          .target {
+            display: inline-block;
+            width: 140px;
+
+            .arrow {
+              margin-right: 5px;
+            }
+          }
+
         }
       }
 

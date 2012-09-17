@@ -12,6 +12,7 @@
         reason += " at #{for_event}" if for_event
 
         _(d.params.pkey).chain().clone().defaults(
+          news_event_id: d.news_event_id
           target: d.params.target
           reason: reason
         ).value()
@@ -102,11 +103,15 @@ draw_target_criticized = (group) ->
     .enter()
       .append('div').classed('source', true)
         .call(avatar_creator)
-      .append('div').classed('reason', true)
+      .append('a').classed('reason', true)
+        .attr('href', (d) -> news_event_path(d.news_event_id))
         .text((d) -> d.reason)
 
   root.selectAll('.target')
     .data([group.items[0].target])
   .enter()
-    .append('div').classed('target', true)
+    .append('span').classed('target', true)
+    .call(->
+      @append('span').classed('arrow', true).text('▶')
+    )
     .call(avatar_creator)

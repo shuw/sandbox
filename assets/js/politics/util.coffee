@@ -13,13 +13,14 @@ window.sort_by_occurrences = (list, key_func, uniq) ->
 
 
 window.avatar_creator = ->
-  @append('img')
+  @append('div')
     .attr('class', (d) -> d.affiliation || 'unknown')
     .classed('avatar', true)
-    .attr('title', (d) -> d.label)
-    .attr('src', (d) -> d.avatar_image.url)
-    .attr('width', (d) -> (d.avatar_image.size)[0])
-    .attr('height', (d) -> (d.avatar_image.size)[1])
+    .append('img')
+      .attr('title', (d) -> d.label)
+      .attr('src', (d) -> d.avatar_image.url)
+      .attr('width', (d) -> (d.avatar_image.size)[0])
+      .attr('height', (d) -> (d.avatar_image.size)[1])
 
 
 # First tries to find an image equal or bigger than requested,
