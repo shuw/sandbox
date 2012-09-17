@@ -6,7 +6,7 @@
       event.params.went_down_by_percent?
     )
 
-  # TODO: Include subpredicate occurred_at_event if exists
+  # TODO: plot polling numbers over time
   render: (events) ->
     events = _(events).map((e) ->
       _(e.params.pkey).chain().clone().defaults(
