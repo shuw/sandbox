@@ -1,7 +1,17 @@
 width = 800
 height = 100
 
+HTML_TEMPLATE = '
+  <div style="position: relative; height: ' + (height + 20) + 'px;" class="activity">
+    <svg></svg>
+    <div class="labels"></div>
+    <div style="display: none" class="tooltip">&nbsp;</div>
+  </div>
+'
+
 window.draw_activity_histogram = (events) ->
+  $el = $(@)
+  $(HTML_TEMPLATE).appendTo(@) if $el.find('.activity').length == 0
   root = d3.select(@).select(".activity")
 
   by_date =  _(events).groupBy((d) -> moment(d.date).format('MM/DD/YY'))
@@ -20,15 +30,20 @@ window.draw_activity_histogram = (events) ->
   update_graph = ->
     @attr("x", (d) -> x(d))
     .attr("y", (d) -> height - y((by_date[d] || []).length))
-    .attr("width", x.rangeBand())
+    .attr("width", x.rangeBand() - 1)
     .attr("height", (d) -> y((by_date[d] || []).length))
 
   recs = root.select('svg').selectAll("rect")
     .data(days, (d) -> d)
-  recs.enter().append("rect").call(update_graph)
+  recs.enter().append("rect")
+    .call(update_graph)
+    .on('mouseover', (d) ->
+      x = parseInt($(this).attr('x'))
+      $el.find('.tooltip').show().text(d).css('left', "#{x}px")
+    )
+    .on('mouseout', (d) -> $el.find('.tooltip').hide())
   recs.exit().remove()
   recs.transition().duration(500).call(update_graph)
-
 
   root.select('.labels').selectAll('.label')
     .data([oldest, newest])
