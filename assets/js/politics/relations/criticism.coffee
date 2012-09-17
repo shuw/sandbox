@@ -83,7 +83,7 @@ render_graph = (items) ->
     .attr("class", "node")
     .call(layout.drag)
     .append("svg:image")
-    .attr("class", "circle")
+    .attr("class", "avatar")
     .attr("xlink:href", (d) -> d.topic_images?[0]?.sizes[0]?.url || '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png' )
     .attr("x", (d) -> "-#{node_width / 2 * Math.sqrt(d.weight)}px")
     .attr("y", (d) -> "-#{node_height / 2 * Math.sqrt(d.weight)}px")
