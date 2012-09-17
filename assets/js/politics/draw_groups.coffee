@@ -6,7 +6,6 @@ RELATION_SORT_ORDER = [
 
 HTML_TEMPLATE = '
   <div class="events">
-    <h1>Events</h1>
   </div>
 '
 window.draw_groups = (events) ->
