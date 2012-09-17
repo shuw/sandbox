@@ -12,7 +12,7 @@ _.mixin(_.string.exports())
 # person_interviewed
 # person_arrived_in
 
-window.elections_init = ->
+window.politics_init = ->
   events = normalize_events(POLITICS_DATA)
   init_filters(events, (selected) ->
     d3.selectAll('#root')
