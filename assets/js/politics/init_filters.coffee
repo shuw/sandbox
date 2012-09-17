@@ -4,8 +4,16 @@ TYPE_SORT_ORDER = [
   'topic'
 ]
 
+
+HTML_TEMPLATE = '
+  <div class="filters">
+    <h1>Filters</h1>
+  </div>
+'
+
 window.init_filters = (events, on_events_selected) ->
   $el = $('#filters')
+  $(HTML_TEMPLATE).appendTo($el) if $el.find('h1').length == 0
 
   grouped_by_type = {
     'event': group_by_type(10, events, 'event',
