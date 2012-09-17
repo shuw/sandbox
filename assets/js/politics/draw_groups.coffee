@@ -9,7 +9,6 @@ HTML_TEMPLATE = '
     <h1>Events</h1>
   </div>
 '
-
 window.draw_groups = (events) ->
   $(HTML_TEMPLATE).appendTo(@) if $(@).find('.events').length == 0
   root = d3.select(@).select(".events")
