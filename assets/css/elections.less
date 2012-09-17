@@ -4,6 +4,9 @@
 @palette-light-grey: #95938f;
 @palette-grey: #555;
 
+@palette-republican: #DE0116;
+@palette-democratic: #0A71D0;
+
 body {
   font-family: sans-serif;
   font-size: 14px;
@@ -47,10 +50,10 @@ a, .link {
   display: inline-block;
 
   &.democrat img {
-    border: 2px solid blue;
+    border: 2px solid @palette-democratic;
   }
   &.republican img {
-    border: 2px solid red;
+    border: 2px solid @palette-republican;
   }
   &.neutral img {
     border: 2px solid gray;
