@@ -28,6 +28,8 @@
 
 
 width = 800
+node_width = 20
+node_height = Math.floor(node_width * 3.0 / 2.0)
 render_graph = (items) ->
   nodes = {}
   links = []
@@ -41,9 +43,9 @@ render_graph = (items) ->
   nodes = _(nodes).values()
 
   layout = d3.layout.force()
-    .gravity(.01)
+    .gravity(.03)
     .distance(100)
-    .charge(-50)
+    .charge(-100)
     .size([width, (items.length / 10) * 100])
 
   layout
@@ -66,12 +68,15 @@ render_graph = (items) ->
     .attr('height', "#{height}px")
     .attr('width', "#{width}px")
 
-  layout.start()
+  layout.start().alpha(0.05)
+
+  link = vis.selectAll("line.link").data(links)
+  link.enter().append("line")
+    .attr("class", "link")
+    .style("stroke-width", (d) -> 2)
 
   node = vis.selectAll("g.node").data(nodes)
-  node
-    .append("title")
-    .text((d) -> d.topic_name || d.name)
+  node.append("title").text((d) -> d.topic_name || d.name)
   node.enter()
     .append("svg:g")
     .attr("class", "node")
@@ -79,16 +84,12 @@ render_graph = (items) ->
     .append("svg:image")
     .attr("class", "circle")
     .attr("xlink:href", (d) -> d.topic_images?[0]?.sizes[0]?.url || '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png' )
-    .attr("x", (d) -> "-#{10 * Math.sqrt(d.weight)}px")
-    .attr("y", (d) -> "-#{15 * Math.sqrt(d.weight)}px")
-    .attr("width", (d) -> "#{20 * Math.sqrt(d.weight)}px")
-    .attr("height", (d) -> "#{30 * Math.sqrt(d.weight)}px")
+    .attr("x", (d) -> "-#{node_width / 2 * Math.sqrt(d.weight)}px")
+    .attr("y", (d) -> "-#{node_height / 2 * Math.sqrt(d.weight)}px")
+    .attr("width", (d) -> "#{node_width * Math.sqrt(d.weight)}px")
+    .attr("height", (d) -> "#{node_height * Math.sqrt(d.weight)}px")
   node.exit().remove()
 
-  link = vis.selectAll("line.link").data(links)
-  link.enter().append("line")
-    .attr("class", "link")
-    .style("stroke-width", (d) -> 2)
   link.exit().remove()
 
 
