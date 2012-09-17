@@ -2,7 +2,7 @@
 
   friendly_name: 'Speeches'
 
-  renderable: (event) -> event.params.pkey?
+  renderable: (event) -> event.params.pkey? && event.params.quote_commonentity?.label
 
   render: (events) ->
     root = d3.select(@)
@@ -29,9 +29,8 @@
     # summary.append('span').text("#{prefix}gave a speech")
 
 
-    quotes = _(events).filter((d) -> d.quote?)
     root.selectAll('.quote')
-      .data(quotes)
+      .data(events)
     .enter()
       .append('div').classed('quote', true)
       .call(avatar_creator)
