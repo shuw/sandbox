@@ -1,8 +1,15 @@
+RELATION_SORT_ORDER = [
+  'political_ad'
+  'criticism'
+  'speech'
+]
+
 HTML_TEMPLATE = '
   <div class="events">
     <h1>Events</h1>
   </div>
 '
+
 window.draw_groups = (events) ->
   $(HTML_TEMPLATE).appendTo(@) if $(@).find('.events').length == 0
   root = d3.select(@).select(".events")
@@ -53,11 +60,6 @@ window.draw_groups = (events) ->
   sel.exit().remove()
 
 
-RELATION_SORT_ORDER = {
-  'political_ad' : 1
-  'criticism' : 1002
-  'speech': 1003
-}
 
 draw_group = (group) ->
   relation_groups = _(group.events).chain()
@@ -75,7 +77,7 @@ draw_group = (group) ->
         }
     )
     .compact()
-    .sortBy((d) -> RELATION_SORT_ORDER[d.relation_type] || 100000)
+    .sortBy((d) -> RELATION_SORT_ORDER.indexOf(d.relation_type))
     .value()
 
   d3.select(@).selectAll('.relation')
