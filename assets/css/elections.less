@@ -15,6 +15,10 @@ body {
   color: @palette-grey;
 }
 
+h1, h2, h3 {
+  font-weight: 100;
+}
+
 .hidden {
   display: none
 }
@@ -56,7 +60,7 @@ a, .link {
   float: left;
 
   .activity {
-    margin-top: 20px;
+    margin: 20px 0 40px 0;
 
     svg {
       height: 105px;
@@ -66,43 +70,46 @@ a, .link {
       }
     }
 
-    .tooltip {
-      padding: 0 100px;
-      margin-left: -100px;
-      position:absolute;
-      bottom: 0;
-      background-color: white
-    }
+    .legend {
+      margin-top: 15px;
+      position: relative;
 
-    .labels {
-      position:absolute;
-      bottom: 0;
-      width: 800px;
-      .label {
-        &:first-child {
-          margin-left: 10px;
-          float: left;
-        }
-        &:last-child {
-          float: right;
+      .tooltip {
+        padding: 0 100px;
+        margin-left: -100px;
+        position:absolute;
+        bottom: 0;
+        background-color: white
+      }
+
+      .labels {
+        position:absolute;
+        bottom: 0;
+        width: 800px;
+        .label {
+          &:first-child {
+            float: left;
+          }
+          &:last-child {
+            float: right;
+          }
         }
       }
     }
   }
 
   .group {
-
     > h1 {
       float: left;
     }
 
-    > time {
-      margin-top: 20px;
-      float: right;
-    }
-
     .relation {
       clear: both;
+      margin-left: 20px;
+
+      > time {
+        float: right;
+      }
 
       &.political_ad {
         .video {

@@ -2,10 +2,13 @@ width = 800
 height = 100
 
 HTML_TEMPLATE = '
-  <div style="position: relative; height: ' + (height + 20) + 'px;" class="activity">
+  <div class="activity">
+    <h1>Activity</h1>
     <svg></svg>
-    <div class="labels"></div>
-    <div style="display: none" class="tooltip">&nbsp;</div>
+    <div class="legend">
+      <div class="labels"></div>
+      <div style="display: none" class="tooltip">&nbsp;</div>
+    </div>
   </div>
 '
 

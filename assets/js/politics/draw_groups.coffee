@@ -1,4 +1,12 @@
+HTML_TEMPLATE = '
+  <div class="events">
+    <h1>Events</h1>
+  </div>
+'
 window.draw_groups = (events) ->
+  $(HTML_TEMPLATE).appendTo(@) if $(@).find('.events').length == 0
+  root = d3.select(@).select(".events")
+
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
   # try to create more interesting clusters first
@@ -34,21 +42,12 @@ window.draw_groups = (events) ->
 
   groups = create_clusters()
 
-  sel = d3.select(@).selectAll('.group')
+  sel = root.selectAll('.group')
     .data(groups, (d) -> d.unique_id)
   sel.enter()
     .append('div').classed('group', true)
     .call(->
-      @append('h1').text((d) -> d.label)
-      @append('time').text((d) ->
-        end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
-        start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
-
-        if start.format('dddd M/D') != end
-          "#{start.format('M/D')} - #{end.format('dddd M/D')}"
-        else
-          start.format('dddd M/D')
-      )
+      @append('h2').text((d) -> d.label)
     )
     .each(draw_group)
   sel.exit().remove()
@@ -86,7 +85,16 @@ draw_group = (group) ->
       .attr('class', (d) -> d.relation_type)
       .classed('relation', true)
       .call(->
-        @append('h2').text((d) -> d.relation_name)
+        @append('time').text((d) ->
+          end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
+          start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
+
+          if start.format('dddd M/D') != end
+            "#{start.format('M/D')} - #{end.format('dddd M/D')}"
+          else
+            start.format('dddd M/D')
+        )
+        @append('h3').text((d) -> d.relation_name)
       )
       .each((d) -> d.render.call(@, d.events))
 
