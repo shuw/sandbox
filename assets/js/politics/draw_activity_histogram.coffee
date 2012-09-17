@@ -50,8 +50,7 @@ window.draw_activity_histogram = (events) ->
   recs.exit().remove()
   recs.transition().duration(500).call(update_graph)
 
-  root.select('.labels').selectAll('.label')
+  labels = root.select('.labels').selectAll('.label')
     .data([oldest, newest])
-  .enter()
-    .append('div').classed('label', true)
-    .text((d) -> d.format('MMM Do, YYYY'))
+  labels.enter().append('div').classed('label', true)
+  labels.text((d) -> d.format('MMM Do, YYYY'))
