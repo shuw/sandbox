@@ -145,22 +145,23 @@ a, .link {
       }
 
       &.criticism {
+
+        .graph {
+          .avatar.node {
+            stroke: #fff;
+            stroke-width: 1.5px;
+          }
+
+          line.link {
+            stroke: #888;
+          }
+        }
+
         .criticism {
           margin-bottom: 10px;
           width: 390px;
           display: inline-block;
 
-          .graph {
-            .avatar.node {
-              stroke: #fff;
-              stroke-width: 1.5px;
-            }
-
-            line.link {
-              stroke: #999;
-              stroke-opacity: .6;
-            }
-          }
           .sources, .target {
             vertical-align: middle;
             display: inline-block;
