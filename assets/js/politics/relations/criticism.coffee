@@ -27,27 +27,23 @@
       .each(draw_target_criticized)
 
 
-# TODO: render directed graph
+width = 800
 render_graph = (items) ->
   nodes = {}
   links = []
   _(items).each (item) ->
     source = nodes[item.topic_id] ||= item
     target = nodes[item.target.topic_id] ||= item.target
-    links.push(
-      source: source
-      target: target
-    )
+    links.push(source: source, target: target)
 
-  height = Math.sqrt(items.length / 10) * 300
-  width = 800
+  height = Math.pow(items.length, 0.6) * 60
 
   nodes = _(nodes).values()
 
   layout = d3.layout.force()
-    .gravity(.05)
-    .distance(80)
-    .charge(-100)
+    .gravity(.01)
+    .distance(100)
+    .charge(-50)
     .size([width, (items.length / 10) * 100])
 
   layout
@@ -58,7 +54,12 @@ render_graph = (items) ->
         .attr("y1", (d) -> d.source.y)
         .attr("x2", (d) -> d.target.x)
         .attr("y2", (d) -> d.target.y)
-      node.attr "transform", (d) -> "translate(#{d.x},#{d.y})"
+      node.attr("transform", (d) ->
+        r = 40 * Math.sqrt(d.weight)
+        d.x = Math.max(r, Math.min(width - r, d.x));
+        d.y = Math.max(r, Math.min(height - r, d.y))
+        "translate(#{d.x},#{d.y})"
+      )
     )
 
   vis = d3.select(@).append('svg').classed('graph', true)
@@ -82,21 +83,13 @@ render_graph = (items) ->
     .attr("y", (d) -> "-#{15 * Math.sqrt(d.weight)}px")
     .attr("width", (d) -> "#{20 * Math.sqrt(d.weight)}px")
     .attr("height", (d) -> "#{30 * Math.sqrt(d.weight)}px")
-  node.exit()
-    .remove()
+  node.exit().remove()
 
   link = vis.selectAll("line.link").data(links)
   link.enter().append("line")
     .attr("class", "link")
     .style("stroke-width", (d) -> 2)
-    .attr("x1", (d) -> d.source.x)
-    .attr("y1", (d) -> d.source.y)
-    .attr("x2", (d) -> d.target.x)
-    .attr("y2", (d) -> d.target.y)
   link.exit().remove()
-
-
-
 
 
 draw_target_criticized = (group) ->
