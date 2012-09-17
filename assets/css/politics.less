@@ -106,10 +106,15 @@ h1 {
     margin: 20px 0 40px 0;
 
     svg {
+      cursor: pointer;
       height: 105px;
       rect {
         fill: @palette-blue;
         stroke: white;
+
+        &:hover {
+          fill: @palette-light-blue;
+        }
       }
     }
 
@@ -118,8 +123,9 @@ h1 {
       position: relative;
 
       .tooltip {
-        padding: 0 100px;
-        margin-left: -100px;
+        text-align: center;
+        width: 300px;
+        margin-left: -150px;
         position:absolute;
         bottom: 0;
         background-color: white
