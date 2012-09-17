@@ -6,9 +6,17 @@ TYPE_SORT_ORDER = [
 
 window.init_filters = (events, on_events_selected) ->
   grouped_by_type = {
-    'event': group_by_type(10, events, 'event', (d) -> d.params.for_event?.topic?.name)
+    'event': group_by_type(10, events, 'event',
+      (d) -> d.params.for_event?.topic?.name,
+      (d) -> d.params.for_event.avatar_image,
+      (d) -> d.params.for_event.affiliation,
+    )
     'relation': group_by_type(10, events, 'relation', (d) -> d.relation_name)
-    'topic': group_by_type(20, events, 'topic', (d) -> d.params.pkey?.topic?.name)
+    'topic': group_by_type(20, events, 'topic',
+      (d) -> d.params.pkey?.topic?.name,
+      (d) -> d.params.pkey.avatar_image,
+      (d) -> d.params.pkey.affiliation,
+    )
   }
 
   current_path = null
@@ -44,7 +52,8 @@ window.init_filters = (events, on_events_selected) ->
         .data((d) -> _(grouped_events.items).values())
       .enter()
         .append('div').classed('link', true)
-        .text((d) -> "#{d.key} (#{d.items.length})")
+        .call(avatar_creator)
+        .call(-> @append('span').text((d) -> "#{d.key} (#{d.items.length})"))
         .on('click', (d) -> select_filter_path("#{grouped_events.type}/#{d.key}"))
     )
 
@@ -53,11 +62,20 @@ window.init_filters = (events, on_events_selected) ->
   onhashchange()
 
 
-group_by_type = (max_count, events, type, key_func) ->
+group_by_type = (max_count, events, type, key_func, avatar_func, affiliation_func) ->
   {
     type: type
     items: _(sort_by_occurrences(events, key_func)).chain()
       .take(max_count)
-      .reduce(((memo, group) -> memo[group.key] = group; memo), {})
+      .reduce(((memo, group) ->
+        item = group.items[0]
+        group.avatar_image = avatar_func?(item) || {
+          url: '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png'
+          size: [40, 40]
+        }
+        group.affiliation = affiliation_func?(item)
+        memo[group.key] = group
+        memo
+      ),{})
       .value()
   }
