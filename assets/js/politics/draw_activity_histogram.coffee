@@ -12,18 +12,20 @@ HTML_TEMPLATE = '
   </div>
 '
 
+DATE_FORMAT = 'MM/DD/YY'
+
 window.draw_activity_histogram = (events) ->
   $el = $(@)
   $(HTML_TEMPLATE).appendTo(@) if $el.find('.activity').length == 0
   root = d3.select(@).select(".activity")
 
-  by_date =  _(events).groupBy((d) -> moment(d.date).format('MM/DD/YY'))
+  by_date =  _(events).groupBy((d) -> moment(d.date).format(DATE_FORMAT))
   oldest = moment(_(events).min((e) -> e.date).date)
   newest = moment(_(events).max((e) -> e.date).date)
 
   current = oldest.clone()
-  days = [current.format('DD/MM/YY')]
-  days.push(current.add('days', 1).format('MM/DD/YY')) while current < newest
+  days = [current.format(DATE_FORMAT)]
+  days.push(current.add('days', 1).format(DATE_FORMAT)) while current < newest
 
   root.classed('hidden', days.length < 4)
 
