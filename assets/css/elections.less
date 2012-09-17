@@ -7,6 +7,9 @@
 @palette-republican: #DE0116;
 @palette-democratic: #0A71D0;
 
+
+@column-width: 390px;
+
 body {
   font-family: sans-serif;
   font-size: 14px;
@@ -47,6 +50,7 @@ a, .link {
 .avatar {
   width: 50px;
   text-align: center;
+  vertical-align: middle;
   display: inline-block;
 
   &.democrat img {
@@ -162,7 +166,7 @@ a, .link {
 
         .criticism {
           margin-bottom: 10px;
-          width: 390px;
+          width: @column-width;
           display: inline-block;
 
           .sources, .target {
@@ -200,15 +204,28 @@ a, .link {
 
       &.speech {
 
-        .speaker {
-          margin-right: 5px;
+        .summary {
+          margin-bottom: 30px;
+          .speaker {
+            margin-right: 5px;
+          }
         }
 
         .quote {
+          clear: both;
+          display: inline-block;
+          width: @column-width;
           margin-bottom: 10px;
 
           .avatar {
             vertical-align: middle;
+          }
+
+          > span {
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            width: 320px;
           }
         }
       }
