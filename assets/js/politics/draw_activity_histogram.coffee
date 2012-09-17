@@ -3,10 +3,10 @@ height = 100
 
 HTML_TEMPLATE = '
   <div class="activity">
-    <h1>Activity</h1>
     <svg></svg>
     <div class="legend">
       <div class="labels"></div>
+      <div class="description">News Activity Histogram</div>
       <div style="display: none" class="tooltip">&nbsp;</div>
     </div>
   </div>

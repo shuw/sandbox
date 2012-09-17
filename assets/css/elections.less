@@ -15,8 +15,12 @@ body {
   color: @palette-grey;
 }
 
-h1, h2, h3 {
+h1, h2 {
   font-weight: 100;
+}
+
+h3 {
+  font-weight: 400;
 }
 
 .hidden {
@@ -59,6 +63,12 @@ a, .link {
   width: 800px;
   float: left;
 
+  h1 {
+    padding-bottom: 7px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid @palette-light-grey;
+  }
+
   .activity {
     margin: 20px 0 40px 0;
 
@@ -80,6 +90,14 @@ a, .link {
         position:absolute;
         bottom: 0;
         background-color: white
+      }
+
+      .description {
+        font-weight: bold;
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        width: 800px;
       }
 
       .labels {
