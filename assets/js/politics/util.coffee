@@ -16,11 +16,13 @@ window.avatar_creator = ->
   @append('div')
     .attr('class', (d) -> d.affiliation || 'unknown')
     .classed('avatar', true)
-    .append('img')
-      .attr('title', (d) -> d.label)
-      .attr('src', (d) -> d.avatar_image.url)
-      .attr('width', (d) -> (d.avatar_image.size)[0])
-      .attr('height', (d) -> (d.avatar_image.size)[1])
+    .append('a')
+    .attr('href', (d) -> topic_path(d.topic_id))
+      .append('img')
+        .attr('title', (d) -> d.label)
+        .attr('src', (d) -> d.avatar_image.url)
+        .attr('width', (d) -> (d.avatar_image.size)[0])
+        .attr('height', (d) -> (d.avatar_image.size)[1])
 
 
 # First tries to find an image equal or bigger than requested,
