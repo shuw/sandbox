@@ -15,9 +15,10 @@ HTML_TEMPLATE = '
 DATE_FORMAT = 'MM/DD/YY'
 
 window.draw_activity_histogram = (events) ->
-  $el = $(@)
-  $(HTML_TEMPLATE).appendTo(@) if $el.find('.activity').length == 0
-  root = d3.select(@).select(".activity")
+  $(HTML_TEMPLATE).appendTo(@) if $(@).find('.activity').length == 0
+  $el = $(@).find('.activity')
+  root = d3.select($el[0])
+
 
   by_date =  _(events).groupBy((d) -> moment(d.date).format(DATE_FORMAT))
   oldest = moment(_(events).min((e) -> e.date).date)

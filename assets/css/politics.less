@@ -3,6 +3,7 @@
 @palette-light-blue: #d6dfe3;
 @palette-light-grey: #95938f;
 @palette-grey: #555;
+@palette-dark-grey: #333;
 
 @palette-republican: #DE0116;
 @palette-democratic: #0A71D0;
@@ -201,6 +202,13 @@ h1 {
         float: right;
       }
 
+      a {
+        color: @palette-grey;
+      }
+      a:hover {
+        color: @palette-blue;
+      }
+
       &.polling_number {
         .result {
           width: 390px;
@@ -208,7 +216,7 @@ h1 {
           margin-bottom: 10px;
 
           .description {
-            margin: 2px 0 0 20px;
+            margin: 4px 0 0 20px;
           }
           .bar {
             margin: 0 6px;
@@ -291,7 +299,6 @@ h1 {
             display: inline-block;
 
             .arrow {
-              color: @palette-blue;
               margin-right: 5px;
             }
           }

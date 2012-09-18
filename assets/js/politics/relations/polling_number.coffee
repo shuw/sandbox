@@ -1,4 +1,4 @@
-CHART_WIDTH = 100
+CHART_WIDTH = 200
 
 (window.relations ||= {}).polling_number =
 
@@ -58,8 +58,8 @@ CHART_WIDTH = 100
             .html('&nbsp;')
             .style('width', (d) -> "#{CHART_WIDTH * d.fraction}px")
 
-        @append('span').text((d) -> "#{d.new_percentage}")
         @append('div').classed('description', true)
+          .append('span').text((d) -> "#{d.new_percentage}")
           .append('span').text((d) -> if d.in_location then " in #{d.in_location}" else '')
           .append('span').text((d) -> if d.by_organization then " by #{d.by_organization}" else '')
           .append('span').text((d) -> if d.date then " on #{moment(d.date).format('MM/DD/YY')}" else '')
