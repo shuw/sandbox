@@ -61,6 +61,10 @@ a, .link {
   vertical-align: middle;
   display: inline-block;
 
+  img {
+    border: 2px solid #555;
+  }
+
   &.democrat img {
     border: 2px solid @palette-democratic;
   }
@@ -68,12 +72,13 @@ a, .link {
     border: 2px solid @palette-republican;
   }
   &.neutral img {
-    border: 2px solid gray;
+    border: 2px solid black;
   }
 }
 
 rect.avatar {
   stroke-width: 2px;
+  stroke: #555;
 
   &.democrat {
     stroke: @palette-democratic;
@@ -82,7 +87,7 @@ rect.avatar {
     stroke: @palette-republican;
   }
   &.neutral {
-    stroke: gray;
+    stroke: black;
   }
 }
 
@@ -235,7 +240,7 @@ h1 {
           }
 
           line.link {
-            stroke: #888;
+            stroke: #AAA;
           }
         }
 
