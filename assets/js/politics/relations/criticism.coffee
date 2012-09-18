@@ -7,9 +7,11 @@
     root = d3.select(@)
 
     items = _(events).chain().map((d) ->
-        reason = d.params.reason_commonentity.label
+        reason = "for #{d.params.reason_commonentity.label}"
         for_event = d.params.for_event?.label
         reason += " at #{for_event}" if for_event
+
+        reason += " because #{d.params.quote_commonentity.label}" if d.params.quote_commonentity?
 
         _(d.params.pkey).chain().clone().defaults(
           news_event_id: d.news_event_id
@@ -138,15 +140,14 @@ draw_target_criticized = (group) ->
     .enter()
       .append('div').classed('source', true)
         .call(create_avatar)
-      .append('a').classed('reason', true)
-        .attr('href', (d) -> news_event_path(d.news_event_id))
-        .text((d) -> d.reason)
+        .call(-> @append('span').classed('arrow', true).text('▶'))
+        .append('a').classed('reason', true)
+          .attr('href', (d) -> news_event_path(d.news_event_id))
+          .text((d) -> d.reason)
+      
 
   root.selectAll('.target')
     .data([group.items[0].target])
   .enter()
     .append('span').classed('target', true)
-    .call(->
-      @append('span').classed('arrow', true).text('▶')
-    )
     .call(create_avatar)
