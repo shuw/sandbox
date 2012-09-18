@@ -13,6 +13,7 @@
   render: (events) ->
     events = _(events).map((e) ->
       _(e.params.pkey).chain().clone().defaults(
+        news_event_id: e.news_event_id
         date: e.date,
         direction_up: e.params.went_up_by_percent?
         new_percentage: e.params.went_up_by_percent.label || e.went_down_by_percent.label
@@ -36,6 +37,7 @@
       .selectAll('.result')
       .data((d) -> d.results)
     .enter()
-      .append('div')
+      .append('a')
+      .attr('href', (d) -> news_event_path(d.news_event_id))
       .classed('result', true)
       .text((d) -> (if d.went_up_by_percent then '▲' else '▼') + d.new_percentage)
