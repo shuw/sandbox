@@ -73,7 +73,7 @@ window.init_filters = (events, on_events_selected) ->
         .append('div')
         .attr('id', (d) -> "#{grouped_events.type}_#{d.key}")
         .classed('link', true)
-        .call(avatar_creator)
+        .call(create_avatar)
         .call(-> @append('span').text((d) -> "#{d.name} (#{d.items.length})"))
         .on('click', (d) -> select_filter_path("#{grouped_events.type}/#{d.key}"))
     )

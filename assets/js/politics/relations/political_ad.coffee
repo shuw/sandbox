@@ -15,7 +15,7 @@ HEIGHT = 240
       .data(events)
     .enter()
       .append('div').classed('ad', true)
-      .call(avatar_creator)
+      .call(create_avatar)
       .append('a')
         .attr('target', '_blank')
         .attr('href', (d) -> "http://www.youtube.com/v/#{d.link}?autoplay=1")

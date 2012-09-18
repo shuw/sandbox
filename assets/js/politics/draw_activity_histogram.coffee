@@ -44,11 +44,15 @@ window.draw_activity_histogram = (events) ->
     .call(update_graph)
     .on('mouseover', (d) ->
       x = parseInt($(this).attr('x'))
+      $el.find('.description, .labels').hide()
       $el.find('.tooltip').show()
         .css('left', "#{x}px")
         .text("#{d} (#{by_date[d].length} events)")
     )
-    .on('mouseout', (d) -> $el.find('.tooltip').hide())
+    .on('mouseout', (d) ->
+      $el.find('.description, .labels').show()
+      $el.find('.tooltip').hide()
+    )
   recs.exit().remove()
   recs.transition().duration(500).call(update_graph)
 

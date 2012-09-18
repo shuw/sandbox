@@ -24,7 +24,7 @@
     # .enter()
     #   .append('a')
     #   .classed('speaker', true)
-    #   .call(avatar_creator)
+    #   .call(create_avatar)
     # prefix = (if top_speakers.length > 5 then "and #{top_speakers.length - 5} others " else "")
     # summary.append('span').text("#{prefix}gave a speech")
 
@@ -33,6 +33,6 @@
       .data(events)
     .enter()
       .append('div').classed('quote', true)
-      .call(avatar_creator)
+      .call(create_avatar)
       .append('span')
         .text((d) -> d.quote)

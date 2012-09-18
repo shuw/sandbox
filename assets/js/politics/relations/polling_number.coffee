@@ -29,7 +29,7 @@
       .data(groups)
     .enter()
       .append('div').classed('results', true)
-      .call(avatar_creator)
+      .call(create_avatar)
       .selectAll('.result')
       .data((d) -> d.results)
     .enter()

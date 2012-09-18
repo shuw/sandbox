@@ -17,13 +17,23 @@ window.draw_groups = (events) ->
   # try to create more interesting clusters first
   create_clusters = ->
     _.union(
-      cluster(2, (e) -> e.params.for_event?.topic?.name),
-      cluster(2, (e) -> e.params.pkey?.topic?.name),
-      cluster(10, ((e) -> e.relation_type), ((e) -> e.relation_name)),
-      cluster(1, (e) -> e.params.pkey?.label),
+      cluster_param(2, 'for_event'),
+      cluster_param(2, 'pkey'),
+      cluster(10,
+        ((e) -> e.relation_type),
+        ((e) -> e.relation_name)
+      ),
+      cluster_param(1, 'pkey'),
     )
 
-  cluster = (min_cluster_size, key_func, name_func) ->
+  cluster_param = (min_cluster_size, param_name) ->
+    cluster(min_cluster_size,
+      (d) -> d.params[param_name]?.topic_id,
+      (d) -> d.params[param_name]?.topic?.name,
+      (d) -> d.params[param_name],
+    )
+
+  cluster = (min_cluster_size, key_func, name_func, entity_func) ->
     return _(events_by_id).chain()
       .values()
       .groupBy(key_func)
@@ -37,7 +47,9 @@ window.draw_groups = (events) ->
             delete events_by_id[e.news_event_id]
             unique_id += e.news_event_id
 
+
           {
+            entity: entity_func?(events[0])
             date: events[0].date
             label: (name_func || key_func)(events[0])
             events: events
@@ -51,8 +63,10 @@ window.draw_groups = (events) ->
     .data(groups, (d) -> d.unique_id)
   sel.enter()
     .append('div').classed('group', true)
-    .call(->
-      @append('h2').text((d) -> d.label)
+    .each((d) ->
+      h2 = d3.select(@).append('h2')
+      h2.datum(d.entity).call(create_avatar) if d.entity
+      h2.append('span').text(d.label)
     )
     .each(draw_group)
   sel.exit().remove()

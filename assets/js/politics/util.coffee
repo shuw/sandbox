@@ -12,7 +12,7 @@ window.sort_by_occurrences = (list, key_func, uniq) ->
     .value()
 
 
-window.avatar_creator = ->
+window.create_avatar = ->
   @append('div')
     .attr('class', (d) -> d.affiliation || 'unknown')
     .classed('avatar', true)

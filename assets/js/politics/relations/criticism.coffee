@@ -102,7 +102,7 @@ draw_target_criticized = (group) ->
       .data(group.items)
     .enter()
       .append('div').classed('source', true)
-        .call(avatar_creator)
+        .call(create_avatar)
       .append('a').classed('reason', true)
         .attr('href', (d) -> news_event_path(d.news_event_id))
         .text((d) -> d.reason)
@@ -114,4 +114,4 @@ draw_target_criticized = (group) ->
     .call(->
       @append('span').classed('arrow', true).text('▶')
     )
-    .call(avatar_creator)
+    .call(create_avatar)
