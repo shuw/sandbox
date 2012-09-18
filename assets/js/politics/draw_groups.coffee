@@ -19,7 +19,7 @@ window.draw_groups = (events) ->
     _.union(
       cluster_param(2, 'for_event'),
       cluster_param(2, 'pkey'),
-      cluster(10,
+      cluster(5,
         ((e) -> e.relation_type),
         ((e) -> e.relation_name)
       ),

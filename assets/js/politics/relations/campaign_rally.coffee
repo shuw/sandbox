@@ -3,7 +3,22 @@
   friendly_name: 'Campaign rallies'
 
   renderable: (event) ->
-    true
+    event.params.pkey?
 
   render: (events) ->
-    0 # do nothing yet
+    root = d3.select(@)
+
+    events = _(events).map (e) ->
+      _(e.params.pkey).chain().clone().extend(
+        {
+          headline: e.headline
+        }
+      ).value()
+
+    root.selectAll('.rally')
+      .data(events)
+    .enter()
+      .append('div').classed('rally', true)
+      .call(create_avatar)
+      .append('span')
+        .text((d) -> d.headline)
