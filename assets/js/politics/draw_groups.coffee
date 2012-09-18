@@ -72,7 +72,7 @@ window.draw_groups = (events) ->
     )
     .each(draw_group)
   sel.exit().remove()
-  sel.sort()
+  sel.order()
 
 
 
@@ -103,8 +103,8 @@ draw_group = (group) ->
       .classed('relation', true)
       .call(->
         @append('time').text((d) ->
-          end = moment(d.events[Math.floor(d.events.length * 0.05)].date)
-          start = moment(d.events[Math.ceil((d.events.length - 1) * 0.95)].date)
+          end = moment(d.events[0].date)
+          start = moment(d.events[d.events.length - 1].date)
 
           if start.format('dddd M/D') != end
             "#{start.format('M/D')} - #{end.format('dddd M/D')}"
