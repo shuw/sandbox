@@ -14,7 +14,9 @@ _.mixin(_.string.exports())
 
 
 # TODO: Fast Preview on hover
-# TODO: Entity Icon in group header
+# TODO: Arrows and affiliation border in criticisms graph viz
+# TODO: Polling numbers as graph
+# TODO: Limit size of feed for perf reasons
 
 window.politics_init = ->
   events = normalize_events(POLITICS_DATA)
@@ -23,7 +25,7 @@ window.politics_init = ->
       .data([selected])
       .each(draw_activity_histogram)
       .each(draw_groups)
-      .each(draw_raw_data)
+      # .each(draw_raw_data)
   )
   $('#root').removeClass('hidden')
 

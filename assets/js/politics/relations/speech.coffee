@@ -12,6 +12,7 @@
     events = _(events)
       .map((event) ->
         _(event.params.pkey).chain().clone().defaults(
+          news_event_id: event.news_event_id,
           affiliation: event.params.pkey.affiliation
           quote: event.params.quote_commonentity?.label
         ).value()
@@ -35,5 +36,6 @@
     .enter()
       .append('div').classed('quote', true)
       .call(create_avatar)
-      .append('span')
+      .append('a')
+        .attr('href', (d) -> news_event_path(d.news_event_id))
         .text((d) -> d.quote)
