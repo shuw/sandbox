@@ -1,5 +1,7 @@
 (window.relations ||= {}).campaign_rally =
 
+  friendly_name: 'Campaign rallies'
+
   renderable: (event) ->
     true
 
