@@ -3,7 +3,6 @@
   renderable: (event) ->
     event.params.pkey? && event.params.target? && event.params.reason_commonentity?
 
-  # TODO: Include subpredicate occurred_at_event if exists
   render: (events) ->
     root = d3.select(@)
 
