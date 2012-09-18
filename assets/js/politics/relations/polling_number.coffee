@@ -13,6 +13,8 @@
   render: (events) ->
     events = _(events).map((e) ->
       _(e.params.pkey).chain().clone().defaults(
+        in_location: e.params.in_location?.topic?.name
+        by_organization: e.params.by_organization?.topic?.name
         news_event_id: e.news_event_id
         date: e.date,
         direction_up: e.params.went_up_by_percent?
@@ -40,4 +42,9 @@
       .append('a')
       .attr('href', (d) -> news_event_path(d.news_event_id))
       .classed('result', true)
-      .text((d) -> (if d.went_up_by_percent then '▲' else '▼') + d.new_percentage)
+      .call(->
+        @append('span').text((d) -> (if d.went_up_by_percent then '▲' else '▼') + " #{d.new_percentage}")
+        @append('span').text((d) -> if d.in_location then " in #{d.in_location}" else '')
+        @append('span').text((d) -> if d.by_organization then " by #{d.by_organization}" else '')
+        @append('span').text((d) -> if d.date then " on #{moment(d.date).format('MM/DD/YY')}" else '')
+      )
