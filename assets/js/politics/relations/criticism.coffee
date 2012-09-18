@@ -43,9 +43,9 @@ render_graph = (items) ->
   nodes = _(nodes).values()
 
   layout = d3.layout.force()
-    .gravity(.03)
+    .gravity(.05)
     .distance(100)
-    .charge(-100)
+    .charge(-150)
     .size([width, (items.length / 10) * 100])
 
   layout
@@ -100,7 +100,7 @@ render_graph = (items) ->
     .classed('arrow', true)
     .attr('r', 2)
     .attr('points', (d) -> "0,0 -14,7 -14,-7")
-    .on('click', (d) -> news_event_path(d.source.news_event_id))
+    .on('click', (d) -> open(news_event_path(d.source.news_event_id)))
     .append('title').text((d) -> d.source.reason)
   arrows.exit().remove()
 
