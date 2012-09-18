@@ -56,6 +56,15 @@ render_graph = (items) ->
         .attr("y1", (d) -> d.source.y)
         .attr("x2", (d) -> d.target.x)
         .attr("y2", (d) -> d.target.y)
+
+      arrows.attr('transform', (d) ->
+        x = (d.source.x + d.target.x) / 2
+        y = (d.source.y + d.target.y) / 2
+
+        angle = Math.atan2(d.target.y - d.source.y, d.target.x - d.source.x)
+
+        "translate(#{x}, #{y})" + " rotate(#{angle * 180 / Math.PI})"
+      )
       node.attr("transform", (d) ->
         r = 40 * Math.sqrt(d.weight)
         d.x = Math.max(r, Math.min(width - r, d.x));
@@ -84,6 +93,16 @@ render_graph = (items) ->
   link.enter().append("line")
     .attr("class", "link")
     .style("stroke-width", (d) -> 2)
+  link.exit().remove()
+
+  arrows = vis.selectAll("polygon.arrow").data(links)
+  arrows.enter().append('svg:polygon')
+    .classed('arrow', true)
+    .attr('r', 2)
+    .attr('points', (d) -> "0,0 -14,7 -14,-7")
+    .on('click', (d) -> news_event_path(d.source.news_event_id))
+    .append('title').text((d) -> d.source.reason)
+  arrows.exit().remove()
 
   node = vis.selectAll("g.node").data(nodes)
   node.append("title").text((d) -> d.topic_name || d.name)
@@ -109,8 +128,6 @@ render_graph = (items) ->
     )
 
   node.exit().remove()
-
-  link.exit().remove()
 
 
 draw_target_criticized = (group) ->
