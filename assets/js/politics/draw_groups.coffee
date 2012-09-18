@@ -99,7 +99,7 @@ draw_group = (group) ->
     .data(relation_groups)
   .enter()
     .append('div')
-      .attr('class', (d) -> d.relation_type)
+      .attr('class', (d) -> d.relation.css_class_name || d.relation_type)
       .classed('relation', true)
       .call(->
         @append('time').text((d) ->

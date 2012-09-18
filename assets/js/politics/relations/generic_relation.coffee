@@ -1,5 +1,8 @@
 generic_relation =
 
+  css_class_name: 'generic_relation'
+  hide_entity_avatar: true
+
   renderable: (event) ->
     event.params.pkey?
 
@@ -9,16 +12,18 @@ generic_relation =
     events = _(events).map (e) ->
       _(e.params.pkey).chain().clone().extend(
         {
+          news_event_id: e.news_event_id
           headline: e.headline
         }
       ).value()
 
-    root.selectAll('.rally')
+    root.selectAll('.event')
       .data(events)
     .enter()
-      .append('div').classed('rally', true)
+      .append('div').classed('event', true)
       .call(create_avatar)
-      .append('span')
+      .append('a')
+        .attr('href', (d) -> news_event_path(d.news_event_id))
         .text((d) -> d.headline)
 
 
