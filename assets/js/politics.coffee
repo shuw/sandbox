@@ -12,6 +12,10 @@ _.mixin(_.string.exports())
 # person_interviewed
 # person_arrived_in
 
+
+# TODO: Fast Preview on hover
+# TODO: Entity Icon in group header
+
 window.politics_init = ->
   events = normalize_events(POLITICS_DATA)
   init_filters(events, (selected) ->
