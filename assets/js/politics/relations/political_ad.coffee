@@ -2,6 +2,9 @@ WIDTH = 320
 HEIGHT = 240
 
 (window.relations ||= {}).political_ad =
+
+  hide_entity_avatar: true
+
   renderable: (event) -> event.params.pkey? && event.media?
 
   render: (events) ->

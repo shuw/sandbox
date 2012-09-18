@@ -1,4 +1,7 @@
 (window.relations ||= {}).polling_number =
+
+  hide_entity_avatar: true
+
   renderable: (event) ->
     event.params.pkey? &&
     (

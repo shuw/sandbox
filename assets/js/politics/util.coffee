@@ -16,6 +16,7 @@ window.create_avatar = ->
   @append('div')
     .attr('class', (d) -> d.affiliation || 'unknown')
     .classed('avatar', true)
+    .attr('topic-id', (d) -> d.topic_id)
     .append('a')
     .attr('href', (d) -> topic_path(d.topic_id))
       .append('img')

@@ -1,6 +1,7 @@
 (window.relations ||= {}).speech =
 
   friendly_name: 'Speeches'
+  hide_entity_avatar: true
 
   renderable: (event) -> event.params.pkey? && event.params.quote_commonentity?.label
 

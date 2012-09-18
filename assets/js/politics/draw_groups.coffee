@@ -67,6 +67,8 @@ window.draw_groups = (events) ->
       h2 = d3.select(@).append('h2')
       h2.datum(d.entity).call(create_avatar) if d.entity
       h2.append('span').text(d.label)
+
+      draw_group.call(this, d)
     )
     .each(draw_group)
   sel.exit().remove()
@@ -86,7 +88,7 @@ draw_group = (group) ->
           relation_name: events[0].relation_name
           relation_type: events[0].relation_type
           events: events
-          render: relation.render
+          relation: relation
         }
     )
     .compact()
@@ -111,6 +113,11 @@ draw_group = (group) ->
         )
         @append('h3').text((d) -> d.relation_name)
       )
-      .each((d) -> d.render.call(@, d.events))
+      .each((d) ->
+        d.relation.render.call(@, d.events, group.entity)
+        if group.entity && d.relation.hide_entity_avatar
+          # hide avatar if it's the same as the group entity avatar
+          $(@).find(".avatar[topic-id=\"#{group.entity.topic_id}\"]").hide()
+      )
 
 
