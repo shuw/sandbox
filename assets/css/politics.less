@@ -72,6 +72,20 @@ a, .link {
   }
 }
 
+rect.avatar {
+  stroke-width: 2px;
+
+  &.democrat {
+    stroke: @palette-democratic;
+  }
+  &.republican {
+    stroke: @palette-republican;
+  }
+  &.neutral {
+    stroke: gray;
+  }
+}
+
 h1 {
   padding-bottom: 7px;
   margin-bottom: 30px;
@@ -208,9 +222,11 @@ h1 {
       &.criticism {
 
         .graph {
-          .avatar.node {
-            stroke: #fff;
-            stroke-width: 1.5px;
+          .node {
+            cursor: pointer;
+            rect {
+              fill: transparent;
+            }
           }
 
           line.link {

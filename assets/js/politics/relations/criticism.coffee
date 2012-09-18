@@ -30,8 +30,6 @@
 
 
 width = 800
-node_width = 20
-node_height = Math.floor(node_width * 3.0 / 2.0)
 render_graph = (items) ->
   nodes = {}
   links = []
@@ -72,6 +70,16 @@ render_graph = (items) ->
 
   layout.start().alpha(0.05)
 
+  _(nodes).each (node) ->
+    w = Math.floor(node.avatar_image.size[0] * Math.sqrt(node.weight) * 0.5)
+    h = Math.floor(node.avatar_image.size[1] * Math.sqrt(node.weight) * 0.5)
+    _(node).extend({
+      offset_x: -(w / 2)
+      offset_y: -(h / 2)
+      width: w
+      height: h
+    })
+
   link = vis.selectAll("line.link").data(links)
   link.enter().append("line")
     .attr("class", "link")
@@ -83,13 +91,23 @@ render_graph = (items) ->
     .append("svg:g")
     .attr("class", "node")
     .call(layout.drag)
-    .append("svg:image")
-      .attr("class", "avatar")
-      .attr("xlink:href", (d) -> d.topic_images?[0]?.sizes[0]?.url || '//wavii-shu.s3.amazonaws.com/images/topic_placeholder.png' )
-      .attr("x", (d) -> "-#{node_width / 2 * Math.sqrt(d.weight)}px")
-      .attr("y", (d) -> "-#{node_height / 2 * Math.sqrt(d.weight)}px")
-      .attr("width", (d) -> "#{node_width * Math.sqrt(d.weight)}px")
-      .attr("height", (d) -> "#{node_height * Math.sqrt(d.weight)}px")
+    .call(->
+      @append("svg:image")
+        .attr("xlink:href", (d) -> d.avatar_image.url)
+        .attr("x", (d) -> d.offset_x)
+        .attr("y", (d) -> d.offset_y)
+        .attr("width", (d) -> d.width)
+        .attr("height", (d) -> d.height)
+      @append('svg:rect')
+        .attr('class', (d) -> "#{d.affiliation} avatar")
+        .attr("x", (d) -> d.offset_x)
+        .attr("y", (d) -> d.offset_y)
+        .attr("width", (d) -> d.width)
+        .attr("height", (d) -> d.height)
+        .on('click', (d) -> open(topic_path(d.topic_id)))
+        .append('title').text((d) -> d.label)
+    )
+
   node.exit().remove()
 
   link.exit().remove()
