@@ -1,3 +1,5 @@
+MAX_GROUPS_TO_SHOW = 20
+
 RELATION_SORT_ORDER = [
   'political_ad'
   'criticism'
@@ -7,10 +9,15 @@ RELATION_SORT_ORDER = [
 HTML_TEMPLATE = '
   <div class="events">
   </div>
+  <div class="and-more link"></div>
 '
 window.draw_groups = (events) ->
-  $(HTML_TEMPLATE).appendTo(@) if $(@).find('.events').length == 0
-  root = d3.select(@).select(".events")
+  if $(@).find('.events').length == 0
+    $(HTML_TEMPLATE).appendTo(@)
+    $(@).find('.and-more').click(-> scroll_to('#filters'))
+
+  $el = $(@).find('.events')
+  root = d3.select($el[0])
 
   events_by_id = _(events).reduce(((m, e) -> m[e.news_event_id] = e; m), {})
 
@@ -60,7 +67,7 @@ window.draw_groups = (events) ->
   groups = _(create_clusters()).sortBy((d) -> -d.events[0].date)
 
   sel = root.selectAll('.group')
-    .data(groups, (d) -> d.unique_id)
+    .data(groups[..MAX_GROUPS_TO_SHOW - 1], (d) -> d.unique_id)
   sel.enter()
     .append('div').classed('group', true)
     .each((d) ->
@@ -74,6 +81,12 @@ window.draw_groups = (events) ->
   sel.exit().remove()
   sel.order()
 
+
+  if groups.length > MAX_GROUPS_TO_SHOW
+    $(@).find('.and-more').show()
+      .text("And #{groups.length - MAX_GROUPS_TO_SHOW} more not shown. Use links on the left to filter this list.")
+  else
+    $(@).find('.and-more').hide()
 
 
 draw_group = (group) ->

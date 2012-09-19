@@ -44,3 +44,9 @@ window.get_image = (generic_image, width, height) ->
     image.size = [scale * image.size[0], scale * image.size[1]]
 
   image
+
+
+window.scroll_to = (query) ->
+  $('html, body').animate({
+    scrollTop: $(query).offset().top
+  }, 100);

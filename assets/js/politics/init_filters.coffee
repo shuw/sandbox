@@ -50,10 +50,7 @@ window.init_filters = (events, on_events_selected) ->
     if path != current_path
       on_events_selected(filtered_events)
       current_path = path
-
-      $('html, body').animate({
-        scrollTop: $("#root").offset().top
-      }, 100);
+      scroll_to('#root')
 
   sorted_filter_groups = _(grouped_by_type).sortBy((d) -> TYPE_SORT_ORDER.indexOf(d.type))
 

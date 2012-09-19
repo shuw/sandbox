@@ -14,7 +14,7 @@ _.mixin(_.string.exports())
 # TODO: Fast Preview on hover
 # TODO: Arrows and affiliation border in criticisms graph viz
 # TODO: Polling numbers as graph
-# TODO: Limit size of feed for perf reasons
+# TODO: Limit events per relation
 
 window.politics_init = ->
   events = normalize_events(POLITICS_DATA)
