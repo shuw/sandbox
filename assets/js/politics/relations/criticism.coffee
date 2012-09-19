@@ -89,8 +89,6 @@ render_graph = (items) ->
     .attr('width', "#{width}px")
     .on('mouseout', (d) -> hide_tooltip())
 
-  $tooltip = $('<div class="tooltip">mouse over objects to see more</div>').appendTo(@)
-
   layout.start().alpha(0.05)
 
   _(nodes).each (node) ->
@@ -147,7 +145,7 @@ render_graph = (items) ->
               if d == l.source
                 sources.push(l.source.headline)
 
-            show_tooltip _.union(sources, targeted)[..10].join("<br/>")
+            show_tooltip "<h2>#{d.topic?.name}</h1>" + _.union(sources, targeted)[..10].join("<br/>")
           )
     )
 

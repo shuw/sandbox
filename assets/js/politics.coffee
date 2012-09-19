@@ -17,6 +17,11 @@ _.mixin(_.string.exports())
 # TODO: Limit events per relation
 # TODO: sidebar search wheel
 
+# TODO: allows duplicate events in clusters in all view
+# TODO: entity filter should search other predicates
+# TODO: sort more interesting clusters first in all view
+# TODO: rename "news activity histogram" -> "event activity"
+
 # TODO: Speech relation needs more predicates (i.e. location)
 
 window.politics_init = ->
