@@ -33,6 +33,8 @@
 
 width = 800
 render_graph = (items) ->
+  $el = $(@)
+
   nodes = {}
   links = []
   _(items).each (item) ->
@@ -54,6 +56,12 @@ render_graph = (items) ->
     .nodes(nodes)
     .links(links)
     .on("tick", ->
+      unless $el.is(':visible')
+        layout.stop()
+        console.log("Not visible shutting down")
+        return
+
+      console.log('tick')
       link.attr("x1", (d) -> d.source.x)
         .attr("y1", (d) -> d.source.y)
         .attr("x2", (d) -> d.target.x)
