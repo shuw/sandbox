@@ -68,9 +68,10 @@ render_graph = (items) ->
         "translate(#{x}, #{y})" + " rotate(#{angle * 180 / Math.PI})"
       )
       node.attr("transform", (d) ->
-        r = 40 * Math.sqrt(d.weight)
-        d.x = Math.max(r, Math.min(width - r, d.x));
-        d.y = Math.max(r, Math.min(height - r, d.y))
+        rx = d.width / 2
+        ry = d.height / 2
+        d.x = Math.max(rx, Math.min(width - rx, d.x));
+        d.y = Math.max(ry, Math.min(height - ry, d.y))
         "translate(#{d.x},#{d.y})"
       )
     )
