@@ -15,6 +15,7 @@ _.mixin(_.string.exports())
 # TODO: Arrows and affiliation border in criticisms graph viz
 # TODO: Polling numbers as graph
 # TODO: Limit events per relation
+# TODO: sidebar search wheel
 
 # TODO: Speech relation needs more predicates (i.e. location)
 
