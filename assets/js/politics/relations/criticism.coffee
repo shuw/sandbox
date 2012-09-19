@@ -13,10 +13,13 @@
       reason += " at #{for_event}" if for_event
       reason += " because #{d.params.quote_commonentity.label}" if d.params.quote_commonentity?
 
+
+
       _(d.params.pkey).chain().clone().defaults(
         news_event_id: d.news_event_id
         target: d.params.target
         reason: reason
+        headline: "#{d.params.pkey.topic?.name} criticized #{d.params.target.topic?.name} #{reason}"
       ).value()
     ).value()
 
@@ -102,7 +105,7 @@ render_graph = (items) ->
     .attr('r', 2)
     .attr('points', (d) -> "0,0 -14,7 -14,-7")
     .on('click', (d) -> open(news_event_path(d.source.news_event_id)))
-    .append('title').text((d) -> d.source.reason)
+    .append('title').text((d) -> d.source.headline)
   arrows.exit().remove()
 
   node = vis.selectAll("g.node").data(nodes)
