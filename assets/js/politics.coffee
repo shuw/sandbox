@@ -16,6 +16,8 @@ _.mixin(_.string.exports())
 # TODO: Polling numbers as graph
 # TODO: Limit events per relation
 
+# TODO: Speech relation needs more predicates (i.e. location)
+
 window.politics_init = ->
   events = normalize_events(POLITICS_DATA)
   init_filters(events, (selected) ->
