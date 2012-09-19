@@ -13,8 +13,6 @@
       reason += " at #{for_event}" if for_event
       reason += " because #{d.params.quote_commonentity.label}" if d.params.quote_commonentity?
 
-
-
       _(d.params.pkey).chain().clone().defaults(
         news_event_id: d.news_event_id
         target: d.params.target

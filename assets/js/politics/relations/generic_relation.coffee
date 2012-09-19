@@ -22,7 +22,7 @@ generic_relation =
     .enter()
       .append('div').classed('event', true)
       .call(create_avatar)
-      .append('a')
+      .append('a').classed('headline', true)
         .attr('href', (d) -> news_event_path(d.news_event_id))
         .text((d) -> d.headline)
 
