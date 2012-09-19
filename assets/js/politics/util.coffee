@@ -50,3 +50,12 @@ window.scroll_to = (query) ->
   $('html, body').animate({
     scrollTop: $(query).offset().top
   }, 100);
+
+
+
+window.show_tooltip = (node) ->
+  $('#tooltip').removeClass('hidden').append(node)
+
+
+window.hide_tooltip = ->
+  $('#tooltip').addClass('hidden').html('')

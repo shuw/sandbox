@@ -87,6 +87,9 @@ render_graph = (items) ->
   vis = d3.select(@).append('svg').classed('graph', true)
     .attr('height', "#{height}px")
     .attr('width', "#{width}px")
+    .on('mouseout', (d) -> hide_tooltip())
+
+  $tooltip = $('<div class="tooltip">mouse over objects to see more</div>').appendTo(@)
 
   layout.start().alpha(0.05)
 
@@ -112,7 +115,7 @@ render_graph = (items) ->
     .attr('r', 2)
     .attr('points', (d) -> "0,0 -14,7 -14,-7")
     .on('click', (d) -> open(news_event_path(d.source.news_event_id)))
-    .append('title').text((d) -> d.source.headline)
+    .on('mouseover', (d) -> show_tooltip(d.source.headline))
   arrows.exit().remove()
 
   node = vis.selectAll("g.node").data(nodes)
@@ -135,7 +138,17 @@ render_graph = (items) ->
         .attr("width", (d) -> d.width)
         .attr("height", (d) -> d.height)
         .on('click', (d) -> open(topic_path(d.topic_id)))
-        .append('title').text((d) -> d.label)
+        .on('mouseover', (d) ->
+            targeted = []
+            sources = []
+            _(links).each (l) ->
+              if d == l.target
+                targeted.push(l.source.headline)
+              if d == l.source
+                sources.push(l.source.headline)
+
+            show_tooltip _.union(sources, targeted)[..10].join("<br/>")
+          )
     )
 
   node.exit().remove()
