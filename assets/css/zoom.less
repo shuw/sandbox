@@ -2,12 +2,112 @@
 @palette-blue: #276b8c;
 @palette-light-blue: #d6dfe3;
 @palette-light-grey: #95938f;
-@palette-grey: #777;
+@palette-grey: #555;
 
 body {
   font-family: sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
+  color: @palette-grey;
+}
+
+#summary {
+  padding: 10px;
+  top: 0;
+  right: 0;
+  width: 10%;
+  background: white;
+  position: fixed;
+  border-left: 1px solid @palette-grey;
+  height: 100%;
+  
+  .year {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+}
+
+#controls {
+  top: 0;
+  left: 0;
+  width: 90%;
+  background: #222;
+  position: fixed;
+  padding: 10px 100px 10px 10px;
+  text-align: center;
+
+  .description {
+    margin-right: 10px;
+    color: #EFEFEF;
+    font-size: 18px;
+  }
+  .button {
+    display: inline-block;
+    color: black;
+    background-color: #AAA;
+    padding: 6px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+
+    &:hover {
+      background-color: #EEE;
+    }
+  }
+}
+
+#root {
+  margin: 0 40px;
+
+  .year {
+    padding-top: 60px;
+
+    > h1 {
+      margin: 10px 0;
+      font-size: 60px;
+      font-weight: 200;
+      > .description, .title {
+        vertical-align: middle;
+      }
+      > .description {
+        margin-left: 20px;
+        font-size: 30px;
+        font-weight: 200;
+      }
+    }
+  }
+
+  .unit {
+    margin: 15px 15px 0 0;
+    width: 500px;
+    display: inline-block;
+    background: #EFEFEF;
+    padding: 15px 20px;
+    border-radius: 5px;
+
+    .message {
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+
+    .meta {
+      margin-top: 10px;
+      text-align: right;
+      color: @palette-light-grey;
+    }
+
+    .share {
+      margin: 10px 0 0 10px;
+      .title {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .blurb {
+      }
+    }
+
+  }
 }

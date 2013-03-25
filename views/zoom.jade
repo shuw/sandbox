@@ -1,7 +1,10 @@
 != js('zoom')
+!= js('vendor/mustache')
 != css('zoom')
 
 header
 body
+  #controls
+  #summary
   #root
   script $(function() { zoomInit('/data/zoom.json', true) })
