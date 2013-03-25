@@ -63,15 +63,20 @@ body {
 
 #root {
   margin: 0 40px;
-  width: 1150px;
+  white-space: nowrap;
 
   .year {
+    width: 500px;
+    display: inline-block;
     padding-top: 60px;
+    vertical-align: top;
+    white-space: normal;
 
     > h1 {
       margin: 10px 0;
       font-size: 60px;
       font-weight: 200;
+
       > .description, .title {
         vertical-align: middle;
       }
@@ -86,7 +91,7 @@ body {
   .unit {
     margin: 15px 15px 0 0;
     padding: 15px 20px;
-    width: 500px;
+    width: 400px;
     display: inline-block;
   }
 

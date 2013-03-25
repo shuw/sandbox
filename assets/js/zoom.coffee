@@ -86,14 +86,16 @@ start = ->
         hidden_count = 0
         for u in _(d.units).sortBy((u) -> -u.moment)
           if u.shown
-            units.push(hidden_count: hidden_count) if hidden_count > 0
+            if g_show_hidden_counts && hidden_count > 0
+              units.push(hidden_count: hidden_count, unique_id: hidden_count)
             units.push u
             hidden_count = 0
             shown_count += 1
           else
             hidden_count += 1
 
-        units.push(hidden_count: hidden_count) if hidden_count > 0
+        if g_show_hidden_counts && hidden_count > 0
+          units.push(hidden_count: hidden_count, unique_id: hidden_count)
 
         $(@).find('h1 .title').text(d.year)
         $(@).find('h1 .description').text(
@@ -114,10 +116,9 @@ drawUnits = (el, units) ->
     .call(->
       @each (unit) ->
         if unit.hidden_count
-          if g_show_hidden_counts
-            $(@)
-              .addClass('hidden_count')
-              .text("... #{unit.hidden_count} more units hidden ...")
+          $(@)
+            .addClass('hidden_count')
+            .text("... #{unit.hidden_count} more units hidden ...")
           return
 
         html = renderUnit(@, unit)
@@ -138,6 +139,7 @@ drawUnits = (el, units) ->
         )
     )
   units.exit().remove()
+  units.order()
 
 
 # TODO:
@@ -148,7 +150,7 @@ renderUnit = (el, unit) ->
       return Mustache.render(
         """
           {{#message}}<div class="message">{{message}}</div>{{/message}}
-          <img class="photo" width="400" src="{{src}}"></img>
+          <img class="photo" width="350" src="{{src}}"></img>
         """,
         src: unit.images[0].uri
         message: unit.message
