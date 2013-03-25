@@ -23,8 +23,10 @@ body {
   height: 100%;
   
   .year {
+    color: @palette-grey;
+    text-decoration: none;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     font-size: 16px;
   }
 }
@@ -61,6 +63,7 @@ body {
 
 #root {
   margin: 0 40px;
+  width: 1150px;
 
   .year {
     padding-top: 60px;
@@ -82,10 +85,20 @@ body {
 
   .unit {
     margin: 15px 15px 0 0;
+    padding: 15px 20px;
     width: 500px;
     display: inline-block;
+  }
+
+  .unit.hidden_count {
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .unit:not(.hidden_count) {
+    vertical-align: top;
+    display: inline-block;
     background: #EFEFEF;
-    padding: 15px 20px;
     border-radius: 5px;
 
     .message {

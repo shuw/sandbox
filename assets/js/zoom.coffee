@@ -1,7 +1,8 @@
 _.mixin(_.string.exports())
 
 g_units = null
-g_max_per_year = 5
+g_max_per_year = 4
+g_show_hidden_counts = true
 
 g_one_month_ago = moment().subtract('days', 30)
 
@@ -24,7 +25,7 @@ initControls = ->
   )
 
   zoomUpdated = ->
-    g_max_per_year = Math.max(Math.min(g_max_per_year, 1000), 5)
+    g_max_per_year = Math.max(Math.min(g_max_per_year, 1000), 1)
     visible_unit = _($('.unit')).find((el) -> $(el).visible())
 
     start()
@@ -38,6 +39,7 @@ initControls = ->
 
   $('#controls .less').click ->
     g_max_per_year /= 2
+    debugger
     zoomUpdated()
 
 
@@ -73,14 +75,27 @@ start = ->
   years
     .call(->
       @each (d) ->
-        units = _(d.units).chain()
+        _(d.units).chain()
           .sortBy((u) -> u.score)
-          .take(g_max_per_year)
-          .sortBy((u) -> u.moment)
-          .value()
+          .each((u, i) -> u.shown = i < g_max_per_year)
+
+        shown_count = 0
+        units = []
+        hidden_count = 0
+        for u in _(d.units).sortBy((u) -> u.moment)
+          if u.shown
+            units.push(hidden_count: hidden_count) if hidden_count > 0
+            units.push u
+            hidden_count = 0
+            shown_count += 1
+          else
+            hidden_count += 1
+
+        units.push(hidden_count: hidden_count) if hidden_count > 0
+
         $(@).find('h1 .title').text(d.year)
         $(@).find('h1 .description').text(
-          "showing Top #{units.length} of #{d.units.length}"
+          "showing Top #{shown_count} of #{d.units.length}"
         )
         drawUnits @, units
     )
@@ -96,6 +111,13 @@ drawUnits = (el, units) ->
     .classed('unit', true)
     .call(->
       @each (unit) ->
+        if unit.hidden_count
+          if g_show_hidden_counts
+            $(@)
+              .addClass('hidden_count')
+              .text("... #{unit.hidden_count} units hidden ...")
+          return
+
         html = renderUnit(@, unit)
         return if !html
         m = unit.moment
