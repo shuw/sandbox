@@ -12,25 +12,25 @@ window.zoomInit = (data_path) ->
       .map((u) -> u.moment = moment.unix(u.start_time); u)
       .value()
     initControls()
-    start()
-
 
 initControls = ->
   $('#controls').append(
     """
-      <span class="description">Zoom Controls: </span>
+      <span class="description"></span>
       <div class="button more">More</div>
-      <div class="button less">Less</div>
+      <div class="button less">Less</div
     """
   )
 
-  zoomUpdated = ->
+  zoomUpdated = (init) ->
     g_max_per_year = Math.max(Math.min(g_max_per_year, 1000), 1)
+    $('#controls .description')
+      .text("Showing #{g_max_per_year} units / year")
     visible_unit = _($('.unit')).find((el) -> $(el).visible())
 
     start()
 
-    if visible_unit
+    if visible_unit && !init
       window.location.href = '#' + $(visible_unit).parent('.year').attr('id')
 
   $('#controls .more').click ->
@@ -42,6 +42,8 @@ initControls = ->
     debugger
     zoomUpdated()
 
+
+  zoomUpdated(true)
 
 start = ->
   year_units = _(g_units).chain()
@@ -82,7 +84,7 @@ start = ->
         shown_count = 0
         units = []
         hidden_count = 0
-        for u in _(d.units).sortBy((u) -> u.moment)
+        for u in _(d.units).sortBy((u) -> -u.moment)
           if u.shown
             units.push(hidden_count: hidden_count) if hidden_count > 0
             units.push u
@@ -95,7 +97,7 @@ start = ->
 
         $(@).find('h1 .title').text(d.year)
         $(@).find('h1 .description').text(
-          "showing Top #{shown_count} of #{d.units.length}"
+          "showing #{shown_count} of #{d.units.length}"
         )
         drawUnits @, units
     )
@@ -115,7 +117,7 @@ drawUnits = (el, units) ->
           if g_show_hidden_counts
             $(@)
               .addClass('hidden_count')
-              .text("... #{unit.hidden_count} units hidden ...")
+              .text("... #{unit.hidden_count} more units hidden ...")
           return
 
         html = renderUnit(@, unit)
