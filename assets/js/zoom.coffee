@@ -3,14 +3,26 @@ _.mixin(_.string.exports())
 g_units = null
 g_max_per_year = 4
 g_show_hidden_counts = true
+g_show_unrecognized_types = true
 
 g_one_month_ago = moment().subtract('days', 30)
 
-window.zoomInit = (data_path) ->
+window.zoomInit = ->
+  data_file = window.location.search.split('?')[1]?.split('=')[1]
+  data_path = '/data/' + if data_file then data_file else 'zoom.json'
   $.ajax data_path, success: (units) ->
     g_units = _(units).chain()
+      .filter((u) ->
+        return true if g_show_unrecognized_types
+        switch (u.unit_type)
+          when 'ADD_SINGLE_PHOTO' then return true
+          when 'STATUS_PHOTO' then return true
+          when 'LINK' then return true
+          else return false
+      )
       .map((u) -> u.moment = moment.unix(u.start_time); u)
       .value()
+
     initControls()
 
 initControls = ->
@@ -51,16 +63,6 @@ start = ->
     .map((units, year) -> {year: year, units: units})
     .sortBy((d) -> -d.year)
     .value()
-
-  summary = d3.select('#summary')
-    .selectAll('.year')
-    .data(year_units, (d) -> d.year)
-  summary.enter()
-    .append('a')
-    .classed('year', true)
-    .text((d) -> "#{d.year} (#{d.units.length})")
-    .attr('href', (d) -> "#year_#{d.year}")
-  summary.exit().remove()
 
   years = d3.select('#root')
     .selectAll('.year')
@@ -142,8 +144,6 @@ drawUnits = (el, units) ->
   units.order()
 
 
-# TODO:
-#   - organize by year
 renderUnit = (el, unit) ->
   switch (unit.unit_type)
     when 'ADD_SINGLE_PHOTO'
@@ -194,4 +194,3 @@ renderUnit = (el, unit) ->
 /*! jQuery visible 1.0.0 teamdf.com/jquery-plugins | teamdf.com/jquery-plugins/license */
   (function(c){c.fn.visible=function(e){var a=c(this),b=c(window),f=b.scrollTop();b=f+b.height();var d=a.offset().top;a=d+a.height();var g=e===true?a:d;return(e===true?d:a)<=b&&g>=f}})(jQuery);
 `
-
