@@ -1,10 +1,7 @@
-_.mixin(_.string.exports())
-
 g_units = null
 g_max_per_year = 4
 g_show_hidden_counts = true
 g_show_unrecognized_types = true
-
 g_one_month_ago = moment().subtract('days', 30)
 
 window.zoomInit = ->
@@ -25,37 +22,23 @@ window.zoomInit = ->
 
     initControls()
 
+
 initControls = ->
-  $('#controls').append(
-    """
-      <span class="description"></span>
-      <div class="button more">More</div>
-      <div class="button less">Less</div
-    """
-  )
+  $('#controls').append("""
+    <span class="description"></span>
+    <div class="button more">More</div>
+    <div class="button less">Less</div>
+  """)
 
-  zoomUpdated = (init) ->
+  zoomUpdated = ->
     g_max_per_year = Math.max(Math.min(g_max_per_year, 1000), 1)
-    $('#controls .description')
-      .text("Showing #{g_max_per_year} units / year")
-    visible_unit = _($('.unit')).find((el) -> $(el).visible())
-
+    $('#controls .description').text("Showing #{g_max_per_year} units / year")
     start()
 
-    if visible_unit && !init
-      window.location.href = '#' + $(visible_unit).parent('.year').attr('id')
+  $('#controls .more').click -> g_max_per_year *= 2; zoomUpdated()
+  $('#controls .less').click -> g_max_per_year /= 2; zoomUpdated()
+  zoomUpdated()
 
-  $('#controls .more').click ->
-    g_max_per_year *= 2
-    zoomUpdated()
-
-  $('#controls .less').click ->
-    g_max_per_year /= 2
-    debugger
-    zoomUpdated()
-
-
-  zoomUpdated(true)
 
 start = ->
   year_units = _(g_units).chain()
@@ -63,21 +46,18 @@ start = ->
     .map((units, year) -> {year: year, units: units})
     .sortBy((d) -> -d.year)
     .value()
-
   years = d3.select('#root')
     .selectAll('.year')
     .data(year_units, (d) -> d.year)
   years.enter()
     .append('div')
     .classed('year', true)
-    .attr('id', (d) -> "year_#{d.year}")
     .append('h1')
-      .call(->
-        @append('span').classed('title', true)
-        @append('span').classed('description', true)
-      )
-  years
     .call(->
+      @append('span').classed('title', true)
+      @append('span').classed('description', true)
+    )
+  years.call(->
       @each (d) ->
         _(d.units).chain()
           .sortBy((u) -> u.score)
@@ -100,10 +80,9 @@ start = ->
           units.push(hidden_count: hidden_count, unique_id: hidden_count)
 
         $(@).find('h1 .title').text(d.year)
-        $(@).find('h1 .description').text(
-          "showing #{shown_count} of #{d.units.length}"
-        )
-        drawUnits @, units
+        $(@).find('h1 .description')
+          .text("showing #{shown_count} of #{d.units.length}")
+        drawUnits(@, units)
     )
   years.exit().remove()
 
@@ -116,29 +95,28 @@ drawUnits = (el, units) ->
     .append('div')
     .classed('unit', true)
     .call(->
-      @each (unit) ->
+      @each((unit) ->
         if unit.hidden_count
-          $(@)
-            .addClass('hidden_count')
-            .text("... #{unit.hidden_count} more units hidden ...")
+          $(@).addClass('hidden_count')
+            .text("... #{unit.hidden_count} units hidden ...")
           return
 
-        html = renderUnit(@, unit)
-        return if !html
-        m = unit.moment
-        time = if m < g_one_month_ago then m.format("M/DD/YY") else m.fromNow()
+        return if !(html = renderUnit(@, unit))
+
+        if unit.moment < g_one_month_ago
+          time = unit.moment.format("M/DD/YY")
+        else
+          time = unit.moment.fromNow()
+
         $(@).append(
           html,
           Mustache.render(
-            """
-              <div class="meta">
-                <div title="{{score}}" class="time">{{time}}</div>
-              </div>
-            """,
+            '<div class="meta" title="{{score}}">{{time}}</div>',
             score: unit.score
             time: time
           )
         )
+      )
     )
   units.exit().remove()
   units.order()
@@ -147,11 +125,9 @@ drawUnits = (el, units) ->
 renderUnit = (el, unit) ->
   switch (unit.unit_type)
     when 'ADD_SINGLE_PHOTO'
-      return Mustache.render(
-        """
+      return Mustache.render("""
           {{#message}}<div class="message">{{message}}</div>{{/message}}
-          <img class="photo" width="350" src="{{src}}"></img>
-        """,
+          <img class="photo" width="250" src="{{src}}"></img>""",
         src: unit.images[0].uri
         message: unit.message
         score: unit.score
@@ -159,9 +135,7 @@ renderUnit = (el, unit) ->
 
     when 'STATUS_UPDATE'
       return Mustache.render(
-        """
-          <div class="message">{{message}}</div>
-        """,
+        '<div class="message">{{message}}</div>',
         message: unit.message
         score: unit.score
       )
@@ -183,14 +157,7 @@ renderUnit = (el, unit) ->
   
     else
       return Mustache.render(
-        """
-          <div class="unit_type">Can't render {{unit_type}} yet</div>
-        """,
+        '<div class="unit_type">Can\'t render {{unit_type}} yet</div>',
         unit_type: unit.unit_type
       )
 
-
-`
-/*! jQuery visible 1.0.0 teamdf.com/jquery-plugins | teamdf.com/jquery-plugins/license */
-  (function(c){c.fn.visible=function(e){var a=c(this),b=c(window),f=b.scrollTop();b=f+b.height();var d=a.offset().top;a=d+a.height();var g=e===true?a:d;return(e===true?d:a)<=b&&g>=f}})(jQuery);
-`
