@@ -2,8 +2,10 @@
 
 _.mixin(_.string.exports())
 
-g_units = null
 g_max_per_year = 4
+g_friends_to_show = 80
+
+g_units = null
 g_show_hidden_counts = true
 g_show_unrecognized_types = true
 g_one_month_ago = moment().subtract('days', 30)
@@ -23,13 +25,15 @@ window.zoomInit = ->
 g_friends = {}
 g_timelines = {}
 g_search_terms = []
+g_toggle_on = true
 showZoom = (user) ->
   g_show_unrecognized_types = false
 
   $('#sidebar').removeClass('hidden')
 
-  $('<a href="#">').text('Deselect all').appendTo('#sidebar').click(->
-    $('#sidebar .friends .friend').removeClass('selected')
+  $('<a href="#">').text('Toggle all').appendTo('#sidebar').click(->
+    g_toggle_on = !g_toggle_on
+    $('#sidebar .friends .friend').toggleClass('selected', g_toggle_on)
     updateFriends()
   )
 
@@ -43,7 +47,7 @@ showZoom = (user) ->
     _(friends).chain()
       .sortBy((f) -> -f.coefficient)
       .map((f) -> f.selected = true; f)
-      .take(50)
+      .take(g_friends_to_show)
       .each((f) -> g_friends[f.id] = f)
 
 
@@ -160,7 +164,7 @@ drawYears = ->
 
 
 createHiddenUnit = (units) ->
-  unique_id = _(units).map((u) -> u.unique_id).join()
+  unique_id = "hidden_" + _(units).map((u) -> u.unique_id).join()
   return {
     hidden_units: units
     unique_id: unique_id
@@ -194,7 +198,6 @@ drawUnits = (el, units) ->
           return
 
         return if !(html = renderUnit(@, unit))
-        html = $(html).addClass(unit.unit_type)
 
         if unit.moment < g_one_month_ago
           time = unit.moment.format("M/DD/YY")
@@ -204,13 +207,16 @@ drawUnits = (el, units) ->
         friend = unit.owner_id && g_friends[unit.owner_id]
         if friend
           $(@).addClass('has_friend_info')
-          prefix = renderUser(friend)
+          prefix = $('<div class="friend_section">').append(
+            renderUser(friend),
+            $('<div class="name">').text(_(friend.name).words()[0])
+          )
         else
           prefix = ''
 
         $(@).append(
           prefix
-          $('<div class="contents"></div>').append(html),
+          $('<div class="contents"></div>').addClass(unit.unit_type).append(html),
           Mustache.render(
             '<div class="meta" title="{{type}} {{score}}">{{time}}</div>',
             type: unit.unit_type
@@ -256,7 +262,8 @@ renderUnit = (el, unit) ->
         """
           {{#message}}<div class="message">{{message}}</div>{{/message}}
           <div>
-            <div class="title">{{description}}</div>
+            <img class="icon" src="http://www.facebook.com/{{icon}}"></img>
+            <span class="title">{{description}}: {{location}} {{name}}</span>
           </div>
         """, unit
       )
@@ -265,7 +272,7 @@ renderUnit = (el, unit) ->
       return Mustache.render(
         """
           {{#message}}<div class="message">{{message}}</div>{{/message}}
-          <div>
+          <div class="share">
             <div class="title">{{title}}</div>
             <div class="blurb">{{blurb}}</div>
           </div>
@@ -287,6 +294,10 @@ processUnits = (units) ->
   return _(units).chain()
     .filter((u) ->
       switch (u.unit_type)
+        when 'ADD_SINGLE_PHOTO'
+          return true
+        when 'STATUS_UPDATE'
+          return true if u.message
         when 'EXPERIENCE'
           if u.description && u.description != 'Other Life Event'
             u.to_tokenize = [u.message, u.description].join(' ')

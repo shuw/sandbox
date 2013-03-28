@@ -122,11 +122,21 @@ body {
     overflow: hidden;
 
     &.has_friend_info {
-      .profile_pic {
+      .friend_section {
+        vertical-align: top;
+        display: inline-block;
+        width: 50px;
         margin-right: 10px;
+
+        .name {
+          text-align: center;
+          margin-top: 5px;
+          overflow: hidden;
+        }
       }
 
       .contents {
+        vertical-align: top;
         display: inline-block;
         width: 270px;
       }
@@ -152,8 +162,24 @@ body {
       color: @palette-light-grey;
     }
 
+    .message {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+
     .EXPERIENCE {
-      font-size: 18px;
+      font-size: 16px;
+      .icon, .title {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .title {
+        margin-top: 10px;
+        display: inline-block;
+        width: 231px;
+      }
     }
 
     .ADD_SINGLE_PHOTO {
@@ -162,7 +188,7 @@ body {
     }
 
 
-    .LINK {
+    .LINK .share {
       margin: 10px 0 0 10px;
       .title {
         font-size: 14px;
