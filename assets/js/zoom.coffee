@@ -1,3 +1,5 @@
+# TODO: aggregate life events
+
 _.mixin(_.string.exports())
 
 g_units = null
@@ -129,7 +131,7 @@ drawYears = ->
   years.call(->
     @each (d) ->
       _(d.units).chain()
-        .sortBy((u) -> u.score)
+        .sortBy((u) -> -u.score)
         .each((u, i) -> u.shown = i < g_max_per_year)
 
       shown_count = 0
@@ -153,6 +155,7 @@ drawYears = ->
         .text("showing #{shown_count} of #{d.units.length}")
       drawUnits(@, units)
     )
+  years.order()
   years.exit().remove()
 
 
@@ -191,6 +194,7 @@ drawUnits = (el, units) ->
           return
 
         return if !(html = renderUnit(@, unit))
+        html = $(html).addClass(unit.unit_type)
 
         if unit.moment < g_one_month_ago
           time = unit.moment.format("M/DD/YY")
@@ -242,16 +246,26 @@ renderUnit = (el, unit) ->
 
     when 'STATUS_UPDATE'
       return Mustache.render(
-        '<div class="message">{{message}}</div>',
+        '<div>{{message}}</div>',
         message: unit.message
         score: unit.score
+      )
+    
+    when 'EXPERIENCE'
+      return Mustache.render(
+        """
+          {{#message}}<div class="message">{{message}}</div>{{/message}}
+          <div>
+            <div class="title">{{description}}</div>
+          </div>
+        """, unit
       )
 
     when 'LINK'
       return Mustache.render(
         """
           {{#message}}<div class="message">{{message}}</div>{{/message}}
-          <div class="share">
+          <div>
             <div class="title">{{title}}</div>
             <div class="blurb">{{blurb}}</div>
           </div>
@@ -273,8 +287,10 @@ processUnits = (units) ->
   return _(units).chain()
     .filter((u) ->
       switch (u.unit_type)
-        when 'ADD_SINGLE_PHOTO' then return true
-        when 'STATUS_PHOTO' then return true
+        when 'EXPERIENCE'
+          if u.description && u.description != 'Other Life Event'
+            u.to_tokenize = [u.message, u.description].join(' ')
+            return true
         when 'LINK'
           if u.message
             u.to_tokenize = \
@@ -295,7 +311,7 @@ processUnits = (units) ->
 
 
 tokenize = (str) ->
-  _(str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"").toUpperCase())
+  _((str || '').replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"").toUpperCase())
     .chain().words().value()
 
 
