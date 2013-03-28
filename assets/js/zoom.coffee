@@ -1,3 +1,5 @@
+_.mixin(_.string.exports())
+
 g_units = null
 g_max_per_year = 4
 g_show_hidden_counts = true
@@ -9,12 +11,16 @@ window.zoomInit = ->
   if zoom_user
     showZoom(zoom_user)
   else
+    # show timeleine for a single user
     user = getQueryVariable('user') || 'default'
-    showSingleUser(user)
+    $.ajax "/data/#{user}_timeline.json", success: (units) ->
+      g_units = processUnits(units)
+      draw()
 
 
 g_friends = {}
 g_timelines = {}
+g_search_terms = []
 showZoom = (user) ->
   g_show_unrecognized_types = false
 
@@ -24,6 +30,11 @@ showZoom = (user) ->
     $('#sidebar .friends .friend').removeClass('selected')
     updateFriends()
   )
+
+  $('#sidebar .search').on('keyup', _.debounce((->
+    g_search_terms = _($(@).val()).chain().capitalize().words().value()
+    showTimelines()
+  ), 500))
 
   $.ajax "/data/#{user}_zoom/friends.json", success: (friends) ->
     # Pick top friends
@@ -67,15 +78,14 @@ showTimelines = ->
   g_units = _(g_timelines).chain()
     .filter((g_timelines, id) -> g_friends[id].selected)
     .flatten(true)
+    .filter((u) ->
+      for term in g_search_terms
+        unless u.tokens[term]
+          return false
+      return true
+    )
     .value()
   draw()
-
-
-showSingleUser = (user) ->
-  data_path = "/data/#{user}_timeline.json"
-  $.ajax data_path, success: (units) ->
-    g_units = processUnits(units)
-    draw()
 
 
 g_controls_initialized = false
@@ -271,7 +281,12 @@ processUnits = (units) ->
 
       return false
     )
-    .map((u) -> u.moment = moment.unix(u.start_time); u)
+    .map((u) ->
+      u.moment = moment.unix(u.start_time)
+      u.tokens = {}
+      _(u.message).chain().capitalize().words().each((t) -> u.tokens[t] = true)
+      u
+    )
     .value()
 
 
