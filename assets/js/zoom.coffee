@@ -5,42 +5,101 @@ g_show_unrecognized_types = true
 g_one_month_ago = moment().subtract('days', 30)
 
 window.zoomInit = ->
-  data_file = window.location.search.split('?')[1]?.split('=')[1]
-  data_path = '/data/' + if data_file then data_file else 'zoom.json'
+  zoom_user = getQueryVariable('for')
+  if zoom_user
+    showZoom(zoom_user)
+  else
+    user = getQueryVariable('user') || 'default'
+    showSingleUser(user)
+
+
+g_friends = {}
+g_timelines = {}
+showZoom = (user) ->
+  g_show_unrecognized_types = false
+
+  $('#sidebar').removeClass('hidden')
+
+  $('<a href="#">').text('Deselect all').appendTo('#sidebar').click(->
+    $('#sidebar .friends .friend').removeClass('selected')
+    updateFriends()
+  )
+
+  $.ajax "/data/#{user}_zoom/friends.json", success: (friends) ->
+    # Pick top friends
+    _(friends).chain()
+      .sortBy((f) -> -f.coefficient)
+      .map((f) -> f.selected = true; f)
+      .take(50)
+      .each((f) -> g_friends[f.id] = f)
+
+
+    still_loading = _(g_friends).size()
+    gotTimeline = (f) ->
+      (units) ->
+        units = processUnits(units)
+        _(units).each((u) -> u.owner_id = f.id)
+        g_timelines[f.id] = units
+        updateFriends() unless --still_loading
+
+    for friend in _(g_friends).values()
+      $.ajax "/data/#{user}_zoom/#{friend.id}_timeline.json",
+        success: gotTimeline(friend)
+        error: -> updateFriends() unless --still_loading
+
+
+updateFriends = ->
+  sidebar = d3.select('#sidebar .friends')
+    .selectAll('.friend')
+    .data(_(g_friends).values(), (d) -> d.id)
+  sidebar.enter()
+    .append('div')
+    .classed('friend', true)
+    .attr('id', (f) -> "friend_#{f.id}")
+    .classed('selected', (f) -> f.selected)
+    .call(-> @each((f) -> $(@).append(renderUser(f))))
+  sidebar.call(-> @each((f) -> f.selected = $(@).hasClass('selected')))
+
+  showTimelines()
+
+
+showTimelines = ->
+  g_units = _(g_timelines).chain()
+    .filter((g_timelines, id) -> g_friends[id].selected)
+    .flatten(true)
+    .value()
+  draw()
+
+
+showSingleUser = (user) ->
+  data_path = "/data/#{user}_timeline.json"
   $.ajax data_path, success: (units) ->
-    g_units = _(units).chain()
-      .filter((u) ->
-        return true if g_show_unrecognized_types
-        switch (u.unit_type)
-          when 'ADD_SINGLE_PHOTO' then return true
-          when 'STATUS_PHOTO' then return true
-          when 'LINK' then return true
-          else return false
-      )
-      .map((u) -> u.moment = moment.unix(u.start_time); u)
-      .value()
-
-    initControls()
+    g_units = processUnits(units)
+    draw()
 
 
-initControls = ->
-  $('#controls').append("""
-    <span class="description"></span>
-    <div class="button more">More</div>
-    <div class="button less">Less</div>
-  """)
-
+g_controls_initialized = false
+draw = ->
   zoomUpdated = ->
     g_max_per_year = Math.max(Math.min(g_max_per_year, 1000), 1)
     $('#controls .description').text("Showing #{g_max_per_year} units / year")
-    start()
+    drawYears()
 
-  $('#controls .more').click -> g_max_per_year *= 2; zoomUpdated()
-  $('#controls .less').click -> g_max_per_year /= 2; zoomUpdated()
+  if !g_controls_initialized
+    g_controls_initialized = true
+    $('#controls').append("""
+      <span class="description"></span>
+      <div class="button more">More</div>
+      <div class="button less">Less</div>
+    """)
+
+    $('#controls .more').click -> g_max_per_year *= 2; zoomUpdated()
+    $('#controls .less').click -> g_max_per_year /= 2; zoomUpdated()
+
   zoomUpdated()
 
 
-start = ->
+drawYears = ->
   year_units = _(g_units).chain()
     .groupBy((u) -> u.moment.year())
     .map((units, year) -> {year: year, units: units})
@@ -58,33 +117,41 @@ start = ->
       @append('span').classed('description', true)
     )
   years.call(->
-      @each (d) ->
-        _(d.units).chain()
-          .sortBy((u) -> u.score)
-          .each((u, i) -> u.shown = i < g_max_per_year)
+    @each (d) ->
+      _(d.units).chain()
+        .sortBy((u) -> u.score)
+        .each((u, i) -> u.shown = i < g_max_per_year)
 
-        shown_count = 0
-        units = []
-        hidden_count = 0
-        for u in _(d.units).sortBy((u) -> -u.moment)
-          if u.shown
-            if g_show_hidden_counts && hidden_count > 0
-              units.push(hidden_count: hidden_count, unique_id: hidden_count)
-            units.push u
-            hidden_count = 0
-            shown_count += 1
-          else
-            hidden_count += 1
+      shown_count = 0
+      units = []
+      hidden_units = []
+      for u in _(d.units).sortBy((u) -> -u.moment)
+        if u.shown
+          if g_show_hidden_counts && hidden_units.length
+            units.push(createHiddenUnit(hidden_units))
+          units.push u
+          hidden_units = []
+          shown_count += 1
+        else
+          hidden_units.push(u)
 
-        if g_show_hidden_counts && hidden_count > 0
-          units.push(hidden_count: hidden_count, unique_id: hidden_count)
+      if g_show_hidden_counts && hidden_units.length
+          units.push(createHiddenUnit(hidden_units))
 
-        $(@).find('h1 .title').text(d.year)
-        $(@).find('h1 .description')
-          .text("showing #{shown_count} of #{d.units.length}")
-        drawUnits(@, units)
+      $(@).find('h1 .title').text(d.year)
+      $(@).find('h1 .description')
+        .text("showing #{shown_count} of #{d.units.length}")
+      drawUnits(@, units)
     )
   years.exit().remove()
+
+
+createHiddenUnit = (units) ->
+  unique_id = _(units).map((u) -> u.unique_id).join()
+  return {
+    hidden_units: units
+    unique_id: unique_id
+  }
 
 
 drawUnits = (el, units) ->
@@ -96,9 +163,21 @@ drawUnits = (el, units) ->
     .classed('unit', true)
     .call(->
       @each((unit) ->
-        if unit.hidden_count
+        if unit.hidden_units
           $(@).addClass('hidden_count')
-            .text("... #{unit.hidden_count} units hidden ...")
+            .text("... #{unit.hidden_units.length} units hidden ...")
+            .click(=>
+              $(@).removeClass('unit').text('').off()
+
+              # draw hidden units, but hide excess in another hidden unit
+              # recursiveness!
+              units = unit.hidden_units[..5]
+              excess_units = unit.hidden_units[5..]
+              if excess_units.length
+                units.unshift(createHiddenUnit(excess_units))
+
+              drawUnits(@, units)
+            )
           return
 
         return if !(html = renderUnit(@, unit))
@@ -108,10 +187,19 @@ drawUnits = (el, units) ->
         else
           time = unit.moment.fromNow()
 
+        friend = unit.owner_id && g_friends[unit.owner_id]
+        if friend
+          $(@).addClass('has_friend_info')
+          prefix = renderUser(friend)
+        else
+          prefix = ''
+
         $(@).append(
-          html,
+          prefix
+          $('<div class="contents"></div>').append(html),
           Mustache.render(
-            '<div class="meta" title="{{score}}">{{time}}</div>',
+            '<div class="meta" title="{{type}} {{score}}">{{time}}</div>',
+            type: unit.unit_type
             score: unit.score
             time: time
           )
@@ -121,6 +209,15 @@ drawUnits = (el, units) ->
   units.exit().remove()
   units.order()
 
+
+renderUser = (user) ->
+  $(Mustache.render(
+    '<img class="profile_pic" title="{{name}}" src={{profile_pic}}></img>',
+    user
+  )).click(->
+    $("#friend_#{user.id}").toggleClass('selected')
+    updateFriends()
+  )
 
 renderUnit = (el, unit) ->
   switch (unit.unit_type)
@@ -161,3 +258,32 @@ renderUnit = (el, unit) ->
         unit_type: unit.unit_type
       )
 
+
+processUnits = (units) ->
+  return _(units).chain()
+    .filter((u) ->
+      switch (u.unit_type)
+        when 'ADD_SINGLE_PHOTO' then return true
+        when 'STATUS_PHOTO' then return true
+        when 'LINK'
+          return true if u.message
+        else return g_show_unrecognized_types
+
+      return false
+    )
+    .map((u) -> u.moment = moment.unix(u.start_time); u)
+    .value()
+
+
+
+`window.getQueryVariable = function(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) == variable) {
+            return decodeURIComponent(pair[1]);
+        }
+    }
+    console.log('Query variable %s not found', variable);
+}`

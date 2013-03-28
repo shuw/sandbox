@@ -5,6 +5,11 @@
 header
 body
   #controls
-  #summary
-  #root
+  table
+    tr
+      td(valign="top")
+        #sidebar.hidden
+          .friends
+      td(valign="top")
+        #root
   script $(function() { zoomInit() })

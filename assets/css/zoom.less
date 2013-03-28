@@ -1,6 +1,4 @@
-@palette-dark-blue: #1b4b63;
-@palette-blue: #276b8c;
-@palette-light-blue: #d6dfe3;
+@palette-blue: #2F4EE5;
 @palette-light-grey: #95938f;
 @palette-grey: #555;
 
@@ -10,6 +8,45 @@ body {
   margin: 0;
   -webkit-text-size-adjust: 100%;
   color: @palette-grey;
+}
+
+.hidden {
+  display: none;
+}
+
+.profile_pic {
+  width: 40px;
+  height: 40px;
+  vertical-align: top;
+  border: 1px solid #555;
+  display: inline-block;
+  cursor: pointer;
+}
+
+
+#sidebar {
+  margin-left: 10px;
+  margin-top: 60px;
+  width: 254px;
+  vertical-align: top;
+  font-size: 16px;
+  font-weight: bold;
+
+  .friend {
+    display: inline-block;
+    margin: 0 0px 8px 8px;
+
+    .profile_pic {
+      border: 3px solid @palette-light-grey;
+      width: 50px;
+      height: 50px;
+    }
+    &.selected {
+      .profile_pic {
+        border: 3px solid @palette-blue;
+      }
+    }
+  }
 }
 
 #controls {
@@ -72,13 +109,27 @@ body {
   .unit {
     margin: 15px 15px 0 0;
     padding: 15px 20px;
-    width: 300px;
+    width: 330px;
     display: inline-block;
+    overflow: hidden;
+
+    &.has_friend_info {
+      .profile_pic {
+        margin-right: 10px;
+      }
+
+      .contents {
+        display: inline-block;
+        width: 270px;
+      }
+    }
   }
 
   .unit.hidden_count {
     vertical-align: middle;
     text-align: center;
+    color: @palette-blue;
+    cursor: pointer;
   }
 
   .unit:not(.hidden_count) {
@@ -88,7 +139,7 @@ body {
     border-radius: 5px;
 
     .message {
-      margin-bottom: 5px;
+      margin-bottom: 10px;
       font-size: 16px;
     }
 
