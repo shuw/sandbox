@@ -32,7 +32,7 @@ showZoom = (user) ->
   )
 
   $('#sidebar .search').on('keyup', _.debounce((->
-    g_search_terms = _($(@).val()).chain().capitalize().words().value()
+    g_search_terms = tokenize($(@).val())
     showTimelines()
   ), 500))
 
@@ -276,7 +276,10 @@ processUnits = (units) ->
         when 'ADD_SINGLE_PHOTO' then return true
         when 'STATUS_PHOTO' then return true
         when 'LINK'
-          return true if u.message
+          if u.message
+            u.to_tokenize = \
+              [u.message, u.share.title, u.share.main_blurb].join(' ')
+            return true
         else return g_show_unrecognized_types
 
       return false
@@ -284,11 +287,16 @@ processUnits = (units) ->
     .map((u) ->
       u.moment = moment.unix(u.start_time)
       u.tokens = {}
-      _(u.message).chain().capitalize().words().each((t) -> u.tokens[t] = true)
+      for token in tokenize(u.to_tokenize || u.message)
+        u.tokens[token] = true
       u
     )
     .value()
 
+
+tokenize = (str) ->
+  _(str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"").toUpperCase())
+    .chain().words().value()
 
 
 `window.getQueryVariable = function(variable) {
