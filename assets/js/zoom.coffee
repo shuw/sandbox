@@ -7,7 +7,7 @@ g_friends_to_show = 80
 
 g_units = null
 g_show_hidden_counts = true
-g_show_unrecognized_types = true
+g_show_unrecognized_types = false
 g_one_month_ago = moment().subtract('days', 30)
 
 window.zoomInit = ->
