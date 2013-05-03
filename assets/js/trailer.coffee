@@ -282,7 +282,7 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
 
     start_time += g_scene_ms
 
-  if g_friends
+  if g_friends?.length
     scenes.push
       type: 'credits'
       friends: _(g_friends).take(30)
