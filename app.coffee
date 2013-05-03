@@ -35,13 +35,25 @@ app.configure 'production', () ->
 app.get '/', (req, res) ->
 	res.render 'index',
 	locals:
-		title: 			'Experiments'
+		title:			'Experiments'
+
+app.post '/trailer/create', (req, res) ->
+  exec = require('child_process').exec
+  child = exec(
+    "scripts/generate.sh #{req.body.user}",
+    (error, stdout, stderr) ->
+      console.log('stdout: ' + stdout)
+      console.log('stderr: ' + stderr)
+      if error != null
+        console.log('exec error: ' + error)
+    )
+  res.json('scheduled')
 
 app.get '/topic_graph', (req, res) ->
 	res.render 'topic_graph',
 		locals:
-			data_path: 	req.query["data"] || 'celebrities_started_dating'
-			title: 			'/|/|/'
+			data_path:	req.query["data"] || 'celebrities_started_dating'
+			title:			'/|/|/'
 
 app.get '/:experiment_name', (req, res) ->
 	experiment_name = req.params.experiment_name
@@ -49,7 +61,5 @@ app.get '/:experiment_name', (req, res) ->
 		locals:
 			title: experiment_name.replace('_', ' ')
 
-# SERVER
-
-app.listen(1234)
+app.listen(8090)
 console.log "Express server listening on port #{app.address().port}"

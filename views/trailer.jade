@@ -1,0 +1,27 @@
+!= js('common/utils')
+!= js('trailer')
+!= js('vendor/mustache')
+!= css('trailer')
+
+header
+body
+  #loading
+  #chooser.hidden
+    h1 How much time do you have?
+    .option(data-seconds=30) 30 seconds
+    .option.selected(data-seconds=120) 2 minutes
+    .option(data-seconds=300) 5 minutes
+
+    div Starting in 3 seconds
+
+
+  #trailer.hidden
+    #header
+      time
+    #stage_container
+      #stage
+    #controls
+      .selector
+    #status_updates
+    
+  script $(function() { trailerInit() })
