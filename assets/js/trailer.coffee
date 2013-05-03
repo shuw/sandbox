@@ -232,7 +232,8 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
         break
 
       experience_index += 1
-      if moment.unix(experience.start_time).year() < current_year
+      if moment.unix(experience.start_time).year() < current_year ||
+         !experience.icon
         continue
       else
         scenes.push
@@ -297,6 +298,11 @@ start = ->
   g_sceneIndex = 0
   $stage = $('#stage')
   g_startTime = moment().valueOf()
+
+  if utils.getQuery('song') == 'remember'
+    $('<iframe width="420" height="315" src="http://www.youtube.com/embed/nSz16ngdsG0?autoplay=1" frameborder="0" allowfullscreen></iframe>')
+      .css(opacity: 0)
+      .appendTo('body')
 
   stop()
   g_drawInterval = setInterval(draw, 1000 / 30)
