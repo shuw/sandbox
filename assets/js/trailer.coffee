@@ -78,7 +78,7 @@ chooseDuration = (data) ->
     start()
 
 
-g_main_scene_duration = null
+g_scene_ms = null
 createScenes = (approx_duration_ms, data) ->
   by_type = _(data.units).groupBy((u) -> u.unit_type)
 
@@ -95,10 +95,10 @@ createScenes = (approx_duration_ms, data) ->
     by_type.COVER_PHOTO_CHANGE || [],
   )
 
-  g_main_scene_duration = if approx_duration_ms < 60000 then 3000 else 6000
+  g_scene_ms = if approx_duration_ms < 60000 then 3000 else 6000
 
-  num_photos_to_show = Math.min(Math.floor(approx_duration_ms / g_main_scene_duration), photos.length)
-  approx_duration_ms = num_photos_to_show * g_main_scene_duration
+  num_photos_to_show = Math.min(Math.floor(approx_duration_ms / g_scene_ms), photos.length)
+  approx_duration_ms = num_photos_to_show * g_scene_ms
   photos = rankAndSort(photos, num_photos_to_show)
 
   status_updates = rankAndSort(by_type.STATUS_UPDATE, 100)
@@ -163,7 +163,7 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
 
   # Name
   scenes.push
-    type: 'text', start_time: 1000, duration: g_main_scene_duration * 0.6, title: user.name,
+    type: 'text', start_time: 1000, duration: g_scene_ms * 0.6, title: user.name,
     subtitle: "since #{born_year}"
 
   # Profile pic
@@ -171,14 +171,14 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
     type: 'photo'
     transition: 'photoRightLeft'
     start_time: 0
-    duration: g_main_scene_duration
+    duration: g_scene_ms
     image: user.image
 
   status_update_index = 0
   experience_index = 0
 
   current_year = born_year
-  start_time = g_main_scene_duration
+  start_time = g_scene_ms
 
   i = 0
   while i < main_units.length
@@ -193,10 +193,10 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
         is_year_marker: true
         type: 'text'
         start_time: start_time
-        duration: g_main_scene_duration / 2
+        duration: g_scene_ms / 2
         title: year
       current_year = year
-      start_time += 3000
+      start_time += g_scene_ms / 2
 
     # TODO: add more types of transitions
     rand = Math.floor(Math.random() * 10000000) % 2
@@ -213,13 +213,13 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
       type: 'photo'
       transition: transition
       start_time: start_time
-      duration: g_main_scene_duration * 1.4
+      duration: g_scene_ms * 1.4
       message: unit.message
       image: unit.images[0]
       event_time: unit.start_time
 
     experiences_in_main_scene = 0
-    experience_start_time = start_time + 1000
+    experience_start_time = start_time + g_scene_ms / 6
     while true
       if experience_index >= experiences.length
         break
@@ -240,12 +240,12 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
           event_time: experience.start_time
           experience: experience
           start_time: experience_start_time
-          duration: 6000
+          duration: g_scene_ms
           ordinal: experiences_in_main_scene
 
         experiences_in_main_scene += 1
-        experience_start_time += 1000
-        if secondary_start_time + 3000 > start_time + g_main_scene_duration
+        experience_start_time += g_scene_ms/ 6
+        if secondary_start_time + (g_scene_ms / 2) > start_time + g_scene_ms
           break
 
     secondary_start_time = start_time + 2000
@@ -270,23 +270,23 @@ getMainScenes = (user, main_units, status_updates, experiences) ->
           type: 'status_update'
           event_time: status_update.start_time
           start_time: secondary_start_time
-          duration: 3000
+          duration: g_scene_ms / 2
           message: status_update.message
           ordinal: status_update_in_main_scene
 
-        secondary_start_time += 1000
+        secondary_start_time += g_scene_ms / 6
         status_update_in_main_scene += 1
-        if secondary_start_time + 3000 > start_time + g_main_scene_duration
+        if secondary_start_time + g_scene_ms / 2  > start_time + g_scene_ms
           break
 
-    start_time += g_main_scene_duration
+    start_time += g_scene_ms
 
   if g_friends
     scenes.push
       type: 'credits'
       friends: _(g_friends).take(30)
       start_time: start_time
-      duration: 10000
+      duration: g_scene_ms * 2
 
   _(scenes).sortBy((s) -> s.start_time)
 
