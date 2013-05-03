@@ -16,22 +16,25 @@ _.mixin(_.string.exports())
 g_user_id = null
 window.trailerInit = ->
   g_user_id = utils.getQuery('user')
-  $.ajax "/data/#{g_user_id}_timeline.json",
-    success: (data) -> gotTimeline(data)
-    error: ->
-      $('#loading')
-        .text('Loading user data. This could take a while, do not refresh the page!')
-      $.post "/trailer/create", {user: g_user_id}
+  if (g_user_id == 'USER_ID')
+    alert("Replace USER_ID in the url with your user_id")
+  else
+    $.ajax "/data/#{g_user_id}_timeline.json",
+      success: (data) -> gotTimeline(data)
+      error: ->
+        $('#loading')
+          .text('Loading user data. This could take a while, do not refresh the page!')
+        $.post "/trailer/create", {user: g_user_id}
 
-      poll = setInterval((->
-        $('#loading').text($('#loading').text() + '.')
-        $.ajax "/data/#{g_user_id}_timeline.json",
-          success: (data) ->
-            return unless data
-            $('#stage').text('')
-            clearInterval(poll)
-            gotTimeline(data)
-      ), 500)
+        poll = setInterval((->
+          $('#loading').text($('#loading').text() + '.')
+          $.ajax "/data/#{g_user_id}_timeline.json",
+            success: (data) ->
+              return unless data
+              $('#stage').text('')
+              clearInterval(poll)
+              gotTimeline(data)
+        ), 500)
 
 
 g_scenes = null
