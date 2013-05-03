@@ -83,9 +83,17 @@ body {
 #controls {
   width: @width;
   height: 20px;
-  background-color: #CCC;
   margin: 20px auto;
   position: relative;
+
+  .line {
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    height: 2px;
+    width: @width;
+    background-color: #CCC;
+  }
 
   .selector {
     z-index: 10;
@@ -97,7 +105,7 @@ body {
   }
 
   .marker {
-    z-index: 0;
+    z-index: 1;
     top: 0;
     width: 2px;
     height: 20px;
