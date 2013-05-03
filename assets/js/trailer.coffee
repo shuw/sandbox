@@ -61,11 +61,17 @@ chooseDuration = (data) ->
     )
 
   started = false
-  setTimeout((->
-    unless started
+  left = 4
+  countdown = ->
+    left -= 1
+    $('#chooser .countdown').text("Starting in #{left} seconds")
+    return if started
+    if left == 0
       seconds = $('#chooser .option.selected').data('seconds')
       duration_chosen(seconds)
-  ), 3000)
+    else
+      setTimeout(countdown, 1000)
+  countdown()
 
   duration_chosen = (seconds) ->
     started = true
