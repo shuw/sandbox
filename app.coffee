@@ -39,10 +39,11 @@ app.get '/', (req, res) ->
 
 app.post '/trailer/create', (req, res) ->
   exec = require('child_process').exec
+  uid = parseInt(req.body.user)
   child = exec(
-    "scripts/generate.sh #{req.body.user}",
+    "scripts/generate.sh #{uid}",
     (error, stdout, stderr) ->
-      console.log('stdout: ' + stdout)
+      console.log("Generated data for #{uid}")
     )
   res.json('scheduled')
 

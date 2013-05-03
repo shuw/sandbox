@@ -313,7 +313,7 @@ start = ->
   stop()
   g_drawInterval = setInterval(draw, 1000 / 30)
 
-stop = -> clearInterval(g_drawInterval)
+window.stop = -> clearInterval(g_drawInterval)
 
 draw = ->
   curr_time = moment().valueOf() - g_startTime
@@ -456,4 +456,3 @@ scale_image = (image, width, height, fill) ->
 
   return [scale * image.width, scale * image.height]
 
-window.stop = stop
