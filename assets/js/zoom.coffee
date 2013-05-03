@@ -17,14 +17,14 @@ window.zoomInit = ->
   else
     # show timeleine for a single user
     user = getQueryVariable('user') || 'default'
-    $.ajax "/data/#{user}_timeline.json", success: (units) ->
-      g_units = processUnits(units)
+    $.ajax "/data/#{user}_timeline.json", success: (data) ->
+      g_units = processUnits(data.units)
       draw()
 
 
 g_friends = {}
 g_timelines = {}
-g_search_terms = []
+g_search_terms = [
 g_toggle_on = true
 showZoom = (user) ->
   g_show_unrecognized_types = false
@@ -53,8 +53,8 @@ showZoom = (user) ->
 
     still_loading = _(g_friends).size()
     gotTimeline = (f) ->
-      (units) ->
-        units = processUnits(units)
+      (data) ->
+        units = processUnits(data.units)
         _(units).each((u) -> u.owner_id = f.id)
         g_timelines[f.id] = units
         updateFriends() unless --still_loading
