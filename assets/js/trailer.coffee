@@ -1,10 +1,5 @@
 _.mixin(_.string.exports())
 
-# TODO:
-# Credits (you, your friends)
-# How much time do you have dialog
-# Important Friends units
-
 WIDTH = 700
 HEIGHT = 400
 
@@ -16,8 +11,10 @@ _.mixin(_.string.exports())
 g_user_id = null
 window.trailerInit = ->
   g_user_id = utils.getQuery('user')
-  if (g_user_id == 'USER_ID')
+  if g_user_id == 'USER_ID'
     alert("Replace USER_ID in the url with your user_id")
+  else if !parseInt(g_user_id)
+    alert("Only numerical user id is supported")
   else
     $.ajax "/data/#{g_user_id}_timeline.json",
       success: (data) -> gotTimeline(data)
