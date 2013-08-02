@@ -3,39 +3,41 @@ w = 1280 - m[1] - m[3]
 h = 800 - m[0] - m[2]
 i = 0
 root = null
+vis = null
 
 tree = d3.layout.tree().size([h, w])
 
 diagonal = d3.svg.diagonal().projection((d) -> [d.y, d.x] )
 
-vis = d3.select("#root").append("svg:svg")
-    .attr("width", w + m[1] + m[3])
-    .attr("height", h + m[0] + m[2])
-  .append("svg:g")
-    .attr("transform", "translate(" + m[3] + "," + m[0] + ")")
+window.gittree = ->
+  vis = d3.select("#root").append("svg:svg")
+      .attr("width", w + m[1] + m[3])
+      .attr("height", h + m[0] + m[2])
+    .append("svg:g")
+      .attr("transform", "translate(" + m[3] + "," + m[0] + ")")
 
-d3.json("/data/flare.json", (json) ->
-  root = json
-  root.x0 = h / 2
-  root.y0 = 0
+  d3.json("/data/flare.json", (json) ->
+    root = json
+    root.x0 = h / 2
+    root.y0 = 0
 
-  toggleAll = (d) ->
-    if (d.children)
-      d.children.forEach(toggleAll)
-      toggle(d)
+    toggleAll = (d) ->
+      if (d.children)
+        d.children.forEach(toggleAll)
+        toggle(d)
 
-  # Initialize the display to show a few nodes.
-  root.children.forEach(toggleAll)
-  toggle(root.children[1])
-  toggle(root.children[1].children[2])
-  toggle(root.children[9])
-  # toggle(root.children[9].children[0])
+    # Initialize the display to show a few nodes.
+    root.children.forEach(toggleAll)
+    toggle(root.children[1])
+    toggle(root.children[1].children[2])
+    toggle(root.children[9])
+    toggle(root.children[9].children[0])
 
-  update(root)
-)
+    update(root)
+  )
 
 update = (source) ->
-  duration = d3.event && (if d3.event.altKey then 5000 else 500)
+  duration = if d3.event?.altKey then 5000 else 500
 
   # Compute the new tree layout.
   nodes = tree.nodes(root).reverse()
@@ -51,16 +53,16 @@ update = (source) ->
   nodeEnter = node.enter().append("svg:g")
       .attr("class", "node")
       .attr("transform", (d) -> "translate(" + source.y0 + "," + source.x0 + ")")
-      .on("click", (d) -> toggle(d) update(d) )
+      .on("click", (d) -> toggle(d); update(d) )
 
   nodeEnter.append("svg:circle")
       .attr("r", 1e-6)
       .style("fill", (d) -> if d._children then "lightsteelblue" else "#fff")
 
   nodeEnter.append("svg:text")
-      .attr("x", (d) -> d.children || (if d._children then -10 else 10))
+      .attr("x", (d) -> if (d._children || d.children) then -10 else 10)
       .attr("dy", ".35em")
-      .attr("text-anchor", (d) -> d.children || (if d._children then "end" else "start"))
+      .attr("text-anchor", (d) -> if (d._children || d.children) then "end" else "start")
       .text((d) -> d.name )
       .style("fill-opacity", 1e-6)
 
