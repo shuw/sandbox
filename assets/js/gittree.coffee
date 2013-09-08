@@ -16,11 +16,24 @@ window.gittree = ->
     .append("svg:g")
       .attr("transform", "translate(" + m[3] + "," + m[0] + ")")
 
-  d3.json("/data/flare.json", (json) ->
-    root = json
+  d3.json("/data/commit_summary.json", (commit_summary) ->
+    root = {}
     root.x0 = h / 2
     root.y0 = 0
 
+    tree = { children: {} }
+
+    snapshot = commit_summary[0].summary
+    for path, summary of snapshot
+      cursor = tree
+      for part in path.split('/')
+        if part != ''
+          cursor = cursor['children'][part] ||= { children: {} }
+
+      _(cursor).extend(summary: summary)
+
+
+    debugger
     toggleAll = (d) ->
       if (d.children)
         d.children.forEach(toggleAll)
