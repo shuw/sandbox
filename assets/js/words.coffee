@@ -37,7 +37,7 @@ window.words_init = (data_path, test_mode=false) ->
         .uniq()
         .filter((w) ->
           /^\w+$/.test(w) &&
-          w.length > 4 &&
+          w.length >= 4 &&
           w.indexOf('facebook') == -1 &&
           !stop_words_dict[w]
         )
@@ -74,7 +74,7 @@ layout = (weighted_words) ->
   return unless weighted_words.length > 2
   font_size = d3.scale
     .linear()
-    .range([10, 100])
+    .range([15, 120])
     .domain([_(weighted_words).last().size, _(weighted_words).first().size])
   d3.layout.cloud()
     .timeInterval(10)
