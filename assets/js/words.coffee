@@ -5,8 +5,8 @@
 
 #= require vendor/d3.layout.cloud
 
-width = 1000
-height = 600
+width = 1400
+height = 800
 
 # word count
 tf = {}
@@ -15,7 +15,7 @@ df = {}
 
 _.mixin(_.string.exports())
 
-skip_topic_names = true
+skip_topic_names = false
 
 window.words_init = (data_path, test_mode=false) ->
   d3.json data_path, (news) ->
@@ -31,26 +31,28 @@ window.words_init = (data_path, test_mode=false) ->
     # we should really be using a more general IDF index calculated over many weeks of news
     # but this is just a prototype so...
     _(news).each (n) ->
-      _words = _.chain(n.articles).map((a) ->
-          _.chain(a.surrounding_sentences)
-            .words()
-            .filter((w) -> !stop_words_dict[w.toLowerCase()])
-            .map((w) -> w.replace(/[^\w\s]|_/g, '').split("'")[0])
-            .value()
+      _words =  _.chain(n)
+        .words()
+        .map((w) -> _(w.toLowerCase()).strip().replace(/[^\w\s]|_/g, '').split("'")[0])
+        .uniq()
+        .filter((w) ->
+          w.length > 4 &&
+          w.indexOf('facebook') == -1 &&
+          !stop_words_dict[w]
         )
-        .flatten()
-      _words.each (w) -> tf[w] = (tf[w] || 0) + 1
+
       _words.uniq().each (w) ->
         w_lower = w.toLowerCase()
         df[w_lower] ||= []
         # we can add news events more than once
         df[w_lower].push(n)
+      _words.each (w) -> tf[w] = (tf[w] || 0) + 1
 
     top_words = _.chain(tf)
-      .map((count, w) -> { word: w, size: count / df[w.toLowerCase()].length })
+      .map((count, w) -> { word: w, size: Math.sqrt(count)  })
       .sortBy((d) -> d.size)
       .reverse()
-      .first(175)
+      .first(250)
       .value()
 
     _dates = _.chain(news).map((n) -> moment(n.date))
@@ -62,7 +64,7 @@ window.words_init = (data_path, test_mode=false) ->
       .attr("height", height)
       .mousemove(debounced_layout) # will cancel layout redraw for 4 seconds
 
-    setInterval(debounced_layout, 5000)
+    # setInterval(debounced_layout, 15000)
     layout(top_words)
 
 
@@ -71,7 +73,7 @@ layout = (weighted_words) ->
   return unless weighted_words.length > 2
   font_size = d3.scale
     .linear()
-    .range([10, 70])
+    .range([10, 100])
     .domain([_(weighted_words).last().size, _(weighted_words).first().size])
   d3.layout.cloud()
     .timeInterval(10)
@@ -133,4 +135,4 @@ show_news = (word, highlight=false) ->
 
 
 # from http://www.ranks.nl/resources/stopwords.html
-stop_words = ["a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours ","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves"]
+stop_words = ["creepy", "112845672063384274mark", "httpfacebookcomlookback", "made", "httpsfacebookcomlookback", "a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours ","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves", "facebook", "facebookis10", "find", "movie","httpsfacebookcomlookback", "heres"]
