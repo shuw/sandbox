@@ -1,4 +1,8 @@
 {
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shuw/sandbox"
+  },
   "name": "sandbox",
   "version": "0.0.1",
   "dependencies": {
