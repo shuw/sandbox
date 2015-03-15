@@ -25,7 +25,7 @@ window.got_data = (friends) ->
       -> $root_
         .css('transform', 'scale3d(0.6, 0.6, 0.6)')
         .css('top', '200px')
-        .css('left', '350px'),
+        .css('left', '400px'),
       100,
     )
 
