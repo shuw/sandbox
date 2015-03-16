@@ -12,8 +12,11 @@ window.got_data = (friends) ->
     $time_ = $('#time')
 
     time_window_ = [
-      friends[1].time
-      _(friends).last().time
+      Math.max(
+        friends[0].time,
+        friends[3].time - 3600 * 24 * 60,
+      ),
+      friends[friends.length - 1].time
     ]
     time_window_size_ = time_window_[1] - time_window_[0]
 
@@ -77,7 +80,12 @@ refresh = ->
 
 
 add_friend = (f) =>
-  pos = Math.min(Math.random() * (3 + friends_shown_.length * 0.5), spiral_positions_.length - 1)
+  if friends_shown_.length == 0
+    pos = 0
+  else
+    pos = Math.min(
+      Math.random() * (3 + friends_shown_.length * 0.5),
+      spiral_positions_.length - 1)
 
   position = spiral_positions_.splice(pos, 1)[0]
   if !position
