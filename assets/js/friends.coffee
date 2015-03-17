@@ -56,7 +56,7 @@ refresh = ->
   real_time = moment().valueOf() / 1000.0
 
   fraction = (real_time - real_start_time_) / DURATION
-  fraction = Math.pow(fraction, 2.0)
+  fraction = Math.pow(fraction, 1.8)
   if fraction > 1.0
     clearInterval loop_
     return
@@ -95,7 +95,8 @@ add_friend = (f) =>
   x += 0
   y += 0
 
-  $node = $('<div class="node" />')
+  $node = $('<a class="node" target="_blank" />')
+    .attr('href', "https://www.facebook.com/#{f.id}")
     .css('left', "#{x * 102}px")
     .css('top', "#{y * 102}px")
     .appendTo($root_)
@@ -116,6 +117,7 @@ update_friend = (o, story_time, real_time) ->
   for i, image of o.f.images
     if image.time > story_time
       break
+  image = o.f.images[Math.max(0, i - 1)]
 
   if real_time - o.f.last_update > 2.0 &&
      o.last_image_url != image.url
