@@ -19,8 +19,13 @@ create_sections = ->
   for o in g_sections.life_events
     $section.append create_base_story o
 
-  $section = create_section("Traveled To", 'traveled', false)
+  $section = create_section("Travels", 'travels', false)
   $section.append create_traveled_map g_sections.visited_cities
+
+  $section = create_section("Top Places", 'places')
+    .addClass('places')
+  for o in g_sections.top_places
+    $section.append create_place_story o
 
   $section = create_section('Top Activities', 'activities')
   for o in g_sections.minutiaes
@@ -35,6 +40,7 @@ create_sections = ->
     $section.append create_base_story o
 
   $section = create_section('New Connections', 'new_connections')
+    .addClass('new_connections')
   for o in g_sections.new_friends
     $section.append create_new_friend_story o
 
@@ -44,6 +50,8 @@ create_sections = ->
       .text(o.title)
       .attr('href', '#' + o.name)
       .appendTo($links)
+
+
 
 
 create_traveled_map = (cities) ->
@@ -120,6 +128,9 @@ create_section = (title, name, has_columns=true) ->
 
 create_new_friend_story = (story) ->
   $story = create_base_story story
+  if !$story
+    return
+
   $story.addClass('contains_people')
 
   for o in story.profiles
@@ -138,6 +149,30 @@ create_new_friend_story = (story) ->
 
   return $story
 
+create_place_story = (place) ->
+  $story = create_base_story(place)
+  if !$story
+    return
+
+  $story.addClass('contains_people')
+
+  $avatars = $('<div />')
+    .addClass('avatars')
+    .appendTo($story)
+
+  for visit in place.visits
+    story_id = place.visits[0].stories[0]
+    $link = $('<a />')
+      .attr('href', "https://www.facebook.com/#{story_id}")
+      .attr('target', '_blank')
+      .appendTo($avatars)
+
+    $avatar = $('<img />')
+      .addClass('avatar')
+      .attr('src', visit.profile.image)
+      .appendTo($link)
+
+  return $story
 
 create_minutiae_story = (story) ->
   $cell = create_cell(story)
@@ -169,11 +204,18 @@ create_minutiae_story = (story) ->
       .attr('src', o.owner.image)
       .appendTo($link)
 
+    if o.message
+      $link.addClass('has_message')
+      $('<div />')
+        .addClass('message')
+        .text(o.message)
+        .appendTo($link)
+
   return $cell
 
 
 create_base_story = (story) ->
-  if !story.message && !story.image
+  if !story.message && !story.image && !story.title
     return
 
   $cell = create_cell(story)
@@ -232,7 +274,7 @@ create_cell = (story) ->
   if story.permalink
     return $('<a />')
       .addClass('cell')
-      .attr('data-id', story.id)
+      .attr('data-id', story.id || '0')
       .attr('href', story.permalink)
       .attr('target', '_blank')
   else

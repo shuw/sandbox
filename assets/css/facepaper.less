@@ -56,6 +56,22 @@ h1#title {
   color: #555;
 }
 
+.places .cell .main_image,
+.new_connections .cell .main_image {
+  display: inline-block;
+  width: 140px;
+  margin-bottom: 10px;
+  vertical-align: top;
+}
+
+.places .cell .avatars,
+.new_connections .cell .avatars {
+  display: inline-block;
+  margin-left: 8px;
+  width: 135px;
+  vertical-align: top;
+}
+
 a {
   text-decoration: none;
   color: #555;
@@ -102,6 +118,22 @@ a {
   margin-right: 5px;
   width: 40px;
   height: 40px;
+}
+
+.cell.contains_people .has_message {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.cell.contains_people .has_message .avatar,
+.cell.contains_people .has_message .message {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cell.contains_people .has_message .message {
+  margin-left: 2px;
+  width: 238px;
 }
 
 .cell .main_image {
