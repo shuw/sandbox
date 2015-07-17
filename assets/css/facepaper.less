@@ -1,0 +1,167 @@
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+  margin: 0 auto;
+  background-color: #EFEFEF;
+}
+
+#root {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+#feedback {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  font-size: 16px;
+  color: #6699FF; 
+}
+
+h1 {
+  font-weight: 500;
+}
+
+h1#title {
+  color: #333;
+  text-align: center;
+  font-size: 50px;
+  font-family: cursive;
+}
+
+#loading {
+  margin: 20px;
+  font-size: 20px;
+}
+
+#links {
+  text-align: center;
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+}
+
+#links a {
+  display: inline-block;
+  font-size: 15px;
+  text-shadow: 0 1px white;
+  margin: 0 10px 10px 10px;
+  color: #555;
+  font-weight: 600;
+}
+
+.section {
+  text-align: left;
+  width: 100%;
+  margin: 20px;
+  color: #555;
+}
+
+a {
+  text-decoration: none;
+  color: #555;
+}
+
+#traveled {
+  width: 994px;
+  height: 400px;
+  margin-bottom: 80px;
+}
+
+#traveled .avatar {
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.columns {
+  -webkit-column-count: 3;
+  -webkit-column-gap: 10px;
+  -webkit-column-fill: auto;
+  -moz-column-count: 3;
+  -moz-column-gap: 10px;
+  -moz-column-fill: auto;
+  column-count: 3;
+  column-gap: 15px;
+  column-fill: auto;
+}
+
+.cell {
+  width: 290px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  -webkit-column-break-inside: avoid;
+  column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+  margin: 0 2px 15px;
+  padding: 15px;
+  padding-bottom: 5px;
+  background-color: white;
+}
+
+.cell.contains_people .avatar {
+  margin-right: 5px;
+  width: 40px;
+  height: 40px;
+}
+
+.cell .main_image {
+  border: 1px solid #CCC;
+}
+
+.cell .title {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.cell .time {
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.cell .left {
+  float: left;
+  width: 40px;
+  margin-top: 10px;
+}
+
+.cell .right {
+  margin-left: 10px;
+  float: left;
+  width: 240px;
+}
+
+.cell .name {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.cell .snippet {
+  white-space: pre-wrap;  
+  max-height: 145px;
+  margin-top: 2px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  white-space: normal;
+  overflow: hidden;
+  color: #555;
+  font-weight: 200;
+}
+
+.minutiae > div {
+  margin: 0px 0 10px 5px;
+  vertical-align:top;
+  display: inline-block;
+  font-size: 14px;
+  width: 250px;
+}
+
+.minutiae > img {
+  width: 30px;
+  display: inline-block;
+}
+
+.avatar {
+  width: 40px;
+}
+
