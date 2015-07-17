@@ -51,6 +51,7 @@ create_traveled_map = (cities) ->
     .attr('id', 'traveled')
 
   map = new google.maps.Map($map[0], {
+    minZoom: 2,
     zoom: 2,
     center: {lat: -34.397, lng: 150.644}
   })
@@ -85,7 +86,7 @@ create_traveled_map = (cities) ->
 
     marker.content = $content[0]
 
-    google.maps.event.addListener marker, 'click', (o, b) ->
+    google.maps.event.addListener marker, 'mouseover', (o, b) ->
       info_window.setContent(this.content)
       info_window.open(map, this)
 
