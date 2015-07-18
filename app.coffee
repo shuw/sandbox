@@ -59,5 +59,5 @@ app.get '/:experiment_name', (req, res) ->
 		locals:
 			title: experiment_name.replace('_', ' ')
 
-app.listen(8090)
+app.listen(8091)
 console.log "Express server listening on port #{app.address().port}"
