@@ -133,6 +133,10 @@ create_new_friend_story = (story) ->
 
   $story.addClass('contains_people')
 
+  $avatars = $('<div />')
+    .addClass('avatars')
+    .appendTo($story)
+
   for o in story.profiles
     if !o.image
       continue
@@ -140,7 +144,7 @@ create_new_friend_story = (story) ->
     $link = $('<a />')
       .attr('href', "http://www.facebook.com/#{o.id}")
       .attr('target', '_blank')
-      .appendTo($story)
+      .appendTo($avatars)
 
     $avatar = $('<img />')
       .addClass('avatar')
