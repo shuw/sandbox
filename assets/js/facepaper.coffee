@@ -15,34 +15,41 @@ window.got_data =  (data) ->
 create_sections = ->
   $root = $('#root')
 
-  $section = create_section('Life Events', 'life_events')
-  for o in g_sections.life_events
-    $section.append create_base_story o
+  if g_sections.life_events.length
+    $section = create_section('Life Events', 'life_events')
+    for o in g_sections.life_events
+      $section.append create_base_story o
 
-  $section = create_section("Travels", 'travels', false)
-  $section.append create_traveled_map g_sections.visited_cities
+  if g_sections.visited_cities.length
+    $section = create_section("Travels", 'travels', false)
+    $section.append create_traveled_map g_sections.visited_cities
 
-  $section = create_section("Top Places", 'places')
-    .addClass('places')
-  for o in g_sections.top_places
-    $section.append create_place_story o
+  if g_sections.top_places.length
+    $section = create_section("Top Places", 'places')
+      .addClass('places')
+    for o in g_sections.top_places
+      $section.append create_place_story o
 
-  $section = create_section('Top Activities', 'activities')
-  for o in g_sections.minutiaes
-    $section.append create_minutiae_story o
+  if g_sections.minutiaes.length
+    $section = create_section('Top Activities', 'activities')
+    for o in g_sections.minutiaes
+      $section.append create_minutiae_story o
 
-  $section = create_section('Most Popular Posts', 'popular')
-  for o in g_sections.popular.liked_posts
-    $section.append create_base_story o
+  if g_sections.popular.liked_posts.length
+    $section = create_section('Most Popular Posts', 'popular')
+    for o in g_sections.popular.liked_posts
+      $section.append create_base_story o
 
-  $section = create_section('Liked by Friends', 'liked')
-  for o in g_sections.popular.liked_by_friends
-    $section.append create_base_story o
+  if g_sections.popular.liked_by_friends.length
+    $section = create_section('Liked by Friends', 'liked')
+    for o in g_sections.popular.liked_by_friends
+      $section.append create_base_story o
 
-  $section = create_section('New Connections', 'new_connections')
-    .addClass('new_connections')
-  for o in g_sections.new_friends
-    $section.append create_new_friend_story o
+  if g_sections.new_friends.length
+    $section = create_section('New Connections', 'new_connections')
+      .addClass('new_connections')
+    for o in g_sections.new_friends
+      $section.append create_new_friend_story o
 
   $links = $('#links')
   for o in g_links
