@@ -24,7 +24,8 @@ class Photo
   constructor: (@photo) ->
     @tags = []
     for tag, score of @photo.tags
-      @tags.push(tag.toLowerCase())
+      for word in _.str.words(tag)
+        @tags.push(word.toLowerCase())
 
     @el = $('<img />')
       .addClass('photo')
