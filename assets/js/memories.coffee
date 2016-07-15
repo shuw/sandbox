@@ -11,13 +11,23 @@ window.got_data =  (data) ->
     if data.error
       $('#error').text(data.error)
 
-    $('#loading').hide()
-    $('#stuff').removeClass('hidden')
     document.title = data.title
 
     window.$root = $('#root')
+    if data.message
+      $('#message')
+        .removeClass('hidden')
+        .text(data.message)
+    else
+      $('#loading').hide()
+
+    if data.index.length == 0
+      return
+
+    $('#stuff').removeClass('hidden')
+
     window.g_photos  = create_photos(data.index)
-    $('#search').on('keyup', _.debounce(queryEntered, 500))
+    $('#search').on('keyup', _.debounce(queryEntered, 100))
     draw()
 
 class Photo
