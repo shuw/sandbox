@@ -25,7 +25,8 @@ window.got_data =  (data) ->
     if !data.index && data.index.length == 0
       return
 
-    $('#stuff').removeClass('hidden')
+    $('#root').removeClass('hidden')
+    $('#searchContainer').removeClass('hidden')
 
     createPhotos(data.index)
     $('#search').on('keyup', _.debounce(queryEntered, 100))
@@ -112,9 +113,6 @@ class YearSection
       @el.hide()
 
 
-
-
-
 queryEntered = (index) ->
   query = $('#search').val().toLowerCase()
 
@@ -124,10 +122,14 @@ queryEntered = (index) ->
 createPhotos = (index) ->
   index = _(index).values()
   index.sort((a, b) -> b.timestamp - a.timestamp)
-
+  
+  tag_counts = {}
   photos = {}
   prev_year = null
   for photo in index
+    if photo.privacy == 10
+      continue
+
     year = moment.unix(photo.timestamp).year()
     if year != prev_year
       year_section = new YearSection(year)
@@ -136,6 +138,28 @@ createPhotos = (index) ->
 
     photo_obj = g_photos[photo.id] = new Photo(photo)
     year_section.addPhoto(photo_obj)
+    for tag in photo_obj.tags
+      if !tag_counts[tag]
+        tag_counts[tag] = 0
+      tag_counts[tag] += 1
+      
+
+  tags = _(_(tag_counts).keys()).sortBy((tag) -> -1 * tag_counts[tag])
+  tag_source = new Bloodhound(
+    datumTokenizer: Bloodhound.tokenizers.whitespace,
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    local: tags,
+  )
+
+  $('#search').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+  },
+  {
+    name: 'tags',
+    source: tag_source,
+  })
 
   return photos
 

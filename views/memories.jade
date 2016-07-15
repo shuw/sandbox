@@ -5,19 +5,26 @@
 
 header
   link(rel="stylesheet", href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css")
+  script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js")
+
 body
   #loading
     div#message(style="margin-bottom: 10px") Go fetch, photos! (this might take a a bit)
     img(src="https://media.giphy.com/media/hHByno1iwbWCY/giphy.gif")
 
   script(type="text/javascript", src="https://www.shuw-2.sb.facebook.com/memories")
+
+  #searchContainer.hidden
+    input#search.typeahead(
+      type="text",
+      placeholder="Things, Places, and People"
+    )
+
   a#feedback(href="https://www.facebook.com/groups/timeline.infra/", target="_blank") Give Feedback
 
   #message.hidden
 
-  #stuff.hidden
-    input#search(type="text", placeholder="Search")
-    #root
+  #root.hidden
 
 
 
