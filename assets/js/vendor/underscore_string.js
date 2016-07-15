@@ -167,7 +167,7 @@
   // Defining underscore.string
 
   var _s = {
-              
+
     VERSION: '2.0.0',
 
     isBlank: sArgs(function(str){
@@ -327,21 +327,21 @@
      * @author github.com/sergiokas
      */
     prune: sArgs(function(str, length, pruneStr){
-      // Function to check word/digit chars including non-ASCII encodings. 
+      // Function to check word/digit chars including non-ASCII encodings.
       var isWordChar = function(c) { return ((c.toUpperCase() != c.toLowerCase()) || /[-_\d]/.test(c)); }
-      
+
       var template = '';
       var pruned = '';
       var i = 0;
-      
+
       // Set default values
       pruneStr = pruneStr || '...';
       length = parseNumber(length);
-      
+
       // Convert to an ASCII string to avoid problems with unicode chars.
       for (i in str) {
         template += (isWordChar(str[i]))?'A':' ';
-      } 
+      }
 
       // Check if we're in the middle of a word
       if( template.substring(length-1, length+1).search(/^\w\w$/) === 0 )

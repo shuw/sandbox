@@ -5,9 +5,15 @@ body {
   background-color: #EFEFEF;
 }
 
-#root {
+#stuff {
   width: 1000px;
   margin: 0 auto;
+  text-align: center;
+  vertical-align: top;
+}
+
+#root {
+  text-align: left;
 }
 
 #feedback {
@@ -18,15 +24,23 @@ body {
   color: #6699FF; 
 }
 
-h1 {
-  font-weight: 500;
+#search {
+  width: 300px;
+  margin: 20px;
 }
 
-h1#title {
-  color: #333;
-  text-align: center;
-  font-size: 50px;
-  font-family: cursive;
+.photo {
+  vertical-align: top;
+}
+
+.photo.small {
+  width: 60px;
+  margin: 2px;
+}
+
+.photo.large {
+  width: 400px;
+  margin: 2px;
 }
 
 #loading {
@@ -34,17 +48,3 @@ h1#title {
   font-size: 20px;
 }
 
-#links {
-  text-align: center;
-  border-top: 1px solid #eeeeee;
-  border-bottom: 1px solid #eeeeee;
-}
-
-#links a {
-  display: inline-block;
-  font-size: 15px;
-  text-shadow: 0 1px white;
-  margin: 0 10px 10px 10px;
-  color: #555;
-  font-weight: 600;
-}
