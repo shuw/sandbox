@@ -6,6 +6,12 @@
 header
   link(rel="stylesheet", href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css")
   script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js")
+  script(
+    type="text/javascript",
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js",
+    integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+    crossorigin="anonymous"
+  )
 
 body
   #loading
@@ -14,13 +20,15 @@ body
 
   script(type="text/javascript", src="https://www.shuw-2.sb.facebook.com/memories")
 
+  #popover.hidden
+
   #searchContainer.hidden
     input#search.typeahead(
       type="text",
       placeholder="Things, Places, and People"
     )
 
-  a#feedback(href="https://www.facebook.com/groups/timeline.infra/", target="_blank") Give Feedback
+  a#feedback(href="https://www.facebook.com/groups/725346487513969/permalink/1100968799951734/", target="_blank") Give Feedback
 
   #message.hidden
 

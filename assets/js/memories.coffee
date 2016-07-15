@@ -31,6 +31,8 @@ window.got_data =  (data) ->
     createPhotos(data.index)
     $('#search').on('keyup', _.debounce(queryEntered, 100))
     draw()
+    $(window).scrollTop(0)
+
 
 class Photo
   constructor: (@photo) ->
@@ -40,6 +42,8 @@ class Photo
         @tags.push(word.toLowerCase())
 
     @el = $('<a />')
+      .addClass('photo_container')
+      .attr('data-id', @photo.id)
       .attr('href', "https://www.facebook.com/#{@photo.id}")
       .attr('target', '_blank')
 
@@ -48,8 +52,6 @@ class Photo
       .attr('title', _(photo.tags).keys().join(', '))
       .appendTo(@el)
 
-    # @el.on('mouseover', => @setExpanded(true))
-    # @el.on('mouseout', => @setExpanded(false))
     @setExpanded(false)
 
   setExpanded: (toggle) ->
@@ -151,14 +153,27 @@ createPhotos = (index) ->
     local: tags,
   )
 
-  $('#search').typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1,
-  },
-  {
-    name: 'tags',
-    source: tag_source,
+  $('#search').typeahead(
+    {
+      hint: true,
+      highlight: true,
+      minLength: 1,
+    },
+    {
+      name: 'tags',
+      source: tag_source,
+    }
+  )
+
+  $('.photo_container').popover({
+    content: ->
+      photo_obj = g_photos[$(this).attr('data-id')]
+      return $('<img />')
+        .addClass('photo')
+        .addClass('large')
+        .attr('src', photo_obj.photo.src.large)
+    html: true,
+    trigger: 'hover',
   })
 
   return photos
