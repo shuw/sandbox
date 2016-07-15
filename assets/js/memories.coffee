@@ -38,6 +38,7 @@ class Photo
   constructor: (@photo) ->
     @tags = []
     for tag, score of @photo.tags
+      tag = tag.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
       for word in _.str.words(tag)
         @tags.push(word.toLowerCase())
 
@@ -167,11 +168,20 @@ createPhotos = (index) ->
 
   $('.photo_container').popover({
     content: ->
-      photo_obj = g_photos[$(this).attr('data-id')]
-      return $('<img />')
+      photo = g_photos[$(this).attr('data-id')].photo
+      $el = $('<div />')
+      $('<img />')
         .addClass('photo')
         .addClass('large')
-        .attr('src', photo_obj.photo.src.large)
+        .attr('src', photo.src.large)
+        .appendTo($el)
+
+      $('<div />')
+        .addClass('tags')
+        .text(_(photo.tags).keys().join(', '))
+        .appendTo($el)
+      return $el
+
     html: true,
     trigger: 'hover',
   })
