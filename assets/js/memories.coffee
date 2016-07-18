@@ -3,9 +3,8 @@ window.g_year_sections = []
 window.$root = null
 
 # TODO
-# - Typeahead suggestions in search
-# - Show larger photo in popover
 # - Chronological organization of photos
+# - Adjust photo size based on number of results
 
 window.got_data =  (data) ->
   $ ->
@@ -22,7 +21,12 @@ window.got_data =  (data) ->
     else
       $('#loading').hide()
 
-    if !data.index && data.index.length == 0
+    if !data.index || data.index.length == 0
+      if data.estimated_time_s
+        window.setTimeout(
+          -> window.location.reload(),
+          data.estimated_time_s * 1000,
+        )
       return
 
     $('#root').removeClass('hidden')
