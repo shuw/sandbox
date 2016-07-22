@@ -54,23 +54,18 @@ class Photo
       .attr('target', '_blank')
 
     @img = $('<img />')
-      .addClass('photo')
       .attr('title', _(photo.tags).keys().join(', '))
       .appendTo(@el)
 
-    @setExpanded(false)
-
-  setExpanded: (toggle) ->
-    if toggle
-      @img
-        .removeClass('small')
-        .addClass('large')
-        .attr('src', @photo.src.large)
+  setSize: (size) ->
+    @img
+      .removeClass()
+      .addClass('photo')
+      .addClass(size)
+    if size == 'large'
+      @img.attr('src', @photo.src.small)
     else
-      @img
-        .addClass('small')
-        .removeClass('large')
-        .attr('src', @photo.src.small)
+      @img.attr('src', @photo.src.small)
 
   setVisible: (toggle) ->
     if toggle
@@ -99,19 +94,24 @@ class YearSection
     @photos.push(photo)
     photo.el.appendTo(@collage)
 
-  applyQuery: (query) ->
+  applyQuery: (terms) ->
+    matches = []
     show_section = false
     for photo in @photos
-      show = false
-      if !query
-        show = true
-      else
+      show = true
+      for term in terms
+        term_match = false
         for tag in photo.tags
-          if tag.startsWith(query)
-            show = true
+          if tag.startsWith(term)
+            term_match = true
             break
 
+        if !term_match
+          show = false
+          break
+
       if show
+        matches.push(photo)
         show_section = true
       photo.setVisible(show)
 
@@ -120,12 +120,26 @@ class YearSection
     else
       @el.hide()
 
+    return matches
+
 
 queryEntered = (index) ->
-  query = $('#search').val().toLowerCase()
+  query = _.str.words($('#search').val().toLowerCase())
 
+  matches = []
   for section in g_year_sections
-    section.applyQuery(query)
+    matches = matches.concat(section.applyQuery(query))
+
+  if matches.length < 20
+    size = 'large'
+  else if matches.length < 100
+    size = 'medium'
+  else
+    size = 'small'
+
+  for match in matches
+    match.setSize(size)
+
 
 createPhotos = (index) ->
   index = _(index).values()
@@ -176,8 +190,7 @@ createPhotos = (index) ->
       photo = g_photos[$(this).attr('data-id')].photo
       $el = $('<div />')
       $('<img />')
-        .addClass('photo')
-        .addClass('large')
+        .addClass('preview')
         .attr('src', photo.src.large)
         .appendTo($el)
 
@@ -191,6 +204,7 @@ createPhotos = (index) ->
     trigger: 'hover',
   })
 
+  queryEntered()
   return photos
 
 createYearContainer = (year) ->
