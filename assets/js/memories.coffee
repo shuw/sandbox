@@ -3,10 +3,7 @@ window.g_year_sections = []
 window.$root = null
 
 # TODO
-# - Chronological organization of photos
-# - Adjust photo size based on number of results
-# - Tokenize query to allow for conjunction queries
-
+# - Group results by search match term and show the shortest matches first
 window.got_data =  (data) ->
   $ ->
     if data.error
